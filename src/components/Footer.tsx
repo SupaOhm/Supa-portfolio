@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <p className="text-gray-400 text-sm">
-            © {currentYear} Supakorn P. Built with <span className="text-blue-400">React</span>, <span className="text-purple-400">TypeScript</span> & <span className="text-pink-400">Tailwind CSS</span>.
+            © {currentYear} <span className="font-semibold">Supakorn P.</span> Built with <span className="text-blue-400 font-bold">React</span>, <span className="text-purple-400 font-bold">TypeScript</span> & <span className="text-pink-400 font-bold">Tailwind CSS</span>.
           </p>
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-gray-700/50 to-transparent" />

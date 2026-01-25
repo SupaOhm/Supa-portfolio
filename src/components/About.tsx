@@ -1,16 +1,10 @@
 export default function About() {
-  const skills = [
-    // Languages
-    'Python', 'Java', 'C', 'C++', 'C#',
-    'JavaScript', 'TypeScript', 'SQL', 'PHP',
-    // Frameworks & Libraries
-    'React', 'Node.js', 'Express.js', '.NET', 'Tailwind',
-    // Databases & Tools
-    'MySQL', 'MongoDB', 'Git', 'Figma', 'Pandas',
-    // Core Concepts
-    'OOP', 'DSA', 'Database Design', 'REST APIs',
-    'Software Engineering', 'UX/UI Design'
-  ];
+  const skillCategories = {
+    'Languages': ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
+    'Frameworks, Libraries, and Tools': ['React', 'Node.js', 'Express.js', '.NET', 'Tailwind CSS', 'Bootstrap', 'Mongoose', 'Axios', 'MySQL', 'MongoDB', 'Git', 'Figma', 'CLI'],
+    'Core Concepts': ['Data Structures and Algorithms', 'Object-Oriented Programming', 'Operating Systems', 'Database Design', 'API Fundamentals', 'REST APIs', 'Software Engineering', 'UX/UI Design', 'Microcontrollers', 'Version Control'],
+    'Soft Skills': ['Quick Learning', 'Communication', 'Problem-Solving', 'Adaptability', 'Time Management', 'Work Ethic'],
+  };
 
   return (
     <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 relative">
@@ -38,21 +32,31 @@ export default function About() {
           </p>
           
           <div className="pt-6">
-            <h3 className="text-xl font-semibold text-white mb-4">Skills & Technologies</h3>
-            <div className="flex flex-wrap gap-3">
-              {skills.map((skill, index) => (
-                <span
-                  key={skill}
-                  className="px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-700 text-gray-300 rounded-full text-sm hover:from-blue-500/20 hover:to-purple-500/20 hover:text-blue-300 hover:border-blue-400/50 border border-gray-700/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-default"
-                  style={{
-                    animation: `fadeIn 0.5s ease-out ${index * 80}ms forwards`,
-                    opacity: 0,
-                  }}
-                >
-                  {skill}
-                </span>
+            <h3 className="text-xl font-semibold text-white mb-6">Skills & Technologies</h3>
+            <div className="space-y-6">
+              {Object.entries(skillCategories).map(([category, skills]) => (
+                <div key={category}>
+                  <h4 className="text-sm font-medium text-blue-400 mb-3">{category}</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {skills.map((skill, index) => (
+                      <span
+                        key={skill}
+                        className="px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-700 text-gray-300 rounded-full text-sm hover:from-blue-500/20 hover:to-purple-500/20 hover:text-blue-300 hover:border-blue-400/50 border border-gray-700/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-default"
+                        style={{
+                          animation: `fadeIn 0.5s ease-out ${index * 80}ms forwards`,
+                          opacity: 0,
+                        }}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
+            <p className="mt-10 text-sm sm:text-base text-gray-400 leading-relaxed">
+              I never stop learning. I'm hungry to keep expanding these skills and bring that growth mindset to your team as an intern.
+            </p>
           </div>
         </div>
       </div>

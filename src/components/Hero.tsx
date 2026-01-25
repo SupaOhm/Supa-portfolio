@@ -127,7 +127,7 @@ export default function Hero() {
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
           Hi, I'm <span 
             onClick={() => handleSectionClick('about')}
-            className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+            className="text-blue-400 hover:text-blue-300 hover:animate-pulse transition-colors cursor-pointer"
           >Supakorn Prayongyam</span>
         </h1>
         
@@ -162,10 +162,9 @@ export default function Hero() {
           <button
             type="button"
             onClick={() => handleSectionClick('connect')}
-            className="group px-8 py-3 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-all duration-200 border border-gray-700 hover:border-blue-500 hover:-translate-y-0.5"
+            className="group px-8 py-3 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-all duration-200 border border-gray-700 hover:border-blue-500 hover:-translate-y-0.5 hover:font-semibold shadow-lg hover:shadow-blue-500/30"
           >
             Get in Touch
-            <span className="inline-block ml-2 opacity-0 group-hover:opacity-100 transition-opacity">✉</span>
           </button>
         </div>
 
