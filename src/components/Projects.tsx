@@ -12,7 +12,7 @@ export default function Projects() {
       title: 'Lost and Found Management System',
       description: 'Full-stack web application for lost and found item reporting with user authentication and admin approval workflows. Features normalized MySQL database with secure CRUD operations and responsive frontend interface.',
       tags: ['PHP', 'MySQL', 'HTML/CSS', 'Session Auth', 'Bootstrap'],
-      imageUrl: '',
+      imageUrl: '/images/projects/lostfound.png',
       githubUrl: 'https://github.com/SupaOhm/Lost-and-Found-Management-System',
     },
     {
@@ -20,7 +20,7 @@ export default function Projects() {
       title: 'Full-stack MERN Expense Tracker',
       description: 'Complete expense management application with RESTful API using Express and Mongoose. Features real-time expense calculation, CRUD operations, and React frontend with Axios integration for seamless data flow.',
       tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'RESTful APIs', 'Axios'],
-      imageUrl: '',
+      imageUrl: '/images/projects/expense.png',
       githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
     },
     {
@@ -28,7 +28,7 @@ export default function Projects() {
       title: 'Baka Platform UX/UI Overhaul',
       description: 'Ongoing collaboration with BAKA Co., Ltd. to redesign Baka Index, a sugarcane satellite-image platform using Google Earth Engine. Conducting user research among farmers, usability testing, and prototyping in Figma.',
       tags: ['Figma', 'UX/UI Research', 'Google Earth Engine'],
-      imageUrl: '',
+      imageUrl: '/images/projects/baka.jpg',
       githubUrl: '',
     },
     {
@@ -36,8 +36,8 @@ export default function Projects() {
       title: 'Online Shop Database System',
       description: 'Designed and implemented a normalized relational database for an e-commerce platform. Created EERD models, obtained relational schema, and optimized MySQL queries for efficient data retrieval.',
       tags: ['MySQL', 'Database Design', 'Normalization'],
-      imageUrl: '',
-      githubUrl: '',
+      imageUrl: '/images/projects/db.png',
+      githubUrl: 'https://github.com/SupaOhm/onlineshop-DB',
     },
     {
       id: '5',
@@ -54,6 +54,14 @@ export default function Projects() {
       tags: ['Python', 'CLI', 'Windows', 'Operating System'],
       imageUrl: '/images/projects/nosleep.jpg',
       githubUrl: 'https://github.com/SupaOhm/NoSleep-CLI',
+    },
+    {
+      id: '7',
+      title: 'Human Computer Interface Design Project',
+      description: 'Course project designing a mobile bus routing application prototype applying HCI and usability principles. Focused on accessibility, visual hierarchy, and user experience flow through user research and iterative design.',
+      tags: ['Figma', 'HCI', 'Mobile Design', 'UX/UI', 'Usability', 'User Research'],
+      imageUrl: '/images/projects/hci.png',
+      githubUrl: '',
     },
   ];
 
