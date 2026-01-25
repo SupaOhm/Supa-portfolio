@@ -185,7 +185,7 @@ export default function Projects() {
                     return (
                       <div
                         key={project.id}
-                        className="absolute w-[280px] sm:w-[360px] transition-all duration-700 ease-out cursor-pointer"
+                        className={`absolute w-[280px] sm:w-[360px] transition-all duration-700 ease-out cursor-pointer ${!isCenter ? 'hidden sm:block' : ''}`}
                         style={{
                           ...style,
                           transformStyle: 'preserve-3d',
