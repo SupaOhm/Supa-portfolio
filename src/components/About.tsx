@@ -179,11 +179,13 @@ export default function About() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-gray-400 text-xs">
-                        <span className="font-bold">TU-GET CBT 90</span> (Equivalent to <span className="font-bold">IELTS 7.5</span>)
+                        <span className="font-bold">
+                          TU-GET CBT 90</span>(Equivalent to <span className="font-bold">IELTS 7.5) </span>
+                            <a href="https://litu.tu.ac.th/wp-content/uploads/2023/10/TU-GET-CBT-aligned-with-IELTS-and-TOEFL-iBT.pdf" className="text-blue-400 text-xs underline" target="_blank" rel="noopener noreferrer">
+                              [Source]
+                            </a> 
                       </span>
-                      <a href="https://litu.tu.ac.th/wp-content/uploads/2023/10/TU-GET-CBT-aligned-with-IELTS-and-TOEFL-iBT.pdf" className="text-blue-400 text-xs underline" target="_blank" rel="noopener noreferrer">
-                        [Source]
-                      </a>
+                      
                     </div>
                   </div>
                 </div>

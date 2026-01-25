@@ -4,6 +4,8 @@ export default function Connect() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [smoothMousePosition, setSmoothMousePosition] = useState({ x: 0, y: 0 });
+  const [showAllDetails, setShowAllDetails] = useState(false);
+  const [fullHover, setFullHover] = useState<{ name: string | null; x: number; y: number }>({ name: null, x: 0, y: 0 });
   const mouseRef = useRef(mousePosition);
 
   // Keep latest mouse position in a ref
@@ -91,12 +93,12 @@ export default function Connect() {
         <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
           Get In Touch
         </h2>
-        <p className="text-gray-400 mb-12 max-w-2xl mx-auto">
+        <p className="text-gray-400 mb-10 max-w-2xl mx-auto">
           I'm currently looking for internship opportunities. Whether you have a question 
           or just want to say hi, feel free to reach out!
         </p>
 
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap mb-8">
           {contactLinks.map((link, index) => (
             <div
               key={link.name}
@@ -161,6 +163,76 @@ export default function Connect() {
               </a>
             </div>
           ))}
+        </div>
+
+        <div className="flex justify-center mb-8">
+          <button
+            onClick={() => setShowAllDetails((prev) => !prev)}
+            aria-expanded={showAllDetails}
+            className="px-4 py-3 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-blue-500/30 border border-blue-400/40 hover:border-blue-400/70 text-xs font-semibold text-blue-100 transition-all duration-300 shadow-sm hover:shadow-blue-500/20"
+          >
+            {showAllDetails ? 'Hide All Contact Details' : 'Show All Contact Details'}
+          </button>
+        </div>
+
+        <div
+          className={`mb-10 overflow-hidden transition-all duration-500 ease-in-out ${
+            showAllDetails
+              ? 'max-h-[1000px] opacity-100 translate-y-0'
+              : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
+          }`}
+        >
+          <span className="block mb-6 text-center text-blue-200 font-bold text-xl">Supakorn Prayongyam</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+            {contactLinks.map((link) => (
+              <a
+                key={`full-${link.name}`}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onMouseEnter={() => setFullHover((prev) => ({ ...prev, name: link.name }))}
+                onMouseLeave={() => setFullHover({ name: null, x: 0, y: 0 })}
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setFullHover({
+                    name: link.name,
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                  });
+                }}
+                className="group relative overflow-hidden flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-gray-800/60 to-gray-700/60 border border-gray-700/60 hover:border-blue-400/60 hover:from-blue-900/20 hover:to-purple-900/20 transition-all duration-300"
+              >
+                {fullHover.name === link.name && (
+                  <>
+                    <span
+                      className="pointer-events-none absolute w-[140px] h-[140px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-transparent rounded-full blur-[40px] opacity-80"
+                      style={{
+                        left: `${fullHover.x - 70}px`,
+                        top: `${fullHover.y - 70}px`,
+                      }}
+                    />
+                    <span
+                      className="pointer-events-none absolute w-[80px] h-[80px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[24px] opacity-80"
+                      style={{
+                        left: `${fullHover.x - 40}px`,
+                        top: `${fullHover.y - 40}px`,
+                      }}
+                    />
+                  </>
+                )}
+                <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="absolute -inset-6 bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 blur-3xl" />
+                </span>
+                <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10 text-blue-200">
+                  {link.icon}
+                </span>
+                <div className="flex flex-col">
+                  <span className="text-md font-semibold text-white">{link.name}</span>
+                  <span className="text-sm text-blue-100">{link.detail}</span>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>
