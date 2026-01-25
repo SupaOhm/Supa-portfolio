@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Project } from '../types/project';
 import ProjectCard from './ProjectCard';
 
 export default function Projects() {
   const [isCarouselView, setIsCarouselView] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [cardHeight, setCardHeight] = useState(600);
+  const centerCardRef = useRef<HTMLDivElement>(null);
 
   const projects: Project[] = [
     {
@@ -72,6 +74,14 @@ export default function Projects() {
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
   };
+
+  // Update card height when center card changes
+  useEffect(() => {
+    if (centerCardRef.current) {
+      const height = centerCardRef.current.offsetHeight;
+      setCardHeight(height);
+    }
+  }, [currentIndex]);
 
   // far-left (-2), left (-1), center (0), right (1), far-right (2)
   const getStyleForPosition = (position: -2 | -1 | 0 | 1 | 2) => {
@@ -158,9 +168,9 @@ export default function Projects() {
         {isCarouselView ? (
           /* 3D Carousel View */
           <div className="relative overflow-x-hidden">
-            <div className="relative min-h-[600px] py-12 flex items-center justify-center">
+            <div className="relative py-12 flex items-center justify-center" style={{ minHeight: `${cardHeight + 96}px` }}>
               {/* Carousel Container */}
-              <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '2000px' }}>
+              <div className="relative w-full flex items-center justify-center" style={{ perspective: '2000px' }}>
                 {(() => {
                   const leftIndex = (currentIndex - 1 + projects.length) % projects.length;
                   const rightIndex = (currentIndex + 1) % projects.length;
@@ -185,6 +195,7 @@ export default function Projects() {
                     return (
                       <div
                         key={project.id}
+                        ref={isCenter ? centerCardRef : null}
                         className="absolute w-[280px] sm:w-[360px] transition-all duration-700 ease-out cursor-pointer"
                         style={{
                           ...style,
