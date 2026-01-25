@@ -158,9 +158,9 @@ export default function Projects() {
         {isCarouselView ? (
           /* 3D Carousel View */
           <div className="relative">
-            <div className="relative h-[600px] flex items-center justify-center">
+            <div className="relative min-h-[600px] py-12 flex items-center justify-center">
               {/* Carousel Container */}
-              <div className="relative w-full h-full flex items-center justify-center overflow-hidden" style={{ perspective: '2000px' }}>
+              <div className="relative w-full h-full flex items-center justify-center overflow-visible" style={{ perspective: '2000px' }}>
                 {(() => {
                   const leftIndex = (currentIndex - 1 + projects.length) % projects.length;
                   const rightIndex = (currentIndex + 1) % projects.length;
@@ -185,7 +185,7 @@ export default function Projects() {
                     return (
                       <div
                         key={project.id}
-                        className="absolute w-[360px] transition-all duration-700 ease-out cursor-pointer"
+                        className="absolute w-[280px] sm:w-[360px] transition-all duration-700 ease-out cursor-pointer"
                         style={{
                           ...style,
                           transformStyle: 'preserve-3d',
@@ -206,7 +206,7 @@ export default function Projects() {
               {/* Arrow Navigation */}
               <button
                 onClick={handlePrev}
-                className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 bg-gray-800/70 hover:bg-gray-700 text-white p-1.5 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
+                className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
                 aria-label="Previous project"
               >
                 <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +215,7 @@ export default function Projects() {
               </button>
               <button
                 onClick={handleNext}
-                className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 bg-gray-800/70 hover:bg-gray-700 text-white p-1.5 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
+                className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
                 aria-label="Next project"
               >
                 <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
