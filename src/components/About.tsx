@@ -87,25 +87,39 @@ export default function About() {
                     
                     <div>
                       <span className="text-gray-400 text-sm">Education:</span>
-                      <p className="font-medium">Computer Engineering, SIIT Thammasat</p>
+                      <p className="font-medium">Computer Engineering | SIIT, Thammasat U.</p>
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm">Availability:</span>
-                      <p className="font-medium text-green-400">Open for Internships</p>
+                      <p className="font-semibold text-green-400">Looking for Internships</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Interests & Hobbies */}
+                {/* Relevant Courses */}
                 <div className="p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm">
                   <h3 className="text-xl font-bold text-purple-400 mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01-.658 6.425A12.08 12.08 0 0112 21a12.08 12.08 0 01-5.502-3.997 12.083 12.083 0 01-.658-6.425L12 14z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14v7" />
                     </svg>
-                    Interests & Hobbies
+                    Relevant Courses
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {['Software Development', 'UI/UX Design', 'Machine Learning', 'Database Systems', 'Cybersecurity', 'Problem Solving', 'Gaming', 'Photography', 'Car Enthusiast'].map((interest) => (
+                    {['Data Structures and Algorithms',
+                      'Object-Oriented Programming',
+                      'Algorithms Design',
+                      'Software Engineering',
+                      'Database Systems',
+                      'Cloud Computing',
+                      'Operating Systems',
+                      'Computer Networks',
+                      'Computer Architecture',
+                      'Cybersecurity',
+                      'Artificial Intelligence',
+                      'Human-Computer Interface',
+                    ].map((interest) => (
                       <span
                         key={interest}
                         className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-sm text-purple-300"
@@ -115,6 +129,26 @@ export default function About() {
                     ))}
                   </div>
                 </div>
+
+                {/* Interests & Hobbies 
+                <div className="p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm">
+                  <h3 className="text-xl font-bold text-purple-400 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Interests & Hobbies
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {['Software Development', 'UI/UX Design', 'AI & Machine Learning', 'Database Design', 'Cybersecurity', 'Problem Solving', 'Gaming', 'Photography', 'Car Enthusiast'].map((interest) => (
+                      <span
+                        key={interest}
+                        className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-sm text-purple-300"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div> */}
 
                 {/* Languages */}
                 <div className="p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm">
@@ -165,7 +199,7 @@ export default function About() {
                   <ul className="space-y-2 text-gray-300">
                     <li className="flex items-start gap-2">
                       <span className="text-blue-400 mt-1">•</span>
-                      <span>I love building interactive web experiences</span>
+                      <span>I love trying new things</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-purple-400 mt-1">•</span>
@@ -173,11 +207,11 @@ export default function About() {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-400 mt-1">•</span>
-                      <span>Passionate about clean code and good UX</span>
+                      <span>Passionate about software development</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-purple-400 mt-1">•</span>
-                      <span>Coffee-powered developer ☕</span>
+                      <span>I learn fast through practical experience</span>
                     </li>
                   </ul>
                 </div>
