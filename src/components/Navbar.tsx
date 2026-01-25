@@ -1,5 +1,16 @@
-import { useState, useEffect } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const NAV_LINKS = [
+  { id: 'home', label: 'Home', type: 'route' as const },
+  { id: 'about', label: 'About', type: 'section' as const },
+  { id: 'projects', label: 'Projects', type: 'section' as const },
+  { id: 'connect', label: 'Connect', type: 'section' as const },
+] as const;
+
+const SECTION_IDS = NAV_LINKS.map(link => link.id);
+const SCROLL_THRESHOLD = 50;
+const VISIBILITY_THRESHOLD = 0.1;
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,20 +19,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('home');
 
-  type RouteLink = { to: string; label: string };
-  type SectionLink = { sectionId: string; label: string };
-  const navLinks: Array<RouteLink | SectionLink> = [
-    { to: '/', label: 'Home' },
-    { sectionId: 'about', label: 'About' },
-    { sectionId: 'projects', label: 'Projects' },
-    { sectionId: 'connect', label: 'Connect' },
-  ];
-
-  const handleLinkClick = () => {
-    setIsMenuOpen(false);
-  };
-
-  const handleSectionClick = (id: string) => {
+  const handleSectionClick = useCallback((id: string) => {
     if (location.pathname !== '/') {
       navigate('/', { state: { targetId: id } });
     } else {
@@ -31,12 +29,45 @@ export default function Navbar() {
       }
     }
     setIsMenuOpen(false);
-  };
+  }, [location.pathname, navigate]);
+
+  const isLinkActive = useCallback((linkId: string) => {
+    return location.pathname === '/' && activeSection === linkId;
+  }, [location.pathname, activeSection]);
+
+  const updateActiveSection = useCallback(() => {
+    const elements = SECTION_IDS
+      .map((sectionId) => document.getElementById(sectionId))
+      .filter((el): el is HTMLElement => !!el);
+
+    if (elements.length === 0) return;
+
+    let mostVisibleElement: HTMLElement | null = null;
+    let maxOccupancy = 0;
+
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      const visibleHeight = Math.max(0, Math.min(viewportHeight, rect.bottom) - Math.max(0, rect.top));
+      const occupancy = visibleHeight / viewportHeight;
+
+      if (occupancy > maxOccupancy) {
+        maxOccupancy = occupancy;
+        mostVisibleElement = el;
+      }
+    });
+
+    if (maxOccupancy > VISIBILITY_THRESHOLD && mostVisibleElement) {
+      const element: HTMLElement = mostVisibleElement;
+      setActiveSection(element.id);
+    }
+  }, []);
 
   // Detect scroll to change navbar appearance
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > SCROLL_THRESHOLD);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -48,29 +79,25 @@ export default function Navbar() {
       return;
     }
 
-    const sectionIds = ['home', 'about', 'projects', 'connect'];
-    const elements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => !!el);
+    let aboutSection: HTMLElement | null = null;
 
-    if (elements.length === 0) return;
+    window.addEventListener('scroll', updateActiveSection);
+    
+    // Handle About section expand/collapse
+    aboutSection = document.getElementById('about');
+    if (aboutSection) {
+      aboutSection.addEventListener('transitionend', updateActiveSection);
+    }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Pick the most visible section
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) {
-          setActiveSection(visible.target.id);
-        }
-      },
-      { threshold: 0.6 }
-    );
+    updateActiveSection();
 
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [location.pathname]);
+    return () => {
+      window.removeEventListener('scroll', updateActiveSection);
+      if (aboutSection) {
+        aboutSection.removeEventListener('transitionend', updateActiveSection);
+      }
+    };
+  }, [location.pathname, updateActiveSection]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -83,16 +110,12 @@ export default function Navbar() {
           {/* Left section: Logo and GitHub */}
           <div className="flex items-center gap-4">
             {/* Logo with gradient */}
-            <NavLink
-              to="/"
-              onClick={(e) => {
-                handleSectionClick('home');
-                e.preventDefault();
-              }}
+            <button
+              onClick={() => handleSectionClick('home')}
               className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all duration-300 hover:scale-105"
             >
               Portfolio
-            </NavLink>
+            </button>
 
             {/* GitHub Icon Button */}
             <a
@@ -110,45 +133,18 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => {
-              if ('to' in link) {
-                const isHome = link.to === '/';
-                const active = location.pathname === '/' ? activeSection === 'home' : location.pathname === link.to;
-                return (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    onClick={(e) => {
-                      if (isHome) {
-                        e.preventDefault();
-                        handleSectionClick('home');
-                      } else {
-                        handleLinkClick();
-                      }
-                    }}
-                    className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 group ${
-                      active ? 'text-blue-400' : 'text-gray-300 hover:text-white'
-                    }`}
-                  >
-                    {link.label}
-                    <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-300 ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-                  </NavLink>
-                );
-              }
-              const active = location.pathname === '/' && activeSection === link.sectionId;
-              return (
-                <button
-                  key={link.sectionId}
-                  onClick={() => handleSectionClick(link.sectionId)}
-                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 group ${
-                    active ? 'text-blue-400' : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  {link.label}
-                  <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-300 ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-                </button>
-              );
-            })}
+            {NAV_LINKS.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleSectionClick(link.id)}
+                className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 group ${
+                  isLinkActive(link.id) ? 'text-blue-400' : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                {link.label}
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-300 ${isLinkActive(link.id) ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+              </button>
+            ))}
           </div>
 
           {/* Mobile Menu Button */}
@@ -175,43 +171,17 @@ export default function Navbar() {
           isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
         }`}>
           <div className="md:hidden py-4 border-t border-gray-800">
-            {navLinks.map((link) => {
-              if ('to' in link) {
-                const isHome = link.to === '/';
-                const active = location.pathname === '/' ? activeSection === 'home' : location.pathname === link.to;
-                return (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    onClick={(e) => {
-                      if (isHome) {
-                        e.preventDefault();
-                        handleSectionClick('home');
-                      } else {
-                        handleLinkClick();
-                      }
-                    }}
-                    className={`block px-4 py-2 text-sm font-medium transition-all duration-200 rounded ${
-                      active ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-400' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                    }`}
-                  >
-                    {link.label}
-                  </NavLink>
-                );
-              }
-              const active = location.pathname === '/' && activeSection === link.sectionId;
-              return (
-                <button
-                  key={link.sectionId}
-                  onClick={() => handleSectionClick(link.sectionId)}
-                  className={`block w-full text-left px-4 py-2 text-sm font-medium transition-all duration-200 rounded ${
-                    active ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-400' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                  }`}
-                >
-                  {link.label}
-                </button>
-              );
-            })}
+            {NAV_LINKS.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleSectionClick(link.id)}
+                className={`block w-full text-left px-4 py-2 text-sm font-medium transition-all duration-200 rounded ${
+                  isLinkActive(link.id) ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-400' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
