@@ -157,10 +157,10 @@ export default function Projects() {
         
         {isCarouselView ? (
           /* 3D Carousel View */
-          <div className="relative">
+          <div className="relative overflow-x-hidden">
             <div className="relative min-h-[600px] py-12 flex items-center justify-center">
               {/* Carousel Container */}
-              <div className="relative w-full h-full flex items-center justify-center overflow-visible" style={{ perspective: '2000px' }}>
+              <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '2000px' }}>
                 {(() => {
                   const leftIndex = (currentIndex - 1 + projects.length) % projects.length;
                   const rightIndex = (currentIndex + 1) % projects.length;
@@ -185,7 +185,7 @@ export default function Projects() {
                     return (
                       <div
                         key={project.id}
-                        className={`absolute w-[280px] sm:w-[360px] transition-all duration-700 ease-out cursor-pointer ${!isCenter ? 'hidden sm:block' : ''}`}
+                        className="absolute w-[280px] sm:w-[360px] transition-all duration-700 ease-out cursor-pointer"
                         style={{
                           ...style,
                           transformStyle: 'preserve-3d',
