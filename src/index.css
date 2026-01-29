@@ -92,4 +92,11 @@
     perspective-origin: center center;
     transform-style: preserve-3d;
   }
+
+  /* Slide-in animation for language bars */
+  @keyframes slideIn {
+    from {
+      width: 0;
+    }
+  }
 }

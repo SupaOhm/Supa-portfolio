@@ -16,6 +16,7 @@ export default function Projects() {
       tags: ['PHP', 'MySQL', 'HTML/CSS', 'Session Auth', 'Bootstrap'],
       imageUrl: '/images/projects/lostfound.png',
       githubUrl: 'https://github.com/SupaOhm/Lost-and-Found-Management-System',
+      status: 'completed',
     },
     {
       id: '2',
@@ -24,6 +25,7 @@ export default function Projects() {
       tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'RESTful APIs', 'Axios'],
       imageUrl: '/images/projects/expense.png',
       githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
+      status: 'completed',
     },
     {
       id: '3',
@@ -32,6 +34,7 @@ export default function Projects() {
       tags: ['Figma', 'UX/UI Research', 'Google Earth Engine'],
       imageUrl: '/images/projects/baka.jpg',
       githubUrl: '',
+      status: 'in-progress',
     },
     {
       id: '4',
@@ -40,6 +43,7 @@ export default function Projects() {
       tags: ['MySQL', 'Database Design', 'Normalization'],
       imageUrl: '/images/projects/db.png',
       githubUrl: 'https://github.com/SupaOhm/onlineshop-DB',
+      status: 'completed',
     },
     {
       id: '5',
@@ -48,6 +52,7 @@ export default function Projects() {
       tags: ['C++', 'Arduino', 'Embedded Systems'],
       imageUrl: '/images/projects/arduino.jpg',
       githubUrl: 'https://github.com/SupaOhm/Binary-Matching-Arduino-Game',
+      status: 'completed',
     },
     {
       id: '6',
@@ -56,6 +61,7 @@ export default function Projects() {
       tags: ['Python', 'CLI', 'Windows', 'Operating System'],
       imageUrl: '/images/projects/nosleep.jpg',
       githubUrl: 'https://github.com/SupaOhm/NoSleep-CLI',
+      status: 'completed',
     },
     {
       id: '7',
@@ -64,6 +70,7 @@ export default function Projects() {
       tags: ['Figma', 'HCI', 'Mobile Design', 'UX/UI', 'Usability', 'User Research'],
       imageUrl: '/images/projects/hci.png',
       githubUrl: '',
+      status: 'completed',
     },
   ];
 
@@ -167,7 +174,7 @@ export default function Projects() {
         
         {isCarouselView ? (
           /* 3D Carousel View */
-          <div className="relative overflow-x-hidden">
+          <div className="relative overflow-x-hidden" style={{ minHeight: '500px' }}>
             <div className="relative py-12 flex items-center justify-center" style={{ minHeight: `${cardHeight + 96}px` }}>
               {/* Carousel Container */}
               <div className="relative w-full flex items-center justify-center" style={{ perspective: '2000px' }}>
@@ -213,27 +220,27 @@ export default function Projects() {
                   });
                 })()}
               </div>
-
-              {/* Arrow Navigation */}
-              <button
-                onClick={handlePrev}
-                className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
-                aria-label="Previous project"
-              >
-                <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={handleNext}
-                className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
-                aria-label="Next project"
-              >
-                <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
             </div>
+
+            {/* Arrow Navigation */}
+            <button
+              onClick={handlePrev}
+              className="absolute left-0 sm:left-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
+              aria-label="Previous project"
+            >
+              <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-0 sm:right-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl"
+              aria-label="Next project"
+            >
+              <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
 
             {/* Navigation Dots - Outside carousel container */}
             <div className="flex justify-center gap-2 mt-8">

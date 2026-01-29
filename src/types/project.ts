@@ -6,4 +6,5 @@ export interface Project {
   imageUrl?: string;
   demoUrl?: string;
   githubUrl?: string;
+  status?: 'completed' | 'in-progress' | 'planned';
 }

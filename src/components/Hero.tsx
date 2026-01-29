@@ -3,11 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 // Add or remove items from this array to customize what gets typed
 const WORDS = [
-  'Computer Engineer',
-  'Software Developer',
-  'Database Enthusiast', 
-  'Fast Learner',
-  'Problem Solver'
+  'Computer Engineering Student',
+  'Software Dev',
+  'Tech Enthusiast', 
+  'Quick Learner',
+  'Problem Solver',
+  'Backend Dev',
 ];
 
 export default function Hero() {
