@@ -8,7 +8,7 @@ const WORDS = [
   'Tech Enthusiast', 
   'Quick Learner',
   'Problem Solver',
-  'Backend Dev',
+  'Full-stack Dev',
 ];
 
 export default function Hero() {
