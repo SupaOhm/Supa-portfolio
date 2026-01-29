@@ -72,6 +72,15 @@ export default function Projects() {
       githubUrl: '',
       status: 'completed',
     },
+    {
+      id: '8',
+      title: 'Intrusion Detection as a Service',
+      description: 'Research project developing a cloud-based intrusion detection system for both signature-based and anomaly-based detection using algorithms and machine learning. Focused on cloud deployment for scalable network security monitoring.',
+      tags: ['IEEE', 'Research', 'Machine Learning', 'Cloud Computing', 'Cybersecurity'],
+      imageUrl: '',
+      githubUrl: '',
+      status: 'in-progress',
+    }
   ];
 
   const handleNext = () => {
