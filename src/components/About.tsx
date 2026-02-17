@@ -102,9 +102,9 @@ export default function About() {
 
   const skillCategories = {
     'Languages': ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
-    'Frameworks, Libraries, and Tools': ['React', 'Node.js', 'Express.js', '.NET', 'Tailwind CSS', 'Bootstrap', 'Mongoose', 'Axios', 'MySQL', 'MongoDB', 'Git', 'Figma', 'CLI'],
-    'Core Concepts': ['Data Structures and Algorithms', 'Object-Oriented Programming', 'Operating Systems', 'Database Design', 'API Fundamentals', 'REST APIs', 'Software Engineering', 'UX/UI Design', 'Microcontrollers', 'Version Control'],
-    'Soft Skills': ['Quick Learning', 'Communication', 'Problem-Solving', 'Adaptability', 'Time Management', 'Work Ethic'],
+    'Frameworks, Libraries, and Tools': ['React', 'Node.js', 'Express.js', '.NET', 'Tailwind CSS', 'Bootstrap', 'Mongoose', 'Axios', 'Postman', 'MySQL', 'MongoDB', 'Git', 'Figma', 'CLI'],
+    'Core Concepts': ['Data Structures and Algorithms', 'Object-Oriented Programming', 'Operating Systems', 'Database Design', 'API Fundamentals', 'REST APIs', 'Software Engineering', 'UX/UI Design', 'Microcontrollers', 'Version Control', 'Cloud Computing', 'Cybersecurity Principles'],
+    'Soft Skills': ['Quick Learning', 'Communication', 'Problem-Solving', 'Adaptability', 'Time Management', 'Work Ethic', 'Collaboration', 'Growth Mindset'],
   };
 
   return (
@@ -126,7 +126,7 @@ export default function About() {
           <p className="text-base sm:text-lg leading-relaxed">
             Through academic and industry-collaborative projects, I've gained hands-on experience building
             <span className="font-semibold"> full-stack web applications</span>, designing RESTful APIs, and working with both relational (MySQL) and
-            NoSQL (MongoDB) databases. Currently, I'm collaborating with BAKA Co., Ltd. on redesigning their agricultural platform's UX/UI.
+            NoSQL (MongoDB) databases. Currently, I'm assigned to collaborate with BAKA Co., Ltd. on redesigning their agricultural platform's UX/UI.
           </p>
           <p className="text-base sm:text-lg leading-relaxed">
             I'm seeking a <span className="font-semibold">Software Engineer internship</span> where I can contribute to building reliable, well-structured systems
