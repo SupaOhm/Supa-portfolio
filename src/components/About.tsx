@@ -79,6 +79,7 @@ type GitHubStats = {
   followers: number;
   totalStars: number;
   sinceYear: number;
+  topLanguage: string;
 };
 
 function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
@@ -157,6 +158,16 @@ export default function About() {
         const repos: GitHubRepoResponse[] = await reposResponse.json();
         const totalStars = repos.reduce((total, repo) => total + repo.stargazers_count, 0);
         const createdYear = new Date(data.created_at).getFullYear();
+        const languageCountMap = repos.reduce<Record<string, number>>((map, repo) => {
+          if (!repo.language) {
+            return map;
+          }
+
+          map[repo.language] = (map[repo.language] ?? 0) + 1;
+          return map;
+        }, {});
+        const topLanguage =
+          Object.entries(languageCountMap).sort((first, second) => second[1] - first[1])[0]?.[0] ?? 'N/A';
 
         setGithubStats({
           login: data.login,
@@ -168,6 +179,7 @@ export default function About() {
           followers: data.followers,
           totalStars,
           sinceYear: createdYear,
+          topLanguage,
         });
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
@@ -232,43 +244,47 @@ export default function About() {
           </h3>
           
           {/* GitHub Profile Card */}
-          <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-6 max-w-2xl mx-auto text-left">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-4">
+          <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-4 sm:p-5 max-w-2xl mx-auto text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <img
                   src={githubStats?.avatarUrl ?? `https://github.com/${GITHUB_USERNAME}.png`}
                   alt={`${GITHUB_USERNAME} GitHub avatar`}
-                  className="w-16 h-16 rounded-full border border-gray-600 object-cover"
+                  className="w-12 h-12 rounded-full border border-gray-600 object-cover"
                   loading="lazy"
                 />
                 <div>
-                  <h3 className="text-white text-lg font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</h3>
-                  <p className="text-blue-300 text-sm">@{githubStats?.login ?? GITHUB_USERNAME}</p>
-                  <p className="text-gray-400 text-sm mt-1 line-clamp-2">{githubStats?.bio ?? 'Loading profile...'}</p>
+                  <h3 className="text-white text-base font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</h3>
+                  <p className="text-blue-300 text-xs">@{githubStats?.login ?? GITHUB_USERNAME}</p>
+                  <p className="text-gray-400 text-xs mt-0.5 line-clamp-2">{githubStats?.bio ?? 'Loading profile...'}</p>
                 </div>
               </div>
               <a
                 href={githubStats?.profileUrl ?? GITHUB_PROFILE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm text-center"
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-semibold text-xs text-center"
               >
                 Open GitHub →
               </a>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-700">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-gray-700">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400">{isGithubLoading ? '...' : (githubStats?.repositories ?? '--')}</div>
-                <div className="text-xs text-gray-400 mt-1">Repositories</div>
+                <div className="text-xl font-bold text-blue-400">{isGithubLoading ? '...' : (githubStats?.repositories ?? '--')}</div>
+                <div className="text-[11px] text-gray-400 mt-0.5">Repos</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-400">{isGithubLoading ? '...' : (githubStats?.totalStars ?? '--')}</div>
-                <div className="text-xs text-gray-400 mt-1">Total Stars</div>
+                <div className="text-xl font-bold text-purple-400">{isGithubLoading ? '...' : (githubStats?.totalStars ?? '--')}</div>
+                <div className="text-[11px] text-gray-400 mt-0.5">Stars</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">{isGithubLoading ? '...' : (githubStats?.sinceYear ?? '--')}</div>
-                <div className="text-xs text-gray-400 mt-1">GitHub Since</div>
+                <div className="text-xl font-bold text-pink-400">{isGithubLoading ? '...' : (githubStats?.topLanguage ?? '--')}</div>
+                <div className="text-[11px] text-gray-400 mt-0.5">Top Lang</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-green-400">{isGithubLoading ? '...' : (githubStats?.sinceYear ?? '--')}</div>
+                <div className="text-[11px] text-gray-400 mt-0.5">Since</div>
               </div>
             </div>
           </div>
