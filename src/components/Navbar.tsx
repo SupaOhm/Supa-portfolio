@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const NAV_LINKS = [
   { id: 'home', label: 'Home', type: 'route' as const },
   { id: 'about', label: 'About', type: 'section' as const },
+  { id: 'skills', label: 'Skills', type: 'section' as const },
   { id: 'projects', label: 'Projects', type: 'section' as const },
   { id: 'connect', label: 'Connect', type: 'section' as const },
 ] as const;

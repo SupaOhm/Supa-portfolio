@@ -1,11 +1,139 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ReactElement } from 'react';
+
+const GITHUB_USERNAME = 'SupaOhm';
+const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
+const GITHUB_USER_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
+
+type PointerPosition = { x: number; y: number };
+
+type FullHoverState = {
+  name: string | null;
+  x: number;
+  y: number;
+};
+
+type ContactLink = {
+  name: string;
+  href: string;
+  detail: string;
+  description?: string;
+  icon: ReactElement;
+};
+
+type GitHubUserResponse = {
+  login: string;
+  avatar_url: string;
+  html_url: string;
+  name: string | null;
+  bio: string | null;
+  location: string | null;
+  company: string | null;
+  blog: string;
+  hireable: boolean | null;
+  public_repos: number;
+  public_gists: number;
+  followers: number;
+  following: number;
+  repos_url: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type GitHubRepoResponse = {
+  name: string;
+  html_url: string;
+  stargazers_count: number;
+  forks_count: number;
+  language: string | null;
+};
+
+type GitHubStats = {
+  login: string;
+  avatarUrl: string;
+  profileUrl: string;
+  displayName: string;
+  bio: string;
+  location: string;
+  hireable: boolean | null;
+  repositories: number;
+  followers: number;
+  totalStars: number;
+  sinceYear: number;
+  updatedAt: string;
+  topLanguage: string;
+  mostStarredRepo: {
+    name: string;
+    stars: number;
+    url: string;
+  } | null;
+};
+
+const INITIAL_POINTER_POSITION: PointerPosition = { x: 0, y: 0 };
+const INITIAL_FULL_HOVER_STATE: FullHoverState = { name: null, x: 0, y: 0 };
+const SMOOTHING_FACTOR = 0.15;
+
+const formatShortDate = (isoDate: string) =>
+  new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(isoDate));
+
+const CONTACT_LINKS: ContactLink[] = [
+  {
+    name: 'Phone',
+    href: 'tel:+66895772122',
+    detail: '(+66)\u00A089\u00A0577\u00A02122',
+    description: '',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Email',
+    href: 'mailto:ohm.supakornth@gmail.com',
+    detail: 'ohm.supakornth@gmail.com',
+    description: '',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'GitHub',
+    href: 'https://github.com/SupaOhm',
+    detail: '@SupaOhm',
+    description: '',
+    icon: (
+      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+        <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
+      </svg>
+    ),
+  },
+  {
+    name: 'LinkedIn',
+    href: 'https://linkedin.com/in/supakornpra',
+    detail: '/in/supakornpra',
+    description: '',
+    icon: (
+      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+      </svg>
+    ),
+  },
+];
 
 export default function Connect() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [smoothMousePosition, setSmoothMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState<PointerPosition>(INITIAL_POINTER_POSITION);
+  const [smoothMousePosition, setSmoothMousePosition] = useState<PointerPosition>(INITIAL_POINTER_POSITION);
   const [showAllDetails, setShowAllDetails] = useState(false);
-  const [fullHover, setFullHover] = useState<{ name: string | null; x: number; y: number }>({ name: null, x: 0, y: 0 });
+  const [fullHover, setFullHover] = useState<FullHoverState>(INITIAL_FULL_HOVER_STATE);
+  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
+  const [isGithubLoading, setIsGithubLoading] = useState(true);
   const mouseRef = useRef(mousePosition);
 
   // Keep latest mouse position in a ref
@@ -19,14 +147,107 @@ export default function Connect() {
     
     const smoothMove = () => {
       setSmoothMousePosition((prev) => ({
-        x: prev.x + (mouseRef.current.x - prev.x) * 0.15,
-        y: prev.y + (mouseRef.current.y - prev.y) * 0.15,
+        x: prev.x + (mouseRef.current.x - prev.x) * SMOOTHING_FACTOR,
+        y: prev.y + (mouseRef.current.y - prev.y) * SMOOTHING_FACTOR,
       }));
       animationFrameId = requestAnimationFrame(smoothMove);
     };
     
     animationFrameId = requestAnimationFrame(smoothMove);
     return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchGitHubStats = async () => {
+      try {
+        setIsGithubLoading(true);
+
+        const response = await fetch(GITHUB_USER_API, {
+          signal: controller.signal,
+          headers: {
+            Accept: 'application/vnd.github+json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch GitHub stats');
+        }
+
+        const data: GitHubUserResponse = await response.json();
+
+        const reposResponse = await fetch(`${data.repos_url}?per_page=100&type=owner`, {
+          signal: controller.signal,
+          headers: {
+            Accept: 'application/vnd.github+json',
+          },
+        });
+
+        if (!reposResponse.ok) {
+          throw new Error('Failed to fetch GitHub repositories');
+        }
+
+        const repos: GitHubRepoResponse[] = await reposResponse.json();
+        const totalStars = repos.reduce((total, repo) => total + repo.stargazers_count, 0);
+        const createdYear = new Date(data.created_at).getFullYear();
+
+        const mostStarredRepo = repos.reduce<GitHubStats['mostStarredRepo']>((best, repo) => {
+          if (!best || repo.stargazers_count > best.stars) {
+            return {
+              name: repo.name,
+              stars: repo.stargazers_count,
+              url: repo.html_url,
+            };
+          }
+
+          return best;
+        }, null);
+
+        const languageCountMap = repos.reduce<Record<string, number>>((map, repo) => {
+          if (!repo.language) {
+            return map;
+          }
+
+          map[repo.language] = (map[repo.language] ?? 0) + 1;
+          return map;
+        }, {});
+
+        const topLanguage =
+          Object.entries(languageCountMap).sort((first, second) => second[1] - first[1])[0]?.[0] ?? 'N/A';
+
+        setGithubStats({
+          login: data.login,
+          avatarUrl: data.avatar_url,
+          profileUrl: data.html_url,
+          displayName: data.name ?? data.login,
+          bio: data.bio ?? 'No bio provided yet.',
+          location: data.location ?? 'Not specified',
+          hireable: data.hireable,
+          repositories: data.public_repos,
+          followers: data.followers,
+          totalStars,
+          sinceYear: createdYear,
+          updatedAt: data.updated_at,
+          topLanguage,
+          mostStarredRepo,
+        });
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          setGithubStats(null);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsGithubLoading(false);
+        }
+      }
+    };
+
+    fetchGitHubStats();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -37,52 +258,22 @@ export default function Connect() {
     });
   };
 
-  const contactLinks = [
-    {
-      name: 'Phone',
-      href: 'tel:+66895772122',
-      detail: '(+66)\u00A089\u00A0577\u00A02122',
-      description: '',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Email',
-      href: 'mailto:ohm.supakornth@gmail.com',
-      detail: 'ohm.supakornth@gmail.com',
-      description: '',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'GitHub',
-      href: 'https://github.com/SupaOhm',
-      detail: '@SupaOhm',
-      description: '',
-      icon: (
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
-        </svg>
-      ),
-    },
-    {
-      name: 'LinkedIn',
-      href: 'https://linkedin.com/in/supakornpra',
-      detail: '/in/supakornpra',
-      description: '',
-      icon: (
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-        </svg>
-      ),
-    },
-  ];
+  const handleLinkHover = (name: string | null) => {
+    setHoveredLink(name);
+  };
+
+  const resetFullHover = () => {
+    setFullHover(INITIAL_FULL_HOVER_STATE);
+  };
+
+  const handleFullMouseMove = (name: string, e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setFullHover({
+      name,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
   return (
     <section id="connect" className="py-20 px-4 sm:px-6 lg:px-8 relative">
@@ -99,12 +290,12 @@ export default function Connect() {
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap mb-8">
-          {contactLinks.map((link, index) => (
+          {CONTACT_LINKS.map((link, index) => (
             <div
               key={link.name}
               className="relative"
-              onMouseEnter={() => setHoveredLink(link.name)}
-              onMouseLeave={() => setHoveredLink(null)}
+              onMouseEnter={() => handleLinkHover(link.name)}
+              onMouseLeave={() => handleLinkHover(null)}
             >
               <a
                 href={link.href}
@@ -122,7 +313,6 @@ export default function Connect() {
                   width: hoveredLink === link.name ? '224px' : '120px',
                   height: hoveredLink === link.name ? '128px' : '96px',
                   padding: hoveredLink === link.name ? '24px' : '12px 16px',
-                  transition: 'width 300ms ease-in-out, height 300ms ease-in-out, padding 300ms ease-in-out, all 300ms ease-in-out',
                 }}
               >
                 {/* Cursor-following gradient effects */}
@@ -155,7 +345,9 @@ export default function Connect() {
                   <div className="flex flex-col items-center gap-1 animate-in fade-in duration-300 relative z-10">
                     <span className="font-bold text-sm">{link.name}</span>
                     <span className="text-xs font-semibold text-blue-100">{link.detail}</span>
-                    <span className="text-xs text-blue-50 text-center leading-tight">{link.description}</span>
+                    {link.description ? (
+                      <span className="text-xs text-blue-50 text-center leading-tight">{link.description}</span>
+                    ) : null}
                   </div>
                 ) : (
                   <span className="font-medium relative z-10 transition-opacity duration-500 ease-in-out">{link.name}</span>
@@ -184,22 +376,15 @@ export default function Connect() {
         >
           <span className="block mb-6 text-center text-blue-200 font-bold text-xl">Supakorn Prayongyam</span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-            {contactLinks.map((link) => (
+            {CONTACT_LINKS.map((link) => (
               <a
                 key={`full-${link.name}`}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 onMouseEnter={() => setFullHover((prev) => ({ ...prev, name: link.name }))}
-                onMouseLeave={() => setFullHover({ name: null, x: 0, y: 0 })}
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setFullHover({
-                    name: link.name,
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
-                  });
-                }}
+                onMouseLeave={resetFullHover}
+                onMouseMove={(e) => handleFullMouseMove(link.name, e)}
                 className="group relative overflow-hidden flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-gray-800/60 to-gray-700/60 border border-gray-700/60 hover:border-blue-400/60 hover:from-blue-900/20 hover:to-purple-900/20 transition-all duration-300"
               >
                 {fullHover.name === link.name && (
@@ -232,6 +417,98 @@ export default function Connect() {
                 </div>
               </a>
             ))}
+          </div>
+        </div>
+
+        {/* Detailed GitHub Profile */}
+        <div className="mb-10 bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-6 text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={githubStats?.avatarUrl ?? `https://github.com/${GITHUB_USERNAME}.png`}
+                alt={`${GITHUB_USERNAME} GitHub avatar`}
+                className="w-16 h-16 rounded-full border border-gray-600 object-cover"
+                loading="lazy"
+              />
+              <div>
+                <h3 className="text-white text-lg font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</h3>
+                <p className="text-blue-300 text-sm">@{githubStats?.login ?? GITHUB_USERNAME}</p>
+                <p className="text-gray-400 text-sm mt-1">{githubStats?.bio ?? 'Loading profile...'}</p>
+              </div>
+            </div>
+            <a
+              href={githubStats?.profileUrl ?? GITHUB_PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm text-center"
+            >
+              Open GitHub →
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-700">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-400">{isGithubLoading ? '...' : (githubStats?.repositories ?? '--')}</div>
+              <div className="text-xs text-gray-400 mt-1">Repositories</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-400">{isGithubLoading ? '...' : (githubStats?.totalStars ?? '--')}</div>
+              <div className="text-xs text-gray-400 mt-1">Total Stars</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">{isGithubLoading ? '...' : (githubStats?.sinceYear ?? '--')}</div>
+              <div className="text-xs text-gray-400 mt-1">GitHub Since</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-cyan-400">{isGithubLoading ? '...' : (githubStats?.followers ?? '--')}</div>
+              <div className="text-xs text-gray-400 mt-1">Followers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-400">{isGithubLoading ? '...' : (githubStats?.topLanguage ?? '--')}</div>
+              <div className="text-xs text-gray-400 mt-1">Top Language</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-6 border-t border-gray-700 text-sm">
+            <p className="text-gray-300">
+              <span className="text-gray-400">Location:</span>{' '}
+              <span className="text-white font-medium">{isGithubLoading ? '...' : (githubStats?.location ?? '--')}</span>
+            </p>
+            <p className="text-gray-300">
+              <span className="text-gray-400">Hireable:</span>{' '}
+              <span className="text-white font-medium">
+                {isGithubLoading
+                  ? '...'
+                  : githubStats?.hireable == null
+                    ? 'Not specified'
+                    : githubStats.hireable
+                      ? 'Yes'
+                      : 'No'}
+              </span>
+            </p>
+            <p className="text-gray-300">
+              <span className="text-gray-400">Last Updated:</span>{' '}
+              <span className="text-white font-medium">
+                {isGithubLoading || !githubStats?.updatedAt ? '...' : formatShortDate(githubStats.updatedAt)}
+              </span>
+            </p>
+            <p className="text-gray-300 sm:col-span-2">
+              <span className="text-gray-400">Most Starred Repo:</span>{' '}
+              {isGithubLoading ? (
+                <span className="text-white font-medium">...</span>
+              ) : githubStats?.mostStarredRepo ? (
+                <a
+                  href={githubStats.mostStarredRepo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-300 hover:text-blue-200 font-medium"
+                >
+                  {githubStats.mostStarredRepo.name} ({githubStats.mostStarredRepo.stars}★)
+                </a>
+              ) : (
+                <span className="text-white font-medium">N/A</span>
+              )}
+            </p>
           </div>
         </div>
         {/*

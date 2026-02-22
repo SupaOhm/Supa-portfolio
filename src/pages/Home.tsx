@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 import About from '../components/About';
+import Skills from '../components/Skills';
 import Projects from '../components/Projects';
 import Connect from '../components/Connect';
 
@@ -24,6 +25,7 @@ export default function Home() {
 		<main>
 			<Hero />
 			<About />
+			<Skills />
 			<Projects />
 			<Connect />
 		</main>

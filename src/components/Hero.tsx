@@ -143,7 +143,7 @@ export default function Hero() {
         </p>
         
         <p className="text-sm text-gray-500 mb-4">
-          Pathum Thani, Thailand | 3rd Year | GPA 3.23
+          3rd Year | GPA 3.23 | Pathum Thani, Thailand
         </p>
         
         <p className="text-base sm:text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
