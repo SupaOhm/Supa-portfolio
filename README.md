@@ -1,13 +1,14 @@
 # Supa's Portfolio
 
-A modern, interactive portfolio website built with React, TypeScript, and Tailwind CSS. Features smooth section navigation, a beautiful 3D carousel for project showcase, and interactive cursor effects.
+A modern interactive portfolio built with React, TypeScript, and Tailwind CSS. It features smooth section navigation, a 3D project carousel, and live GitHub profile stats.
 
 ## ✨ Features
 
 - **Smooth Section Navigation** - Navigate between Home, About, Projects, and Connect sections with smooth scrolling
 - **Active Section Indicator** - Visual indicator tracks which section is currently in view
 - **3D Project Carousel** - Beautiful 3D carousel with rotating cards and smooth transitions
-- **Interactive Cursor Effects** - Cursor-following gradient effects on project cards
+- **Category Filtering** - Project filters with count badges (Web, Mobile, Backend, Database, Tools, Embedded, Security, Cloud, AI, Design)
+- **Live GitHub Data** - GitHub profile and stats fetched from GitHub API
 - **Responsive Design** - Fully responsive layout that works on desktop, tablet, and mobile
 - **Dark Theme** - Modern dark theme with blue/purple accent colors
 - **Grid & Carousel Views** - Toggle between carousel and grid view for projects
@@ -21,44 +22,6 @@ A modern, interactive portfolio website built with React, TypeScript, and Tailwi
 - **Tailwind CSS** 3.4.19 - Styling and animations
 - **Vite** 7.2.4 - Build tool
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/SupaOhm/Supa-portfolio.git
-cd Supa-portfolio
-```
-
-2. Install dependencies
-```bash
-npm install
-```
-
-3. Start the development server
-```bash
-npm run dev
-```
-
-The portfolio will be available at `http://localhost:5173`
-
-## 📦 Build
-
-Build for production:
-```bash
-npm run build
-```
-
-Preview the production build:
-```bash
-npm run preview
-```
-
 ## 📂 Project Structure
 
 ```
@@ -66,14 +29,16 @@ src/
 ├── components/
 │   ├── Navbar.tsx         # Navigation bar with section tracking
 │   ├── Hero.tsx           # Landing section with typing animation
-│   ├── About.tsx          # About section with skills
-│   ├── Projects.tsx       # 3D carousel and grid view for projects
-│   ├── ProjectCard.tsx    # Individual project card with effects
-│   └── Connect.tsx        # Contact/connect section
+│   ├── About.tsx          # About section + compact GitHub profile card
+│   ├── Skills.tsx         # Skills breakdown by categories
+│   ├── Projects.tsx       # 3D carousel, grid view, and category filtering
+│   ├── ProjectCard.tsx    # Individual project card
+│   ├── Connect.tsx        # Contact section + detailed GitHub profile insights
+│   └── Footer.tsx         # Footer links and credits
 ├── pages/
 │   └── Home.tsx          # Main home page composition
 ├── types/
-│   └── project.ts        # Project type definitions
+│   └── project.ts        # Project and project-category types
 ├── App.tsx               # Main app component with router
 ├── main.tsx              # React entry point
 └── index.css             # Global styles and animations
@@ -91,15 +56,15 @@ src/
 - 3D perspective transform carousel
 - Center card is scaled to 1.0 with full brightness
 - Adjacent cards rotate 35 degrees with 0.85 scale
-- Far cards fade with reduced brightness
+- Far cards fade with reduced brightness for depth
 - Infinite looping with next/previous buttons
 - Dot navigation for direct access
+- Stable transitions for 3-card category views
 
-### Project Card
-- Interactive cursor-following gradient effects
-- Two gradient circles for visual depth
-- Smooth easing (0.15 factor) for cursor tracking
-- Links to GitHub and live demos
+### GitHub Integration
+- About section: compact live GitHub snapshot
+- Connect section: detailed live profile insights (avatar, stars, top language, most starred repo, etc.)
+- Data sourced from public GitHub API endpoints
 
 ### Hero Section
 - Typing animation cycling through different roles
@@ -125,12 +90,13 @@ src/
 ### Update Projects
 Edit the projects array in `src/components/Projects.tsx`:
 ```typescript
-const projects: Project[] = [
+const PROJECTS: Project[] = [
   {
     id: '1',
     title: 'Your Project',
     description: 'Description',
     tags: ['Tech1', 'Tech2'],
+    categories: ['Web', 'Backend'],
     githubUrl: 'https://github.com/...',
     demoUrl: 'https://...'
   }
