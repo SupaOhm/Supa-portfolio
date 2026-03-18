@@ -1,15 +1,22 @@
-export type ProjectCategory =
-  | 'All'
-  | 'Web'
-  | 'Mobile'
-  | 'Backend'
-  | 'Database'
-  | 'Tools'
-  | 'Embedded'
-  | 'Security'
-  | 'Cloud'
-  | 'AI'
-  | 'Design';
+export const PROJECT_CATEGORIES = [
+  'Web',
+  'Mobile',
+  'Backend',
+  'Database',
+  'Tools',
+  'Embedded',
+  'Security',
+  'Cloud',
+  'AI',
+  'Design',
+  'Data',
+] as const;
+
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
+
+export const PROJECT_STATUSES = ['completed', 'in-progress', 'planned'] as const;
+
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
 export interface Project {
   id: string;
@@ -19,6 +26,6 @@ export interface Project {
   imageUrl?: string;
   demoUrl?: string;
   githubUrl?: string;
-  status?: 'completed' | 'in-progress' | 'planned';
+  status?: ProjectStatus;
   categories: ProjectCategory[];
 }
