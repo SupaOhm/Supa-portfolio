@@ -94,87 +94,123 @@ export default function Hero() {
   return (
     <section 
       id="home" 
-      className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16 overflow-hidden"
+      className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8 pt-16 overflow-hidden bg-grid-pattern bg-[#030712]"
       onMouseMove={handleMouseMove}
     >
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20 animate-gradient" />
-      
-      {/* Primary cursor-following glow - smooth and large */}
+      {/* Primary cursor-following glow - scaled down for structural feel */}
       <div
-        className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500/15 via-purple-500/10 to-transparent rounded-full blur-[80px] pointer-events-none"
+        className="absolute w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] pointer-events-none mix-blend-screen"
         style={{
-          left: `${smoothMousePosition.x - 250}px`,
-          top: `${smoothMousePosition.y - 250}px`,
+          left: `${smoothMousePosition.x - 200}px`,
+          top: `${smoothMousePosition.y - 200}px`,
           transition: 'none',
         }}
       />
       
-      {/* Secondary accent glow - more subtle */}
-      <div
-        className="absolute w-[300px] h-[300px] bg-gradient-to-r from-blue-400/10 to-transparent rounded-full blur-[60px] pointer-events-none"
-        style={{
-          left: `${smoothMousePosition.x - 150}px`,
-          top: `${smoothMousePosition.y - 150}px`,
-          transition: 'none',
-        }}
-      />
-      
-      {/* Floating orbs */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float-delayed" />
-
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
-          Hi, I'm <span 
-            onClick={() => handleSectionClick('about')}
-            className="text-blue-400 hover:text-blue-300 hover:animate-pulse transition-colors cursor-pointer"
-          >Supakorn Prayongyam</span>
-        </h1>
+      <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-10">
         
-        {/* Typing animation */}
-        <div className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 h-8 flex items-center justify-center">
-          <span className="font-mono">{displayedText}</span>
-          <span className="inline-block w-0.5 h-6 bg-blue-400 ml-1 animate-blink" />
-        </div>
-        
-        <p className="text-base sm:text-lg text-gray-400 mb-2">
-          Computer Engineering Student | SIIT, Thammasat University
-        </p>
-        
-        <p className="text-sm text-gray-500 mb-4">
-          3rd Year | GPA 3.23 | Pathum Thani, Thailand
-        </p>
-        
-        <p className="text-base sm:text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-          Fascinated by building full-stack applications, designing APIs, and working with relational and NoSQL databases.
-          Seeking a Software Engineer internship to contribute to reliable systems while growing as an engineer.
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <button
-            type="button"
-            onClick={() => handleSectionClick('projects')}
-            className="group px-8 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all duration-200 shadow-lg hover:shadow-blue-500/50 hover:shadow-xl hover:-translate-y-0.5"
-          >
-            View Projects
-            <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionClick('connect')}
-            className="group px-8 py-3 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-all duration-200 border border-gray-700 hover:border-blue-500 hover:-translate-y-0.5 hover:font-semibold shadow-lg hover:shadow-blue-500/30"
-          >
-            Get in Touch
-          </button>
+        {/* Left column: Text Content */}
+        <div className="text-left relative marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-6 sm:p-10 border border-gray-800/50 bg-gray-950/60 backdrop-blur-md">
+          <p className="font-mono text-blue-400 mb-4 text-sm uppercase tracking-widest">// Initializing_Profile</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in tracking-tight">
+            Hi, I'm <span 
+              onClick={() => handleSectionClick('about')}
+              className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 transition-colors cursor-pointer hover:opacity-80"
+            >Supakorn</span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">Prayongyam</span>
+          </h1>
+          
+          {/* Typing animation */}
+          <div className="text-lg sm:text-xl text-gray-300 mb-8 h-8 flex items-center justify-start">
+            <span className="font-mono text-blue-300">&gt; </span>
+            <span className="font-mono ml-2 text-gray-200">{displayedText}</span>
+            <span className="inline-block w-2.5 h-6 bg-blue-500 ml-1 animate-blink" />
+          </div>
+          
+          <div className="font-mono text-xs sm:text-sm text-gray-400 mb-10 border-l-2 border-gray-700 pl-5 py-2 space-y-2">
+            <p><span className="text-gray-500">PROGRAM    :</span> Computer Engineering, SIIT Thammasat</p>
+            <p><span className="text-gray-500">YEAR       :</span> 3rd Year [GPA: 3.23]</p>
+            <p><span className="text-gray-500">LOCATION   :</span> Pathum Thani, Thailand</p>
+            <div className="mt-4 pt-4 border-t border-gray-800/50 text-gray-300 max-w-lg leading-relaxed font-sans text-base">
+              Fascinated by building full-stack applications, designing APIs, and working with relational and NoSQL databases. Seeking a Software Engineer internship to contribute to reliable systems.
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-start">
+            <button
+              type="button"
+              onClick={() => handleSectionClick('projects')}
+              className="group px-8 py-3 bg-blue-500 text-gray-950 font-bold uppercase tracking-wider text-sm transition-all shadow-tactile border-2 border-transparent"
+            >
+              View Projects
+              <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSectionClick('connect')}
+              className="group px-8 py-3 bg-gray-900 text-gray-300 font-bold uppercase tracking-wider text-sm transition-all shadow-tactile-dark border-2 border-gray-600 focus:outline-none"
+            >
+              Get in Touch
+            </button>
+          </div>
         </div>
 
-        {/* Scroll indicator */}
-        <button type="button" onClick={() => handleSectionClick('about')} className="inline-block animate-bounce cursor-pointer">
-          <svg className="w-6 h-6 text-gray-400 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </button>
+        {/* Right column: Blueprint Technical Display */}
+        <div className="hidden lg:flex justify-center items-center relative h-full min-h-[500px] w-full">
+           <div className="absolute inset-0 bg-dot-pattern opacity-30" />
+           
+           {/* Technical framing lines */}
+           <div className="absolute top-0 right-0 w-32 h-32 border-t-[1px] border-r-[1px] border-blue-500/40" />
+           <div className="absolute bottom-0 left-0 w-32 h-32 border-b-[1px] border-l-[1px] border-purple-500/40" />
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-gray-700/50 to-transparent" />
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-[1px] bg-gradient-to-b from-transparent via-gray-700/50 to-transparent" />
+
+           {/* Floating Code Block */}
+           <div className="relative z-10 p-6 border-[1px] border-gray-700/80 bg-gray-900/80 backdrop-blur-md shadow-2xl transform rotate-2 hover:rotate-0 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] shadow-blue-900/20">
+             <div className="flex gap-2 mb-4 border-b border-gray-700/50 pb-2">
+               <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+               <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+               <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+             </div>
+             <pre className="font-mono text-sm leading-relaxed text-blue-300/90">
+{`const developer = {
+  name: "Supakorn P.",
+  role: "Full-Stack Dev",
+  core_stack: [
+    "TypeScript",
+    "React",
+    "Node.js",
+    "SQL/NoSQL"
+  ],
+  passion: [
+    "System Design",
+    "Scalable APIs"
+  ],
+  status: "Seeking Internship"
+  
+};
+
+// Ready to build
+developer.initialize();`}
+             </pre>
+             <div className="absolute -bottom-3 -right-3 text-[10px] font-mono text-gray-500 bg-gray-900 px-1 border border-gray-800">
+               SYS_ACTV
+             </div>
+           </div>
+           
+           {/* Floating crosshairs */}
+           <div className="absolute top-1/4 left-1/4 w-4 h-4 text-blue-500/40 font-mono text-xs">+</div>
+           <div className="absolute bottom-1/4 right-1/4 w-4 h-4 text-purple-500/40 font-mono text-xs">+</div>
+        </div>
+
+        {/* Scroll indicator - redesigned as a rigid arrow */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <div className="w-[1px] h-12 bg-gradient-to-b from-blue-500 to-transparent animate-pulse" />
+          <button type="button" onClick={() => handleSectionClick('about')} className="text-blue-500 font-mono text-xs mt-2 uppercase tracking-widest hover:text-white transition-colors">
+            Scroll
+          </button>
+        </div>
       </div>
     </section>
   );

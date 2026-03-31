@@ -101,13 +101,13 @@ export default function Navbar() {
   }, [location.pathname, updateActiveSection]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed top-0 left-0 right-0 sm:top-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-full sm:w-[90%] max-w-4xl z-50 transition-all duration-300 sm:border-[1px] ${
       isScrolled 
-        ? 'bg-gray-900/95 backdrop-blur-md border-b border-blue-500/20 shadow-lg shadow-blue-500/10' 
-        : 'bg-gray-900/50 backdrop-blur-sm border-b border-gray-800/50'
+        ? 'bg-gray-950/95 backdrop-blur-md border-b sm:border-blue-500/40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' 
+        : 'bg-gray-950/70 backdrop-blur-sm border-b sm:border-gray-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
     }`}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Left section: Logo and GitHub */}
           <div className="flex items-center gap-4">
             {/* Logo with gradient */}

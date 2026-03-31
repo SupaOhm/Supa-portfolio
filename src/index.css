@@ -32,40 +32,69 @@
     }
   }
 
-  .animate-gradient {
-    animation: gradientShift 8s ease infinite;
-    background-size: 200% 200%;
+  /* Engineer's Blueprint Theme Utilities */
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
 
-  @keyframes gradientShift {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
+  .bg-dot-pattern {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  /* Tactile / Offset Shadow for buttons */
+  .shadow-tactile {
+    box-shadow: 4px 4px 0px 0px rgba(59, 130, 246, 0.8);
+    transition: all 0.2s ease;
+  }
+  
+  .shadow-tactile:hover {
+    box-shadow: 6px 6px 0px 0px rgba(59, 130, 246, 1);
+    transform: translate(-2px, -2px);
   }
 
-  .animate-float-delayed {
-    animation: float 8s ease-in-out infinite;
-    animation-delay: -2s;
+  .shadow-tactile:active {
+    box-shadow: 0px 0px 0px 0px rgba(59, 130, 246, 0.8);
+    transform: translate(4px, 4px);
   }
 
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0) translateX(0);
-    }
-    33% {
-      transform: translateY(-20px) translateX(10px);
-    }
-    66% {
-      transform: translateY(10px) translateX(-10px);
-    }
+  .shadow-tactile-dark {
+    box-shadow: 4px 4px 0px 0px rgba(107, 114, 128, 0.8);
+    transition: all 0.2s ease;
   }
+  
+  .shadow-tactile-dark:hover {
+    box-shadow: 6px 6px 0px 0px rgba(107, 114, 128, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  .shadow-tactile-dark:active {
+    box-shadow: 0px 0px 0px 0px rgba(107, 114, 128, 0.8);
+    transform: translate(4px, 4px);
+  }
+
+  /* Crosshair marker for sections */
+  .marker-cross {
+    position: relative;
+  }
+  .marker-cross::before, .marker-cross::after {
+    content: '';
+    position: absolute;
+    background-color: rgba(156, 163, 175, 0.4);
+  }
+  .marker-cross-tl::before { top: 10px; left: 0; width: 20px; height: 1px; }
+  .marker-cross-tl::after { top: 0; left: 10px; width: 1px; height: 20px; }
+  
+  .marker-cross-tr::before { top: 10px; right: 0; width: 20px; height: 1px; }
+  .marker-cross-tr::after { top: 0; right: 10px; width: 1px; height: 20px; }
+  
+  .marker-cross-bl::before { bottom: 10px; left: 0; width: 20px; height: 1px; }
+  .marker-cross-bl::after { bottom: 0; left: 10px; width: 1px; height: 20px; }
+  
+  .marker-cross-br::before { bottom: 10px; right: 0; width: 20px; height: 1px; }
+  .marker-cross-br::after { bottom: 0; right: 10px; width: 1px; height: 20px; }
 
   .animate-blink {
     animation: blink 1s step-end infinite;
