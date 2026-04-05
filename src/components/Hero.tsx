@@ -112,14 +112,23 @@ export default function Hero() {
         {/* Left column: Text Content */}
         <div className="text-left relative marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-6 sm:p-10 border border-gray-800/50 bg-gray-950/60 backdrop-blur-md">
           <p className="font-mono text-blue-400 mb-4 text-sm uppercase tracking-widest">// Initializing_Profile</p>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in tracking-tight">
-            Hi, I'm <span 
-              onClick={() => handleSectionClick('about')}
-              className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 transition-colors cursor-pointer hover:opacity-80"
-            >Supakorn</span>
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">Prayongyam</span>
-          </h1>
+          <div className="mb-6 animate-fade-in">
+            <p className="mb-3 font-mono text-xs uppercase tracking-[0.35em] text-gray-500">
+              Full-stack builder with an engineering mindset
+            </p>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
+              <span
+                onClick={() => handleSectionClick('about')}
+                className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-500 transition-opacity cursor-pointer hover:opacity-85"
+              >
+                Supakorn
+              </span>
+              <span className="block text-gray-100">Prayongyam</span>
+              <span className="mt-4 block max-w-2xl text-lg sm:text-xl md:text-2xl font-medium tracking-[-0.02em] text-gray-300">
+                I design thoughtful interfaces and build reliable systems that feel sharp, calm, and ready to ship.
+              </span>
+            </h1>
+          </div>
           
           {/* Typing animation */}
           <div className="text-lg sm:text-xl text-gray-300 mb-8 h-8 flex items-center justify-start">
@@ -129,11 +138,11 @@ export default function Hero() {
           </div>
           
           <div className="font-mono text-xs sm:text-sm text-gray-400 mb-10 border-l-2 border-gray-700 pl-5 py-2 space-y-2">
-            <p><span className="text-gray-500">PROGRAM    :</span> Computer Engineering, SIIT Thammasat</p>
+            <p><span className="text-gray-500">PROGRAM    :</span> Computer Engineering, SIIT Thammasat University</p>
             <p><span className="text-gray-500">YEAR       :</span> 3rd Year [GPA: 3.23]</p>
             <p><span className="text-gray-500">LOCATION   :</span> Pathum Thani, Thailand</p>
             <div className="mt-4 pt-4 border-t border-gray-800/50 text-gray-300 max-w-lg leading-relaxed font-sans text-base">
-              Fascinated by building full-stack applications, designing APIs, and working with relational and NoSQL databases. Seeking a Software Engineer internship to contribute to reliable systems.
+              Fascinated by building full-stack applications, designing APIs, and working with relational and NoSQL databases. Looking for a Software Engineer internship to contribute to reliable systems.
             </div>
           </div>
           
@@ -176,18 +185,20 @@ export default function Hero() {
              <pre className="font-mono text-sm leading-relaxed text-blue-300/90">
 {`const developer = {
   name: "Supakorn P.",
-  role: "Full-Stack Dev",
+  role: "Computer Engineering Student",
   core_stack: [
-    "TypeScript",
+    "JavaScript/TypeScript",
     "React",
     "Node.js",
     "SQL/NoSQL"
   ],
   passion: [
-    "System Design",
-    "Scalable APIs"
+    "Artificial Intelligence",
+    "Networking",
+    "Full-stack Development",
+    "Database Design"
   ],
-  status: "Seeking Internship"
+  status: "Looking for Internship"
   
 };
 
