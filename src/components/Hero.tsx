@@ -114,7 +114,7 @@ export default function Hero() {
           <p className="font-mono text-blue-400 mb-4 text-sm uppercase tracking-widest">// Initializing_Profile</p>
           <div className="mb-6 animate-fade-in">
             <p className="mb-3 font-mono text-xs uppercase tracking-[0.35em] text-gray-500">
-              Full-stack builder with an engineering mindset
+              Hola World 
             </p>
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
               <span
@@ -125,7 +125,7 @@ export default function Hero() {
               </span>
               <span className="block text-gray-100">Prayongyam</span>
               <span className="mt-4 block max-w-2xl text-lg sm:text-xl md:text-2xl font-medium tracking-[-0.02em] text-gray-300">
-                I design thoughtful interfaces and build reliable systems that feel sharp, calm, and ready to ship.
+                SIIT, Thammasat University
               </span>
             </h1>
           </div>
@@ -138,7 +138,7 @@ export default function Hero() {
           </div>
           
           <div className="font-mono text-xs sm:text-sm text-gray-400 mb-10 border-l-2 border-gray-700 pl-5 py-2 space-y-2">
-            <p><span className="text-gray-500">PROGRAM    :</span> Computer Engineering, SIIT Thammasat University</p>
+            <p><span className="text-gray-500">PROGRAM    :</span> Computer Engineering, SIIT, Thammasat</p>
             <p><span className="text-gray-500">YEAR       :</span> 3rd Year [GPA: 3.23]</p>
             <p><span className="text-gray-500">LOCATION   :</span> Pathum Thani, Thailand</p>
             <div className="mt-4 pt-4 border-t border-gray-800/50 text-gray-300 max-w-lg leading-relaxed font-sans text-base">
