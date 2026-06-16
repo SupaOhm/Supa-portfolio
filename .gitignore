@@ -44,3 +44,7 @@ yarn-error.log*
 
 # graphify knowledge graph output
 graphify-out/
+
+# agent skill tooling
+.agents/
+skills-lock.json
