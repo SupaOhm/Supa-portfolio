@@ -47,4 +47,5 @@ graphify-out/
 
 # agent skill tooling
 .agents/
+.claude/
 skills-lock.json
