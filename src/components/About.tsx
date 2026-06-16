@@ -1,8 +1,9 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode } from 'react';
+import { useGitHubProfile } from '../hooks/useGitHubProfile';
+import { useReveal } from '../hooks/useReveal';
 
 const GITHUB_USERNAME = 'SupaOhm';
 const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
-const GITHUB_USER_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
 
 const RELEVANT_COURSES = [
   'Data Structures and Algorithms',
@@ -50,38 +51,6 @@ type InfoCardProps = {
   children: ReactNode;
 };
 
-type GitHubUserResponse = {
-  login: string;
-  avatar_url: string;
-  html_url: string;
-  name: string | null;
-  bio: string | null;
-  public_repos: number;
-  followers: number;
-  repos_url: string;
-  created_at: string;
-};
-
-type GitHubRepoResponse = {
-  name: string;
-  html_url: string;
-  stargazers_count: number;
-  language: string | null;
-};
-
-type GitHubStats = {
-  login: string;
-  avatarUrl: string;
-  profileUrl: string;
-  displayName: string;
-  bio: string;
-  repositories: number;
-  followers: number;
-  totalStars: number;
-  sinceYear: number;
-  topLanguage: string;
-};
-
 function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
   return (
     <div className={`p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
@@ -95,109 +64,8 @@ function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
 }
 
 export default function About() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
-  const [isGithubLoading, setIsGithubLoading] = useState(true);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Intersection Observer to detect when section is visible
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchGitHubStats = async () => {
-      try {
-        setIsGithubLoading(true);
-
-        const response = await fetch(GITHUB_USER_API, {
-          signal: controller.signal,
-          headers: {
-            Accept: 'application/vnd.github+json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch GitHub stats');
-        }
-
-        const data: GitHubUserResponse = await response.json();
-
-        const reposResponse = await fetch(`${data.repos_url}?per_page=100&type=owner`, {
-          signal: controller.signal,
-          headers: {
-            Accept: 'application/vnd.github+json',
-          },
-        });
-
-        if (!reposResponse.ok) {
-          throw new Error('Failed to fetch GitHub repositories');
-        }
-
-        const repos: GitHubRepoResponse[] = await reposResponse.json();
-        const totalStars = repos.reduce((total, repo) => total + repo.stargazers_count, 0);
-        const createdYear = new Date(data.created_at).getFullYear();
-        const languageCountMap = repos.reduce<Record<string, number>>((map, repo) => {
-          if (!repo.language) {
-            return map;
-          }
-
-          map[repo.language] = (map[repo.language] ?? 0) + 1;
-          return map;
-        }, {});
-        const topLanguage =
-          Object.entries(languageCountMap).sort((first, second) => second[1] - first[1])[0]?.[0] ?? 'N/A';
-
-        setGithubStats({
-          login: data.login,
-          avatarUrl: data.avatar_url,
-          profileUrl: data.html_url,
-          displayName: data.name ?? data.login,
-          bio: data.bio ?? 'No bio provided yet.',
-          repositories: data.public_repos,
-          followers: data.followers,
-          totalStars,
-          sinceYear: createdYear,
-          topLanguage,
-        });
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
-          setGithubStats(null);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsGithubLoading(false);
-        }
-      }
-    };
-
-    fetchGitHubStats();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  const { ref: sectionRef, isVisible } = useReveal<HTMLElement>();
+  const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
 
   return (
     <section ref={sectionRef} id="about" className="py-20 px-4 sm:px-6 lg:px-8 relative">

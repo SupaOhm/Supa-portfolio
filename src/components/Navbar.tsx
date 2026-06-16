@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useActiveSection } from '../hooks/useActiveSection';
 
 const NAV_LINKS = [
   { id: 'home', label: 'Home', type: 'route' as const },
@@ -11,14 +12,13 @@ const NAV_LINKS = [
 
 const SECTION_IDS = NAV_LINKS.map(link => link.id);
 const SCROLL_THRESHOLD = 50;
-const VISIBILITY_THRESHOLD = 0.1;
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<string>('home');
+  const activeSection = useActiveSection(SECTION_IDS, { enabled: location.pathname === '/' });
 
   const handleSectionClick = useCallback((id: string) => {
     if (location.pathname !== '/') {
@@ -36,35 +36,6 @@ export default function Navbar() {
     return location.pathname === '/' && activeSection === linkId;
   }, [location.pathname, activeSection]);
 
-  const updateActiveSection = useCallback(() => {
-    const elements = SECTION_IDS
-      .map((sectionId) => document.getElementById(sectionId))
-      .filter((el): el is HTMLElement => !!el);
-
-    if (elements.length === 0) return;
-
-    let mostVisibleElement: HTMLElement | null = null;
-    let maxOccupancy = 0;
-
-    elements.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      
-      const visibleHeight = Math.max(0, Math.min(viewportHeight, rect.bottom) - Math.max(0, rect.top));
-      const occupancy = visibleHeight / viewportHeight;
-
-      if (occupancy > maxOccupancy) {
-        maxOccupancy = occupancy;
-        mostVisibleElement = el;
-      }
-    });
-
-    if (maxOccupancy > VISIBILITY_THRESHOLD && mostVisibleElement) {
-      const element: HTMLElement = mostVisibleElement;
-      setActiveSection(element.id);
-    }
-  }, []);
-
   // Detect scroll to change navbar appearance
   useEffect(() => {
     const handleScroll = () => {
@@ -73,32 +44,6 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Track which section is in view on Home for active indicator
-  useEffect(() => {
-    if (location.pathname !== '/') {
-      return;
-    }
-
-    let aboutSection: HTMLElement | null = null;
-
-    window.addEventListener('scroll', updateActiveSection);
-    
-    // Handle About section expand/collapse
-    aboutSection = document.getElementById('about');
-    if (aboutSection) {
-      aboutSection.addEventListener('transitionend', updateActiveSection);
-    }
-
-    updateActiveSection();
-
-    return () => {
-      window.removeEventListener('scroll', updateActiveSection);
-      if (aboutSection) {
-        aboutSection.removeEventListener('transitionend', updateActiveSection);
-      }
-    };
-  }, [location.pathname, updateActiveSection]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 sm:top-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-full sm:w-[90%] max-w-4xl z-50 transition-all duration-300 sm:border-[1px] ${
