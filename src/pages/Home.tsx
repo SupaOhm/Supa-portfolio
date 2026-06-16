@@ -5,6 +5,7 @@ import About from '../components/About';
 import Skills from '../components/Skills';
 import Projects from '../components/Projects';
 import Connect from '../components/Connect';
+import { scrollToSection } from '../hooks/useActiveSection';
 
 export default function Home() {
 	const location = useLocation();
@@ -13,11 +14,7 @@ export default function Home() {
 		const state = location.state as { targetId?: string } | null;
 		const targetId = state?.targetId || (window.location.hash ? window.location.hash.slice(1) : undefined);
 		if (targetId) {
-			const el = document.getElementById(targetId);
-			if (el) {
-				// slight delay to ensure elements are laid out
-				setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 0);
-			}
+			scrollToSection(targetId);
 		}
 	}, [location]);
 

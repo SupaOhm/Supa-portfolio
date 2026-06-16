@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useReveal } from '../hooks/useReveal';
 
 const SKILL_CATEGORIES = {
   Languages: ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
@@ -8,31 +8,7 @@ const SKILL_CATEGORIES = {
 } as const;
 
 export default function Skills() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
+  const { ref: sectionRef, isVisible } = useReveal<HTMLElement>();
 
   return (
     <section ref={sectionRef} id="skills" className="py-20 px-4 sm:px-6 lg:px-8 relative">

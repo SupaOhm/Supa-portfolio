@@ -7,6 +7,7 @@ import {
 } from '../types/project';
 import ProjectCard from './ProjectCard';
 import { PROJECTS } from '../data/projects';
+import useCarousel from '../hooks/useCarousel';
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   completed: 'Completed',
@@ -20,13 +21,6 @@ const STATUS_COLORS: Record<ProjectStatus, string> = {
   planned: 'bg-blue-400',
 };
 
-// Returns the carousel slot [-2, 2] for a given index relative to current, or null if out of range
-function getCarouselPosition(index: number, current: number, total: number): number | null {
-  const raw = ((index - current) % total + total) % total;
-  const pos = raw > total / 2 ? raw - total : raw;
-  return Math.abs(pos) <= 2 ? pos : null;
-}
-
 const POSITION_STYLES: Record<number, React.CSSProperties> = {
   0:  { transform: 'translateX(0) scale(1) rotateY(0deg)',        opacity: 1,   zIndex: 30, filter: 'brightness(1.2)' },
   1:  { transform: 'translateX(110%) scale(0.85) rotateY(-35deg)', opacity: 0.7, zIndex: 20, filter: 'brightness(0.7)' },
@@ -37,12 +31,9 @@ const POSITION_STYLES: Record<number, React.CSSProperties> = {
 
 export default function Projects() {
   const [isCarouselView, setIsCarouselView] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [cardHeight, setCardHeight] = useState(600);
   const [selectedCategories, setSelectedCategories] = useState<Set<ProjectCategory>>(new Set());
   const [selectedStatuses, setSelectedStatuses] = useState<Set<ProjectStatus>>(new Set());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const centerCardRef = useRef<HTMLDivElement>(null);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
   const filteredProjects = useMemo(
@@ -55,13 +46,11 @@ export default function Projects() {
     [selectedCategories, selectedStatuses],
   );
 
-  // Reset carousel to first card when filters change
-  useEffect(() => { setCurrentIndex(0); }, [selectedCategories, selectedStatuses]);
+  const { currentIndex, setCurrentIndex, next, prev, reset, slotOf, cardHeight, centerCardRef } =
+    useCarousel(filteredProjects.length);
 
-  // Track center card height so the carousel wrapper doesn't collapse
-  useEffect(() => {
-    if (centerCardRef.current) setCardHeight(centerCardRef.current.offsetHeight);
-  }, [currentIndex, filteredProjects.length, isCarouselView]);
+  // Reset carousel to first card when filters change
+  useEffect(() => { reset(); }, [selectedCategories, selectedStatuses, reset]);
 
   // Close filter dropdown on outside click
   useEffect(() => {
@@ -72,11 +61,6 @@ export default function Projects() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  const navigate = (dir: 1 | -1) => {
-    if (filteredProjects.length <= 1) return;
-    setCurrentIndex((prev) => (prev + dir + filteredProjects.length) % filteredProjects.length);
-  };
 
   const toggleCategory = (cat: ProjectCategory) =>
     setSelectedCategories((prev) => {
@@ -252,7 +236,7 @@ export default function Projects() {
               <div className="relative w-full flex items-center justify-center" style={{ perspective: '2000px' }}>
                 {filteredProjects.length > 0 ? (
                   filteredProjects.map((project, idx) => {
-                    const pos = getCarouselPosition(idx, currentIndex, filteredProjects.length);
+                    const pos = slotOf(idx);
                     if (pos === null) return null;
                     const isCenter = pos === 0;
                     return (
@@ -278,12 +262,12 @@ export default function Projects() {
             {/* Arrow Navigation */}
             {filteredProjects.length > 1 && (
               <>
-                <button onClick={() => navigate(-1)} className="absolute left-0 sm:left-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Previous project">
+                <button onClick={prev} className="absolute left-0 sm:left-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Previous project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <button onClick={() => navigate(1)} className="absolute right-0 sm:right-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Next project">
+                <button onClick={next} className="absolute right-0 sm:right-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Next project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>

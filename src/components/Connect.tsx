@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, type ReactElement } from 'react';
+import { useGitHubProfile } from '../hooks/useGitHubProfile';
 
 const GITHUB_USERNAME = 'SupaOhm';
 const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
-const GITHUB_USER_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
 
 type PointerPosition = { x: number; y: number };
 
@@ -18,54 +18,6 @@ type ContactLink = {
   detail: string;
   description?: string;
   icon: ReactElement;
-};
-
-type GitHubUserResponse = {
-  login: string;
-  avatar_url: string;
-  html_url: string;
-  name: string | null;
-  bio: string | null;
-  location: string | null;
-  company: string | null;
-  blog: string;
-  hireable: boolean | null;
-  public_repos: number;
-  public_gists: number;
-  followers: number;
-  following: number;
-  repos_url: string;
-  created_at: string;
-  updated_at: string;
-};
-
-type GitHubRepoResponse = {
-  name: string;
-  html_url: string;
-  stargazers_count: number;
-  forks_count: number;
-  language: string | null;
-};
-
-type GitHubStats = {
-  login: string;
-  avatarUrl: string;
-  profileUrl: string;
-  displayName: string;
-  bio: string;
-  location: string;
-  hireable: boolean | null;
-  repositories: number;
-  followers: number;
-  totalStars: number;
-  sinceYear: number;
-  updatedAt: string;
-  topLanguage: string;
-  mostStarredRepo: {
-    name: string;
-    stars: number;
-    url: string;
-  } | null;
 };
 
 const INITIAL_POINTER_POSITION: PointerPosition = { x: 0, y: 0 };
@@ -132,8 +84,7 @@ export default function Connect() {
   const [smoothMousePosition, setSmoothMousePosition] = useState<PointerPosition>(INITIAL_POINTER_POSITION);
   const [showAllDetails, setShowAllDetails] = useState(false);
   const [fullHover, setFullHover] = useState<FullHoverState>(INITIAL_FULL_HOVER_STATE);
-  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
-  const [isGithubLoading, setIsGithubLoading] = useState(true);
+  const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
   const mouseRef = useRef(mousePosition);
 
   // Keep latest mouse position in a ref
@@ -155,99 +106,6 @@ export default function Connect() {
     
     animationFrameId = requestAnimationFrame(smoothMove);
     return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchGitHubStats = async () => {
-      try {
-        setIsGithubLoading(true);
-
-        const response = await fetch(GITHUB_USER_API, {
-          signal: controller.signal,
-          headers: {
-            Accept: 'application/vnd.github+json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch GitHub stats');
-        }
-
-        const data: GitHubUserResponse = await response.json();
-
-        const reposResponse = await fetch(`${data.repos_url}?per_page=100&type=owner`, {
-          signal: controller.signal,
-          headers: {
-            Accept: 'application/vnd.github+json',
-          },
-        });
-
-        if (!reposResponse.ok) {
-          throw new Error('Failed to fetch GitHub repositories');
-        }
-
-        const repos: GitHubRepoResponse[] = await reposResponse.json();
-        const totalStars = repos.reduce((total, repo) => total + repo.stargazers_count, 0);
-        const createdYear = new Date(data.created_at).getFullYear();
-
-        const mostStarredRepo = repos.reduce<GitHubStats['mostStarredRepo']>((best, repo) => {
-          if (!best || repo.stargazers_count > best.stars) {
-            return {
-              name: repo.name,
-              stars: repo.stargazers_count,
-              url: repo.html_url,
-            };
-          }
-
-          return best;
-        }, null);
-
-        const languageCountMap = repos.reduce<Record<string, number>>((map, repo) => {
-          if (!repo.language) {
-            return map;
-          }
-
-          map[repo.language] = (map[repo.language] ?? 0) + 1;
-          return map;
-        }, {});
-
-        const topLanguage =
-          Object.entries(languageCountMap).sort((first, second) => second[1] - first[1])[0]?.[0] ?? 'N/A';
-
-        setGithubStats({
-          login: data.login,
-          avatarUrl: data.avatar_url,
-          profileUrl: data.html_url,
-          displayName: data.name ?? data.login,
-          bio: data.bio ?? 'No bio provided yet.',
-          location: data.location ?? 'Not specified',
-          hireable: data.hireable,
-          repositories: data.public_repos,
-          followers: data.followers,
-          totalStars,
-          sinceYear: createdYear,
-          updatedAt: data.updated_at,
-          topLanguage,
-          mostStarredRepo,
-        });
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
-          setGithubStats(null);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsGithubLoading(false);
-        }
-      }
-    };
-
-    fetchGitHubStats();
-
-    return () => {
-      controller.abort();
-    };
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
