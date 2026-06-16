@@ -1,126 +1,137 @@
 # Supa's Portfolio
 
-A modern interactive portfolio built with React, TypeScript, and Tailwind CSS. It features smooth section navigation, a 3D project carousel, and live GitHub profile stats.
+A modern, interactive developer portfolio built with **React 19**, **TypeScript**, and **Tailwind CSS**. It presents projects, skills, and live GitHub activity as a single scrolling page with smooth section navigation, a 3D project carousel, and a dark, animated UI.
+
+🔗 **Live:** `https://github.com/SupaOhm/Supa-portfolio`
+
+---
 
 ## ✨ Features
 
-- **Smooth Section Navigation** - Navigate between Home, About, Projects, and Connect sections with smooth scrolling
-- **Active Section Indicator** - Visual indicator tracks which section is currently in view
-- **3D Project Carousel** - Beautiful 3D carousel with rotating cards and smooth transitions
-- **Category Filtering** - Project filters with count badges (Web, Mobile, Backend, Database, Tools, Embedded, Security, Cloud, AI, Design)
-- **Live GitHub Data** - GitHub profile and stats fetched from GitHub API
-- **Responsive Design** - Fully responsive layout that works on desktop, tablet, and mobile
-- **Dark Theme** - Modern dark theme with blue/purple accent colors
-- **Grid & Carousel Views** - Toggle between carousel and grid view for projects
-- **Smooth Animations** - Fluid transitions and animations throughout
+- **Single-page, section-based navigation** — Home, About, Skills, Projects, and Connect live on one page; the navbar tracks the section in view with an `IntersectionObserver` and scrolls smoothly to it.
+- **3D project carousel** — Perspective-transformed cards where the center card is full-size and bright while neighbors rotate and dim for depth, with looping next/previous controls and dot navigation.
+- **Grid ↔ carousel toggle** — Switch between an immersive carousel and a scannable grid.
+- **Category filtering** — Filter projects across Web, Mobile, Backend, Database, Tools, Embedded, Security, Cloud, AI, Design, and Data, each with a live count badge.
+- **Live GitHub data** — Profile and repo stats (avatar, total stars, top language, most-starred repo, and more) fetched at runtime from the public GitHub API.
+- **Animated hero** — A typing animation cycling through roles, with a cursor-following gradient that eases toward the pointer.
+- **Reveal-on-scroll** — Sections fade and animate in as they enter the viewport.
+- **Fully responsive dark theme** — Blue/purple accents on gray-950, tuned for mobile, tablet, and desktop.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **React** 19.2.0 - UI framework
-- **TypeScript** 5.9.3 - Type safety
-- **React Router** 7.12.0 - Client-side routing
-- **Tailwind CSS** 3.4.19 - Styling and animations
-- **Vite** 7.2.4 - Build tool
+| Tool | Version | Role |
+| --- | --- | --- |
+| React | 19.2 | UI framework |
+| TypeScript | 5.9 | Type safety |
+| React Router | 7.x | Routing + scroll-target state |
+| Tailwind CSS | 3.4 | Styling & animation utilities |
+| Vite | 7.x | Dev server & build |
+| ESLint | 9.x | Linting (typescript-eslint, react-hooks) |
+
+---
+
+## 🚀 Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start the dev server (http://localhost:5173, also exposed on your LAN)
+npm run dev
+
+# Type-check and build for production → dist/
+npm run build
+
+# Preview the production build locally
+npm run preview
+
+# Lint
+npm run lint
+```
+
+> Requires Node 18+ (Vite 7). There is no test suite configured.
+
+---
 
 ## 📂 Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Navbar.tsx         # Navigation bar with section tracking
-│   ├── Hero.tsx           # Landing section with typing animation
-│   ├── About.tsx          # About section + compact GitHub profile card
-│   ├── Skills.tsx         # Skills breakdown by categories
-│   ├── Projects.tsx       # 3D carousel, grid view, and category filtering
-│   ├── ProjectCard.tsx    # Individual project card
-│   ├── Connect.tsx        # Contact section + detailed GitHub profile insights
-│   └── Footer.tsx         # Footer links and credits
+│   ├── Navbar.tsx        # Section tracking (IntersectionObserver) + smooth scroll nav
+│   ├── Hero.tsx          # Typing animation + cursor-following gradient
+│   ├── About.tsx         # Bio + compact live GitHub snapshot
+│   ├── Skills.tsx        # Skills grouped by category
+│   ├── Projects.tsx      # 3D carousel, grid view, and category filtering
+│   ├── ProjectCard.tsx   # Individual project card
+│   ├── Connect.tsx       # Contact links + detailed live GitHub insights
+│   └── Footer.tsx        # Footer links and credits
+├── data/
+│   └── projects.ts       # PROJECTS array — the source of project content
 ├── pages/
-│   └── Home.tsx          # Main home page composition
+│   └── Home.tsx          # Composes all sections; handles scroll-to-section on load
 ├── types/
-│   └── project.ts        # Project and project-category types
-├── App.tsx               # Main app component with router
-├── main.tsx              # React entry point
-└── index.css             # Global styles and animations
+│   └── project.ts        # Project type + category/status string-literal unions
+├── App.tsx               # Router + layout shell
+├── main.tsx              # React entry (StrictMode + BrowserRouter)
+└── index.css             # Global styles, keyframes, and animations
 ```
 
-## 🎨 Key Components
+Project images are static assets in `public/images/projects/`, referenced by absolute path (e.g. `/images/projects/expense.png`).
 
-### Navbar
-- Fixed navigation with smooth scrolling between sections
-- IntersectionObserver tracks active section with threshold of 0.6
-- Responsive mobile menu
-- Active indicator underline
+---
 
-### Projects Carousel
-- 3D perspective transform carousel
-- Center card is scaled to 1.0 with full brightness
-- Adjacent cards rotate 35 degrees with 0.85 scale
-- Far cards fade with reduced brightness for depth
-- Infinite looping with next/previous buttons
-- Dot navigation for direct access
-- Stable transitions for 3-card category views
+## 🧭 How Navigation Works
 
-### GitHub Integration
-- About section: compact live GitHub snapshot
-- Connect section: detailed live profile insights (avatar, stars, top language, most starred repo, etc.)
-- Data sourced from public GitHub API endpoints
+`App.tsx` declares routes (`/`, `/about`, `/projects`, `/connect`), but the real experience is a **single scrolling page**: `pages/Home.tsx` stacks `Hero`, `About`, `Skills`, `Projects`, and `Connect`.
 
-### Hero Section
-- Typing animation cycling through different roles
-- Cursor-following gradient effects
-- Smooth easing animation
+- The **navbar** observes each section (threshold ~0.6) to highlight the active one and triggers `scrollIntoView` for smooth jumps.
+- When you arrive at `/` from elsewhere, `Home.tsx` reads `location.state.targetId` (or the URL hash) and scrolls to that section on mount.
 
-## 🎯 Navigation
+When extending navigation, treat the standalone routes as secondary — the primary path renders everything inside `Home`.
 
-- **Portfolio Button** - Scrolls to home/top
-- **Home** - Landing section (Hero)
-- **About** - Skills and bio
-- **Projects** - 3D carousel showcase
-- **Connect** - Contact information
-
-## 📱 Responsive Breakpoints
-
-- Mobile: 0px - 640px
-- Tablet: 641px - 1024px
-- Desktop: 1025px+
+---
 
 ## 🔧 Customization
 
-### Update Projects
-Edit the projects array in `src/components/Projects.tsx`:
-```typescript
-const PROJECTS: Project[] = [
-  {
-    id: '1',
-    title: 'Your Project',
-    description: 'Description',
-    tags: ['Tech1', 'Tech2'],
-    categories: ['Web', 'Backend'],
-    githubUrl: 'https://github.com/...',
-    demoUrl: 'https://...'
-  }
-];
+### Add or edit projects
+Projects live in **`src/data/projects.ts`** as the `PROJECTS: Project[]` array:
+
+```ts
+{
+  id: '1',
+  title: 'Full-Stack Expense Management',
+  description: 'A full-stack expense app with a React frontend and Express/MongoDB backend…',
+  tags: ['MongoDB', 'Express.js', 'React', 'Node.js'],
+  imageUrl: '/images/projects/expense.png',
+  githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
+  status: 'completed',          // 'completed' | 'in-progress' | 'planned'
+  categories: ['Web', 'Backend', 'Database'],
+}
 ```
 
-### Adjust Colors
-Modify Tailwind color classes in components. The portfolio uses:
-- Primary: `blue-400` to `blue-500`
-- Secondary: `purple-400` to `purple-500`
-- Background: `gray-900` to `gray-950`
+The `Project` type and the allowed `categories`/`status` values are defined in **`src/types/project.ts`** as `as const` unions — add a new category or status there first and TypeScript (and the filter UI) will pick it up.
 
-## 📄 License
+### Update the hero roles
+Edit the `WORDS` array in `src/components/Hero.tsx`.
 
-This project is open source and available under the MIT License.
+### Update skills
+Edit the `SKILL_CATEGORIES` object in `src/components/Skills.tsx`.
+
+### Point GitHub stats at a different account
+`GITHUB_USERNAME` is set in both `src/components/About.tsx` and `src/components/Connect.tsx`. Requests are unauthenticated and subject to GitHub's public rate limit (60 req/hr/IP), so expect occasional throttling during heavy local reloading.
+
+### Theme
+The dark theme uses `gray-900`/`gray-950` backgrounds with `blue-*` and `purple-*` accents via Tailwind utility classes (`tailwind.config.js` has no custom theme extensions).
+
+---
 
 ## 👤 Author
 
-**SupaOhm**
-- GitHub: [@SupaOhm](https://github.com/SupaOhm)
+**SupaOhm** — [@SupaOhm](https://github.com/SupaOhm)
 
-## 🙏 Acknowledgments
+## 📄 License
 
-- React and Vite communities
-- Tailwind CSS for styling utilities
-- Inspiration from modern portfolio designs
-
+Open source under the MIT License.
