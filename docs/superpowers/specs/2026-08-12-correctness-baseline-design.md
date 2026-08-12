@@ -174,7 +174,19 @@ which is the correct order.
 
 Currently at `src/hooks/useCarousel.ts:5-9`. Already exported and pure.
 
-- Table-driven slot assignment for `total ∈ {1, 2, 3, 4, 5, 6}` at `current === 0`
+- Table-driven slot assignment for `total ∈ {1, 2, 3, 4, 5, 6}` at `current === 0`.
+  Executed against the current implementation, the expected table is:
+
+  ```
+  total=0 -> [null]
+  total=1 -> [0]
+  total=2 -> [0, 1]
+  total=3 -> [0, 1, -1]
+  total=4 -> [0, 1, 2, -1]          <- asymmetric
+  total=5 -> [0, 1, 2, -2, -1]
+  total=6 -> [0, 1, 2, null, -2, -1]
+  ```
+
 - **The `total === 4` asymmetry:** slot `-2` is never filled while slot `2` is, so one
   neighbour renders at `opacity: 0` with no counterpart. `PROJECTS` holds 12 entries and a
   single two-category filter can land on 4, so this is reachable.
@@ -226,7 +238,14 @@ natural home for the helpers Slice E will extract.
 - Category and status filters AND across groups
 - **A project with no `status` is excluded whenever any status filter is active.**
   `status` is optional on the `Project` type (`src/types/project.ts:29`) and
-  `Projects.tsx:43` requires `p.status != null`. Deliberate-looking, but undocumented.
+  `Projects.tsx:43` requires `p.status != null`.
+
+  **This case requires a synthetic fixture.** All 12 entries in `PROJECTS` currently supply
+  a `status`, verified by parsing `src/data/projects.ts` — so no real project exercises this
+  branch today. That makes it *more* worth pinning, not less: it is a live code path with
+  zero coverage from real data, and it will start mattering silently the first time someone
+  adds a project without a status. The test constructs its own small `Project[]` fixture
+  rather than importing `PROJECTS`, which also keeps it stable as real project data changes.
 
 ## 4. Dead-code sweep
 
@@ -243,7 +262,7 @@ natural home for the helpers Slice E will extract.
 | `ContactLink.description` field and its unreachable render branch (all four entries are `''`) | `src/components/Connect.tsx:19, 39, 50, 61, 72, 206-208` |
 | `NAV_LINKS[].type` field (zero readers) | `src/components/Navbar.tsx:6-10` |
 | `threshold` option (never supplied by its only caller) | `src/hooks/useActiveSection.ts:6` |
-| Four unreferenced images: `db2.png`, `db3.jpg`, `lostfound2.png`, `nosleep2.jpg` | `public/images/projects/` |
+| Four unreferenced images totalling **2.5 MB**: `db2.png` (117 KB), `db3.jpg` (452 KB), `lostfound2.png` (888 KB), `nosleep2.jpg` (1.13 MB) | `public/images/projects/` |
 | Three `.DS_Store` files | `public/`, `public/images/`, `public/images/projects/` |
 
 Notes:
