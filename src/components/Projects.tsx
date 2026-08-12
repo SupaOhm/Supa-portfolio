@@ -8,6 +8,7 @@ import {
 import ProjectCard from './ProjectCard';
 import { PROJECTS } from '../data/projects';
 import useCarousel from '../hooks/useCarousel';
+import { filterProjects } from '../lib/filterProjects';
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   completed: 'Completed',
@@ -37,12 +38,7 @@ export default function Projects() {
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
   const filteredProjects = useMemo(
-    () =>
-      PROJECTS.filter((p) => {
-        const catOk = selectedCategories.size === 0 || p.categories.some((c) => selectedCategories.has(c));
-        const stOk = selectedStatuses.size === 0 || (p.status != null && selectedStatuses.has(p.status));
-        return catOk && stOk;
-      }),
+    () => filterProjects(PROJECTS, selectedCategories, selectedStatuses),
     [selectedCategories, selectedStatuses],
   );
 
