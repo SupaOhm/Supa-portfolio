@@ -65,14 +65,22 @@ export default function Projects() {
   const toggleCategory = (cat: ProjectCategory) =>
     setSelectedCategories((prev) => {
       const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
+      if (next.has(cat)) {
+        next.delete(cat);
+      } else {
+        next.add(cat);
+      }
       return next;
     });
 
   const toggleStatus = (st: ProjectStatus) =>
     setSelectedStatuses((prev) => {
       const next = new Set(prev);
-      next.has(st) ? next.delete(st) : next.add(st);
+      if (next.has(st)) {
+        next.delete(st);
+      } else {
+        next.add(st);
+      }
       return next;
     });
 

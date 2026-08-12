@@ -7,26 +7,24 @@ export function useReveal<T extends Element = HTMLElement>(
   const ref = useRef<T>(null);
 
   useEffect(() => {
+    const element = ref.current;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        });
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsVisible(true);
+          // Reveal-once: stop observing after the first intersection.
+          observer.disconnect();
+        }
       },
       { threshold }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    if (element) {
+      observer.observe(element);
     }
 
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
-    };
+    return () => observer.disconnect();
   }, [threshold]);
 
   return { ref, isVisible };
