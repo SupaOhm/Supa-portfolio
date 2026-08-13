@@ -212,6 +212,7 @@ export default function Connect() {
           <button
             onClick={() => setShowAllDetails((prev) => !prev)}
             aria-expanded={showAllDetails}
+            aria-controls="contact-details-panel"
             className="px-4 py-3 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-blue-500/30 border border-blue-400/40 hover:border-blue-400/70 text-xs font-semibold text-blue-100 transition-all duration-300 shadow-sm hover:shadow-blue-500/20"
           >
             {showAllDetails ? 'Hide All Contact Details' : 'Show All Contact Details'}
@@ -219,6 +220,8 @@ export default function Connect() {
         </div>
 
         <div
+          id="contact-details-panel"
+          inert={!showAllDetails}
           className={`mb-10 overflow-hidden transition-all duration-500 ease-in-out ${
             showAllDetails
               ? 'max-h-[1000px] opacity-100 translate-y-0'
