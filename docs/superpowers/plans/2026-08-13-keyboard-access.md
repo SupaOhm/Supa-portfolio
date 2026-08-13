@@ -83,14 +83,16 @@ describe('jsdom environment probe', () => {
   it('reports whether jsdom implements window.matchMedia', () => {
     // NOT an assertion about what jsdom SHOULD do — this records what it DOES.
     // The result decides whether src/test/setup.ts needs a matchMedia stub.
-    // eslint-disable-next-line no-console
     console.log('PROBE typeof window.matchMedia =', typeof window.matchMedia);
     expect(['function', 'undefined']).toContain(typeof window.matchMedia);
   });
 });
 ```
 
-Note the `eslint-disable-next-line` here is the single permitted exception in this plan, and only because this file is deleted in Step 6. Do not carry that pattern into any other file.
+No `eslint-disable` is needed for the `console.log`: this project's ESLint config extends
+`js.configs.recommended`, which does not enable `no-console`. Verified by linting a probe
+file containing a bare `console.log` — ESLint reported nothing. The Global Constraints ban
+on `eslint-disable` therefore holds with no exception.
 
 - [ ] **Step 3: Run the probe and RECORD the output**
 
