@@ -51,7 +51,7 @@ npm run preview
 npm run lint
 ```
 
-> Requires Node 18+ (Vite 7). There is no test suite configured.
+> Requires Node ^20.19 or >=22.12 (Vite 7). Run `npm test` for the unit test suite and `npm run typecheck` for a standalone type check.
 
 ---
 

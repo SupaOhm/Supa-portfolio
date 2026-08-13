@@ -53,7 +53,7 @@ type InfoCardProps = {
 
 function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
   return (
-    <div className={`p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
+    <div className={`group p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
       <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
         {icon}
         {title}

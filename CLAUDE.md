@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint` — run ESLint over the repo
 - `npm run preview` — serve the production build locally
 
-There is no test suite or test runner configured.
+`npm test` runs the Vitest suite (34 tests, `environment: 'node'`, no jsdom); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
 
 ## Architecture
 

@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useActiveSection } from '../hooks/useActiveSection';
 
 const NAV_LINKS = [
-  { id: 'home', label: 'Home', type: 'route' as const },
-  { id: 'about', label: 'About', type: 'section' as const },
-  { id: 'skills', label: 'Skills', type: 'section' as const },
-  { id: 'projects', label: 'Projects', type: 'section' as const },
-  { id: 'connect', label: 'Connect', type: 'section' as const },
+  { id: 'home', label: 'Home' },
+  { id: 'about', label: 'About' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'connect', label: 'Connect' },
 ] as const;
 
 const SECTION_IDS = NAV_LINKS.map(link => link.id);

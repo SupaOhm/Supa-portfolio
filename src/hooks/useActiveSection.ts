@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 const DEFAULT_VISIBILITY_THRESHOLD = 0.1;
 
 interface UseActiveSectionOptions {
-  threshold?: number;
   enabled?: boolean;
 }
 
@@ -20,7 +19,7 @@ export function useActiveSection(
   sectionIds: readonly string[],
   options?: UseActiveSectionOptions,
 ): string {
-  const { threshold = DEFAULT_VISIBILITY_THRESHOLD, enabled = true } = options ?? {};
+  const { enabled = true } = options ?? {};
   const initialId = sectionIds[0] ?? 'home';
   const [activeSection, setActiveSection] = useState<string>(initialId);
 
@@ -52,7 +51,7 @@ export function useActiveSection(
         }
       });
 
-      if (maxOccupancy > threshold && mostVisibleElement) {
+      if (maxOccupancy > DEFAULT_VISIBILITY_THRESHOLD && mostVisibleElement) {
         const element: HTMLElement = mostVisibleElement;
         setActiveSection(element.id);
       }
@@ -74,7 +73,7 @@ export function useActiveSection(
         aboutSection.removeEventListener('transitionend', updateActiveSection);
       }
     };
-  }, [sectionIds, threshold, enabled]);
+  }, [sectionIds, enabled]);
 
   return enabled ? activeSection : initialId;
 }
