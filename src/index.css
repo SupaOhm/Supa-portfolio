@@ -17,10 +17,6 @@
     animation: fadeIn 1s ease-in;
   }
 
-  .animate-fadeIn {
-    animation: fadeIn 0.6s ease-out forwards;
-  }
-  
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -107,23 +103,6 @@
     50% {
       opacity: 0;
     }
-  }
-
-  /* Hide scrollbar for carousel */
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* 3D Carousel Perspective */
-  .perspective-container {
-    perspective: 2500px;
-    perspective-origin: center center;
-    transform-style: preserve-3d;
   }
 
   /* Slide-in animation for language bars */
