@@ -144,22 +144,57 @@ export function revealStyle(
 ): CSSProperties;
 ```
 
-Returns:
+Returns exactly two properties:
 
-| Property | Revealed | Hidden |
-|---|---|---|
-| `opacity` | `1` | `0` |
-| `transform` | `'translateY(0)'` | `'translateY(20px)'` |
-| `transitionProperty` | `'opacity, transform'` | same |
-| `transitionDuration` | `reduced ? '1ms' : '500ms'` | same |
-| `transitionDelay` | `reduced ? '0ms' : \`${delayMs}ms\`` | same |
+| Property | Value |
+|---|---|
+| `opacity` | `isVisible ? 1 : 0` |
+| `animation` | `isVisible && !reduced ? \`fadeIn 500ms ease-out ${delayMs}ms both\` : 'none'` |
 
-`1ms` rather than `0ms` so a `transitionend` listener still fires — nothing depends on
-that today, but a zero-duration transition does not emit the event and that is a
-surprising trap to leave behind.
+**It must NOT set any `transition*` property.** This is the critical constraint, and it
+is why the design keeps `animation` rather than converting to transitions as originally
+sketched.
 
-The revealed state is a **declared style value**, not an animation fill. That is what
-makes the reduced-motion remedy safe by construction.
+Five of the six Group 1 elements already declare a CSS transition in their `className`:
+
+| Site | Existing class |
+|---|---|
+| `About.tsx:182` | `transition-transform duration-200` |
+| `About.tsx:213` | `transition-all duration-300` |
+| `About.tsx:290` | `transition-transform duration-300` |
+| `Skills.tsx:35` | `transition-all duration-300` |
+| `Skills.tsx:46` | `transition-all duration-300` |
+
+Inline styles beat Tailwind classes, and `transitionProperty` / `transitionDuration` /
+`transitionDelay` are the same longhands those utilities compile to. Setting them inline
+would retime every hover on those five elements from 200-300ms to 500ms **and** apply the
+reveal's stagger delay to hover — so hovering the fourth fun-fact would lag 300ms before
+it moved. There is no way to set an inline transition that does not clobber the class;
+the only safe answer is to not set one.
+
+### How the hazard is removed without transitions
+
+The blanking bug is caused by the **base opacity being wrong**, not by the use of
+`animation`. Flipping the base is sufficient:
+
+| State | `opacity` (base) | `animation` | Result |
+|---|---|---|---|
+| Hidden | `0` | `none` | Correctly invisible |
+| Revealed, normal motion | `1` | `fadeIn … both` | `backwards` holds `from` during the stagger delay, fades in, fills at 1 |
+| Revealed, reduced motion | `1` | `none` | **Appears instantly and visibly** |
+| Revealed, `* { animation: none !important }` | `1` | overridden | **Still visible** — the hazard is gone |
+
+`both` is required for the same reason as Group 2: without `backwards`, the element would
+render at base `opacity: 1` during its stagger delay, then snap to `0` when the animation
+starts. Group 1 and Group 2 therefore receive the same shape of fix, which is why the
+constant lives in one place.
+
+**Pre-existing issue, observed and deliberately not fixed:** `fadeIn` animates `transform`
+as well as `opacity`, and a `forwards`/`both` fill on `transform` overrides the element's
+own hover transform. So `hover:translate-x-1` at `About.tsx:179` and
+`hover:translate-x-2` at `About.tsx:287` are already dead today, and remain dead after
+this change. Fixing it means either dropping `translateY` from the reveal (losing the
+slide-in) or restructuring those elements — both out of scope here. Recorded for Slice E.
 
 ### `src/hooks/usePrefersReducedMotion.ts`
 
@@ -278,13 +313,17 @@ reports discomfort.
 
 ### `src/lib/revealStyle.test.ts`
 
-- Revealed: `opacity: 1`, `transform: 'translateY(0)'`
-- Hidden: `opacity: 0`, `transform: 'translateY(20px)'`
-- Normal motion: duration `'500ms'`, delay reflects the `delayMs` argument
-- Reduced motion: duration `'1ms'`, delay `'0ms'` **regardless of `delayMs`**
-- Reduced motion still returns the correct visible/hidden opacity — the regression that
-  would reintroduce the blanking bug
-- `transitionProperty` is always `'opacity, transform'`
+- Revealed, normal motion: `opacity: 1`, and `animation` contains `fadeIn`, the
+  `delayMs` value, and the `both` fill mode
+- Hidden: `opacity: 0`, `animation: 'none'`
+- Revealed, reduced motion: `opacity: 1` **and `animation: 'none'`** — the element is
+  visible without any animation. This is the case that would reintroduce the blanking bug
+  if it regressed, so it is asserted explicitly.
+- Hidden, reduced motion: `opacity: 0`, `animation: 'none'`
+- **The returned object contains no key beginning with `transition`.** Asserted directly
+  (`Object.keys(style).every(k => !k.startsWith('transition'))`), because an inline
+  transition would silently clobber the hover timing on five of the six call sites.
+- The `delayMs` argument appears in the animation string only when not reduced
 
 ### `src/components/Projects.test.ts` (or colocated with the map)
 
@@ -308,11 +347,14 @@ Everything else is verified by the manual check in §6.
 3. `npx tsc -b --noEmit` clean
 4. `npm run build` succeeds
 5. `grep -rn "forwards" src/` returns exactly one hit — `About.tsx:251`, the `slideIn`
-   bar. The six Group 1 sites lose their `animation` declaration entirely, and the two
-   Group 2 sites now read `both`. Correspondingly, `grep -rn "fadeIn.*both" src/` returns
-   exactly two hits, in `Projects.tsx` and `Connect.tsx`.
+   bar, which this slice does not modify. All eight `fadeIn` sites now use `both`:
+   six via `revealStyle` (so the literal appears once, in `src/lib/revealStyle.ts`) and
+   two inline in `Projects.tsx` and `Connect.tsx`.
    *(There are 9 `forwards` sites today: 5 in About, 2 in Skills, 1 each in Projects and
    Connect.)*
+5b. **No inline transition was introduced.** `grep -rn "transitionProperty\|transitionDuration\|transitionDelay" src/`
+   returns nothing. The five Group 1 elements that carry `transition-transform` or
+   `transition-all` classes must keep their original 200-300ms hover timing.
 6. **The hazard check.** With DevTools applying
    `* { animation: none !important; transition: none !important }`, every project card,
    contact link, skill chip, and About row is **visible**. Before this slice the same
@@ -331,6 +373,7 @@ Everything else is verified by the manual check in §6.
 |---|---|
 | Transition conversion changes reveal timing perceptibly | Duration matches the current `0.5s` animation; the stagger delays are carried over unchanged. Criterion 8 covers it. |
 | Deleting `opacity: 0` makes Group 2 flash visible during its staggered delay | This is a real hazard, caught in spec review — `forwards` does not fill during the delay. Mitigated by changing `forwards` to `both`, whose `backwards` half holds the `from` state while waiting. Criterion 8 covers it: with reduced motion off, no card may flash before fading in. |
+| An inline transition clobbers hover timing on 5 of 6 Group 1 sites | Caught in spec review. The design sets no `transition*` property at all; `revealStyle` returns only `opacity` and `animation`. Asserted by a test and by done-criterion 5b. |
 | `usePrefersReducedMotion` has no automated test | Acknowledged in §5 rather than papered over. Criterion 7 is the check. |
 | Reduced-motion carousel map drifts out of sync with the full map | Tested: same keys, matching `opacity`/`zIndex`. |
 | The typewriter's reduced branch strands the component mid-word | The effect returns before scheduling and the return value switches to `words[0]`, so there is no partial state to strand. |
