@@ -463,9 +463,16 @@ Create `src/components/Projects.test.tsx`:
 
 ```tsx
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Projects from './Projects';
+
+// @testing-library/react only auto-registers its cleanup when a global `afterEach`
+// exists, which requires vitest's `test.globals: true`. This project does not set it,
+// so without an explicit cleanup every render accumulates in the document and later
+// queries in this file match multiple elements. Discovered in Task 2.
+afterEach(cleanup);
 
 /**
  * Asserts ATTRIBUTE OUTPUT only. jsdom does not implement inert semantics, so a
@@ -615,11 +622,7 @@ describe('active filter pills', () => {
 });
 ```
 
-Add `userEvent` to the file's imports if Task 4 did not already:
-
-```tsx
-import userEvent from '@testing-library/user-event';
-```
+`userEvent` is already imported by the file Task 4 created; do not add a duplicate import.
 
 - [ ] **Step 2: Run to confirm failure**
 
@@ -994,6 +997,13 @@ Summarise: lint/test/typecheck/build results, each grep result, and the outcome 
 ---
 
 ## Notes for the implementer
+
+**Explicit `afterEach(cleanup)` is required in every jsdom test file.**
+`@testing-library/react` only auto-registers cleanup when a global `afterEach` exists,
+which needs vitest's `test.globals: true`. This project does not set it, and Task 1
+deliberately did not add it. Without an explicit `afterEach(cleanup)`, renders accumulate
+across tests within a file and queries start matching multiple elements. Both test files
+in this plan include it.
 
 **Anchor the Filter trigger query.** Use `getByRole('button', { name: /^filter/i })`, not
 `/filter/i`. `Projects.tsx:199` renders a **"Clear all filters"** button whenever any filter
