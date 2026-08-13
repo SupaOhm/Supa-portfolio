@@ -9,6 +9,8 @@ import ProjectCard from './ProjectCard';
 import { PROJECTS } from '../data/projects';
 import useCarousel from '../hooks/useCarousel';
 import { filterProjects } from '../lib/filterProjects';
+import { POSITION_STYLES, REDUCED_POSITION_STYLES } from '../lib/carouselPositionStyles';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   completed: 'Completed',
@@ -22,20 +24,14 @@ const STATUS_COLORS: Record<ProjectStatus, string> = {
   planned: 'bg-blue-400',
 };
 
-const POSITION_STYLES: Record<number, React.CSSProperties> = {
-  0:  { transform: 'translateX(0) scale(1) rotateY(0deg)',        opacity: 1,   zIndex: 30, filter: 'brightness(1.2)' },
-  1:  { transform: 'translateX(110%) scale(0.85) rotateY(-35deg)', opacity: 0.7, zIndex: 20, filter: 'brightness(0.7)' },
-  [-1]: { transform: 'translateX(-110%) scale(0.85) rotateY(35deg)',  opacity: 0.7, zIndex: 20, filter: 'brightness(0.7)' },
-  2:  { transform: 'translateX(220%) scale(0.7) rotateY(-45deg)',  opacity: 0,   zIndex: 10, filter: 'brightness(0.5)' },
-  [-2]: { transform: 'translateX(-220%) scale(0.7) rotateY(45deg)',   opacity: 0,   zIndex: 10, filter: 'brightness(0.5)' },
-};
-
 export default function Projects() {
   const [isCarouselView, setIsCarouselView] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<Set<ProjectCategory>>(new Set());
   const [selectedStatuses, setSelectedStatuses] = useState<Set<ProjectStatus>>(new Set());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
+  const positionStyles = reducedMotion ? REDUCED_POSITION_STYLES : POSITION_STYLES;
 
   const filteredProjects = useMemo(
     () => filterProjects(PROJECTS, selectedCategories, selectedStatuses),
@@ -248,7 +244,7 @@ export default function Projects() {
                         key={project.id}
                         ref={isCenter ? centerCardRef : null}
                         className={`w-[280px] sm:w-[360px] transition-all duration-700 ease-out ${filteredProjects.length === 1 ? '' : 'absolute cursor-pointer'}`}
-                        style={{ ...POSITION_STYLES[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity', pointerEvents: Math.abs(pos) <= 1 ? 'auto' : 'none' }}
+                        style={{ ...positionStyles[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity', pointerEvents: Math.abs(pos) <= 1 ? 'auto' : 'none' }}
                         onClick={() => { if (!isCenter) setCurrentIndex(idx); }}
                       >
                         <div className={`${isCenter ? 'ring-4 ring-blue-500/60 shadow-[0_0_50px_rgba(59,130,246,0.5)]' : ''} rounded-xl overflow-hidden`}>
