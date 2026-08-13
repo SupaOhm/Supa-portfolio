@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTypewriter } from '../hooks/useTypewriter';
 
 // Add or remove items from this array to customize what gets typed
 const WORDS = [
@@ -12,17 +13,12 @@ const WORDS = [
 ];
 
 export default function Hero() {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const displayedText = useTypewriter(WORDS);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [smoothMousePosition, setSmoothMousePosition] = useState({ x: 0, y: 0 });
   const mouseRef = useRef(mousePosition);
   const location = useLocation();
   const navigate = useNavigate();
-  const typingSpeed = 80;
-  const deletingSpeed = 50;
-  const pauseDuration = 2000;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -53,32 +49,6 @@ export default function Hero() {
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
-  useEffect(() => {
-    const currentWord = WORDS[currentWordIndex];
-    let timeout: number;
-
-    if (!isDeleting && displayedText === currentWord) {
-      // Finished typing
-      timeout = setTimeout(() => setIsDeleting(true), pauseDuration);
-    } else if (isDeleting && displayedText === '') {
-      // Finished deleting
-      setIsDeleting(false);
-      setCurrentWordIndex((prev) => (prev + 1) % WORDS.length);
-    } else if (isDeleting) {
-      // Deleting
-      timeout = setTimeout(() => {
-        setDisplayedText(currentWord.substring(0, displayedText.length - 1));
-      }, deletingSpeed);
-    } else {
-      // Typing
-      timeout = setTimeout(() => {
-        setDisplayedText(currentWord.substring(0, displayedText.length + 1));
-      }, typingSpeed);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [displayedText, currentWordIndex, isDeleting]);
-  
   // Match Navbar logic: navigate to '/' then scroll, or just scroll if already on '/'
   const handleSectionClick = (id: string) => {
     if (location.pathname !== '/') {

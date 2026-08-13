@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 export type TypewriterPhase = 'typing' | 'deleting';
 
 export type TypewriterState = {
@@ -68,4 +70,40 @@ export function nextTypewriterState(
     state: { ...state, text: word.slice(0, state.text.length - 1) },
     delayMs: speeds.deletingMs,
   };
+}
+
+/**
+ * Drives `nextTypewriterState` on a timer and returns the text to display.
+ *
+ * Every state update happens inside a setTimeout callback, never synchronously
+ * in the effect body, which is what keeps react-hooks/set-state-in-effect
+ * satisfied by construction.
+ *
+ * `speeds` is destructured to primitives before the dependency array so a
+ * caller passing an object literal does not re-subscribe the effect on every
+ * render. `words` must be a stable reference - define it at module scope.
+ */
+export function useTypewriter(
+  words: readonly string[],
+  speeds: TypewriterSpeeds = DEFAULT_TYPEWRITER_SPEEDS,
+): string {
+  const [state, setState] = useState<TypewriterState>(INITIAL_TYPEWRITER_STATE);
+  const { typingMs, deletingMs, pauseMs } = speeds;
+
+  useEffect(() => {
+    if (words.length === 0) {
+      return;
+    }
+
+    const { state: next, delayMs } = nextTypewriterState(state, words, {
+      typingMs,
+      deletingMs,
+      pauseMs,
+    });
+
+    const timeout = setTimeout(() => setState(next), delayMs);
+    return () => clearTimeout(timeout);
+  }, [state, words, typingMs, deletingMs, pauseMs]);
+
+  return state.text;
 }
