@@ -465,7 +465,6 @@ Create `src/components/Projects.test.tsx`:
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import Projects from './Projects';
 
 // @testing-library/react only auto-registers its cleanup when a global `afterEach`
@@ -538,8 +537,17 @@ Expected: PASS — 2 new tests, 54 total.
 
 - [ ] **Step 5: Confirm nothing else still references the removed behaviour**
 
-Run: `grep -n "pointerEvents\|cursor-pointer" src/components/Projects.tsx`
-Expected: no output.
+Run: `grep -c "pointerEvents" src/components/Projects.tsx`
+Expected: `0` — the inline rule is gone from the file entirely.
+
+Then confirm the CARD specifically lost its `cursor-pointer`:
+
+Run: `sed -n '243,250p' src/components/Projects.tsx | grep -c "cursor-pointer"`
+Expected: `0`.
+
+Do NOT grep the whole file for `cursor-pointer`. Four legitimate occurrences remain — two
+on the filter checkbox labels and two on the active-filter pills, which stay clickable and
+keep the class. Only the carousel card loses it.
 
 - [ ] **Step 6: Verify and commit**
 
@@ -622,7 +630,12 @@ describe('active filter pills', () => {
 });
 ```
 
-`userEvent` is already imported by the file Task 4 created; do not add a duplicate import.
+Add the `userEvent` import to the file — Task 4 deliberately does not include it, because
+Task 4's own tests use none and `noUnusedLocals` would fail the build on a dead import:
+
+```tsx
+import userEvent from '@testing-library/user-event';
+```
 
 - [ ] **Step 2: Run to confirm failure**
 
