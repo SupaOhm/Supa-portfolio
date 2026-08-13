@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Projects from './Projects';
 
 // @testing-library/react only auto-registers its cleanup when a global `afterEach`
@@ -32,5 +33,35 @@ describe('Projects carousel', () => {
       expect(card).not.toHaveAttribute('role', 'button');
       expect(card).not.toHaveAttribute('tabindex');
     }
+  });
+});
+
+describe('active filter pills', () => {
+  it('renders each active filter as a button with a descriptive label', async () => {
+    const user = userEvent.setup();
+    render(<Projects />);
+
+    // Open the filter dropdown and tick the first category.
+    await user.click(screen.getByRole('button', { name: /^filter/i }));
+    const firstCategory = screen.getAllByRole('checkbox')[0];
+    await user.click(firstCategory);
+
+    // The corresponding removal pill must be a button, not a span.
+    const removal = screen.getByRole('button', { name: /^remove .+ filter$/i });
+    expect(removal.tagName).toBe('BUTTON');
+    expect(removal).toHaveAttribute('type', 'button');
+  });
+
+  it('clears the filter when its removal button is activated', async () => {
+    const user = userEvent.setup();
+    render(<Projects />);
+
+    await user.click(screen.getByRole('button', { name: /^filter/i }));
+    await user.click(screen.getAllByRole('checkbox')[0]);
+
+    const removal = screen.getByRole('button', { name: /^remove .+ filter$/i });
+    await user.click(removal);
+
+    expect(screen.queryByRole('button', { name: /^remove .+ filter$/i })).toBeNull();
   });
 });

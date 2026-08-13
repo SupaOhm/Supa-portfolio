@@ -210,20 +210,32 @@ export default function Projects() {
           {activeFilterCount > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
               {[...selectedCategories].map((cat) => (
-                <span key={cat} onClick={() => toggleCategory(cat)} className="flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150">
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleCategory(cat)}
+                  aria-label={`Remove ${cat} filter`}
+                  className="flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150"
+                >
                   {cat}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </span>
+                </button>
               ))}
               {[...selectedStatuses].map((st) => (
-                <span key={st} onClick={() => toggleStatus(st)} className="flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150">
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => toggleStatus(st)}
+                  aria-label={`Remove ${STATUS_LABELS[st]} filter`}
+                  className="flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150"
+                >
                   {STATUS_LABELS[st]}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </span>
+                </button>
               ))}
             </div>
           )}
