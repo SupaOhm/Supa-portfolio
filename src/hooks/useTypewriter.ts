@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export type TypewriterPhase = 'typing' | 'deleting';
 
@@ -81,7 +81,9 @@ export function nextTypewriterState(
  *
  * `speeds` is destructured to primitives before the dependency array so a
  * caller passing an object literal does not re-subscribe the effect on every
- * render. `words` must be a stable reference - define it at module scope.
+ * render. `words` is held in a ref and kept in sync via its own effect, so it
+ * does not need to be a stable reference - a caller may pass an inline array
+ * literal without clearing and rescheduling the timeout on every render.
  */
 export function useTypewriter(
   words: readonly string[],
@@ -90,12 +92,17 @@ export function useTypewriter(
   const [state, setState] = useState<TypewriterState>(INITIAL_TYPEWRITER_STATE);
   const { typingMs, deletingMs, pauseMs } = speeds;
 
+  const wordsRef = useRef(words);
   useEffect(() => {
-    if (words.length === 0) {
+    wordsRef.current = words;
+  }, [words]);
+
+  useEffect(() => {
+    if (wordsRef.current.length === 0) {
       return;
     }
 
-    const { state: next, delayMs } = nextTypewriterState(state, words, {
+    const { state: next, delayMs } = nextTypewriterState(state, wordsRef.current, {
       typingMs,
       deletingMs,
       pauseMs,
@@ -103,7 +110,7 @@ export function useTypewriter(
 
     const timeout = setTimeout(() => setState(next), delayMs);
     return () => clearTimeout(timeout);
-  }, [state, words, typingMs, deletingMs, pauseMs]);
+  }, [state, typingMs, deletingMs, pauseMs]);
 
   return state.text;
 }
