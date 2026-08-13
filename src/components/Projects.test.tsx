@@ -65,3 +65,33 @@ describe('active filter pills', () => {
     expect(screen.queryByRole('button', { name: /^remove .+ filter$/i })).toBeNull();
   });
 });
+
+describe('filter dropdown keyboard handling', () => {
+  it('closes on Escape and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    render(<Projects />);
+
+    const trigger = screen.getByRole('button', { name: /^filter/i });
+    await user.click(trigger);
+    expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0);
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(trigger).toHaveFocus();
+  });
+
+  it('does not steal focus when Escape is pressed with the dropdown closed', async () => {
+    const user = userEvent.setup();
+    render(<Projects />);
+
+    const viewToggle = screen.getByRole('button', { name: /toggle view/i });
+    viewToggle.focus();
+    expect(viewToggle).toHaveFocus();
+
+    await user.keyboard('{Escape}');
+
+    // Focus must stay where it was — the handler must be a no-op when closed.
+    expect(viewToggle).toHaveFocus();
+  });
+});

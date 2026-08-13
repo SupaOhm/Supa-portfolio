@@ -30,6 +30,7 @@ export default function Projects() {
   const [selectedStatuses, setSelectedStatuses] = useState<Set<ProjectStatus>>(new Set());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const filterTriggerRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = usePrefersReducedMotion();
   const positionStyles = reducedMotion ? REDUCED_POSITION_STYLES : POSITION_STYLES;
 
@@ -53,6 +54,26 @@ export default function Projects() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Close the filter dropdown on Escape and return focus to its trigger.
+  // This is a SEPARATE effect with [isFilterOpen] in its deps: the outside-click
+  // effect above declares [], so a handler registered there would close over
+  // isFilterOpen === false forever and steal focus on every Escape keypress.
+  useEffect(() => {
+    if (!isFilterOpen) {
+      return;
+    }
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFilterOpen(false);
+        filterTriggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isFilterOpen]);
 
   const toggleCategory = (cat: ProjectCategory) =>
     setSelectedCategories((prev) => {
@@ -132,6 +153,7 @@ export default function Projects() {
         <div className="flex flex-wrap justify-center items-center gap-2 mb-8">
           <div className="relative" ref={filterDropdownRef}>
             <button
+              ref={filterTriggerRef}
               onClick={() => setIsFilterOpen((v) => !v)}
               className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700/50 hover:border-blue-400/50 hover:text-white transition-all duration-200"
             >
