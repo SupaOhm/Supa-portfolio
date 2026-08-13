@@ -579,8 +579,14 @@ Run: `npm run lint && npm test && npx tsc -b --noEmit && npm run build`
 Expected: all pass.
 
 Run: `grep -rn "forwards" src/`
-Expected: exactly one hit — `src/components/About.tsx`, the `slideIn` language bar, which
-this slice deliberately does not modify.
+Expected: exactly TWO hits, and only these two —
+1. `src/components/About.tsx` — the `slideIn` language bar. Real code, deliberately not
+   modified by this slice.
+2. `src/lib/revealStyle.ts` — the word inside that file's docstring, which explains why
+   the `forwards` pattern was abandoned. Documentation, not code.
+
+Neither `src/components/Projects.tsx` nor `src/components/Connect.tsx` may appear. That
+absence is what this check actually exists to prove.
 
 - [ ] **Step 4: Commit**
 
@@ -976,8 +982,11 @@ echo "--- no inverted opacity remains ---"
 grep -rn "opacity: isVisible ? 0 : 1" src/ | wc -l
 ```
 
-Expected: criterion 5 prints exactly one line, in `src/components/About.tsx` (the
-`slideIn` language bar). Criterion 5b prints `0`. The inverted-opacity check prints `0`.
+Expected: criterion 5 prints exactly TWO lines — `src/components/About.tsx` (the
+`slideIn` language bar, real code, out of scope) and `src/lib/revealStyle.ts` (the word
+inside a docstring, not code). Neither `Projects.tsx` nor `Connect.tsx` may appear; that
+absence is the property being checked. Criterion 5b prints `0`. The inverted-opacity
+check prints `0`.
 
 - [ ] **Step 3: The hazard check — the reason this slice exists**
 
