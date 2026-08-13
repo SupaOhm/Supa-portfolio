@@ -70,7 +70,8 @@ opacity: isVisible ? 0 : 1,
 
 Before reveal the element is `opacity: 1` — **visible**. On reveal it flips to `0` and
 the animation fades it back in. Net effect: visible → blank → fade in, the opposite of
-the intent. These convert to transitions via `useRevealStyle` (§2).
+the intent. These are fixed via `useRevealStyle` (§2): the base opacity is flipped and
+the animation gains a `both` fill.
 
 ### Group 2 — mount-staggered (2 sites)
 
@@ -135,7 +136,6 @@ with a thin React wrapper around it.
 import type { CSSProperties } from 'react';
 
 export const REVEAL_DURATION_MS = 500;
-export const REVEAL_OFFSET_PX = 20;
 
 export function revealStyle(
   isVisible: boolean,
