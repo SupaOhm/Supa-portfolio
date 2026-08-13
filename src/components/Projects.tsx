@@ -295,7 +295,7 @@ export default function Projects() {
             {filteredProjects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map((project, i) => (
-                  <div key={project.id} style={{ animation: `fadeIn 0.6s ease-out ${i * 100}ms both` }}>
+                  <div key={project.id} style={{ animation: reducedMotion ? 'none' : `fadeIn 0.6s ease-out ${i * 100}ms both` }}>
                     <ProjectCard project={project} />
                   </div>
                 ))}

@@ -119,7 +119,8 @@
   }
 
   .animate-blink,
-  .animate-pulse {
+  .animate-pulse,
+  .animate-fade-in {
     animation: none;
   }
 }

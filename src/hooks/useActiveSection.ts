@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { currentScrollBehavior } from '../lib/scrollBehavior';
 
 const DEFAULT_VISIBILITY_THRESHOLD = 0.1;
 
@@ -86,6 +87,6 @@ export function scrollToSection(id: string): void {
   const el = document.getElementById(id);
   if (el) {
     // slight delay to ensure elements are laid out
-    setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 0);
+    setTimeout(() => el.scrollIntoView({ behavior: currentScrollBehavior() }), 0);
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTypewriter } from '../hooks/useTypewriter';
+import { currentScrollBehavior } from '../lib/scrollBehavior';
 
 // Add or remove items from this array to customize what gets typed
 const WORDS = [
@@ -56,7 +57,7 @@ export default function Hero() {
     } else {
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+        el.scrollIntoView({ behavior: currentScrollBehavior() });
       }
     }
   };
