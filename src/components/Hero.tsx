@@ -88,10 +88,7 @@ export default function Hero() {
               Hola World 
             </p>
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
-              <span
-                onClick={() => handleSectionClick('about')}
-                className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-500 transition-opacity cursor-pointer hover:opacity-85"
-              >
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-500">
                 Supakorn
               </span>
               <span className="block text-gray-100">Prayongyam</span>
@@ -129,7 +126,7 @@ export default function Hero() {
             <button
               type="button"
               onClick={() => handleSectionClick('connect')}
-              className="group px-8 py-3 bg-gray-900 text-gray-300 font-bold uppercase tracking-wider text-sm transition-all shadow-tactile-dark border-2 border-gray-600 focus:outline-none"
+              className="group px-8 py-3 bg-gray-900 text-gray-300 font-bold uppercase tracking-wider text-sm transition-all shadow-tactile-dark border-2 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               Get in Touch
             </button>
