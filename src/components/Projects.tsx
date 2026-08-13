@@ -243,9 +243,10 @@ export default function Projects() {
                       <div
                         key={project.id}
                         ref={isCenter ? centerCardRef : null}
-                        className={`w-[280px] sm:w-[360px] transition-all duration-700 ease-out ${filteredProjects.length === 1 ? '' : 'absolute cursor-pointer'}`}
-                        style={{ ...positionStyles[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity', pointerEvents: Math.abs(pos) <= 1 ? 'auto' : 'none' }}
-                        onClick={() => { if (!isCenter) setCurrentIndex(idx); }}
+                        data-testid="carousel-card"
+                        inert={!isCenter}
+                        className={`w-[280px] sm:w-[360px] transition-all duration-700 ease-out ${filteredProjects.length === 1 ? '' : 'absolute'}`}
+                        style={{ ...positionStyles[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
                       >
                         <div className={`${isCenter ? 'ring-4 ring-blue-500/60 shadow-[0_0_50px_rgba(59,130,246,0.5)]' : ''} rounded-xl overflow-hidden`}>
                           <ProjectCard project={project} />
