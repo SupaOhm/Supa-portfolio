@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 export type TypewriterPhase = 'typing' | 'deleting';
 
@@ -91,6 +92,7 @@ export function useTypewriter(
 ): string {
   const [state, setState] = useState<TypewriterState>(INITIAL_TYPEWRITER_STATE);
   const { typingMs, deletingMs, pauseMs } = speeds;
+  const reduced = usePrefersReducedMotion();
 
   const wordsRef = useRef(words);
   useEffect(() => {
@@ -98,7 +100,9 @@ export function useTypewriter(
   }, [words]);
 
   useEffect(() => {
-    if (wordsRef.current.length === 0) {
+    // Under reduced motion the animation is replaced by static text, so no timer is
+    // scheduled at all - the hook is genuinely idle rather than animating invisibly.
+    if (reduced || wordsRef.current.length === 0) {
       return;
     }
 
@@ -110,7 +114,7 @@ export function useTypewriter(
 
     const timeout = setTimeout(() => setState(next), delayMs);
     return () => clearTimeout(timeout);
-  }, [state, typingMs, deletingMs, pauseMs]);
+  }, [state, reduced, typingMs, deletingMs, pauseMs]);
 
-  return state.text;
+  return reduced ? (words[0] ?? '') : state.text;
 }

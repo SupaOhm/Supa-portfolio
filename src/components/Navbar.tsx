@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useActiveSection } from '../hooks/useActiveSection';
+import { currentScrollBehavior } from '../lib/scrollBehavior';
 
 const NAV_LINKS = [
   { id: 'home', label: 'Home' },
@@ -26,7 +27,7 @@ export default function Navbar() {
     } else {
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+        el.scrollIntoView({ behavior: currentScrollBehavior() });
       }
     }
     setIsMenuOpen(false);

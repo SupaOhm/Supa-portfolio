@@ -1,4 +1,6 @@
 import { useReveal } from '../hooks/useReveal';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { revealStyle } from '../lib/revealStyle';
 
 const SKILL_CATEGORIES = {
   Languages: ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
@@ -9,6 +11,7 @@ const SKILL_CATEGORIES = {
 
 export default function Skills() {
   const { ref: sectionRef, isVisible } = useReveal<HTMLElement>();
+  const reducedMotion = usePrefersReducedMotion();
 
   return (
     <section ref={sectionRef} id="skills" className="py-20 px-4 sm:px-6 lg:px-8 relative">
@@ -30,10 +33,7 @@ export default function Skills() {
             <div
               key={category}
               className="p-5 rounded-xl border border-gray-700/70 bg-gradient-to-br from-gray-900/70 to-gray-800/40 backdrop-blur-sm hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300"
-              style={{
-                animation: isVisible ? `fadeIn 0.5s ease-out ${categoryIndex * 120}ms forwards` : 'none',
-                opacity: isVisible ? 0 : 1,
-              }}
+              style={revealStyle(isVisible, categoryIndex * 120, reducedMotion)}
             >
               <h3 className="text-sm font-semibold text-blue-300 mb-4 tracking-wide">{category}</h3>
               <div className="flex flex-wrap gap-2.5">
@@ -41,10 +41,7 @@ export default function Skills() {
                   <span
                     key={skill}
                     className="px-3.5 py-1.5 bg-gray-800/80 text-gray-300 rounded-full text-sm border border-gray-700/80 hover:bg-blue-500/15 hover:text-blue-200 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 cursor-default"
-                    style={{
-                      animation: isVisible ? `fadeIn 0.45s ease-out ${(categoryIndex * 120) + (index * 45)}ms forwards` : 'none',
-                      opacity: isVisible ? 0 : 1,
-                    }}
+                    style={revealStyle(isVisible, (categoryIndex * 120) + (index * 45), reducedMotion, 450)}
                   >
                     {skill}
                   </span>
