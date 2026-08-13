@@ -113,17 +113,24 @@ import { vi } from 'vitest';
 // jsdom does not implement window.matchMedia (verified by probe, Task 1 Step 3).
 // usePrefersReducedMotion calls it during render, so without this every component
 // test that renders Projects, Connect or Hero would throw.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  }),
-});
+//
+// The `typeof window` guard is REQUIRED, not defensive: setupFiles run in every
+// test file's own context, including the plain 'node' files that are this
+// project's default, where `window` does not exist at all. Without it, all six
+// existing node test files fail with `ReferenceError: window is not defined`.
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  });
+}
 ```
 
 **If Step 3 printed `function`** — jsdom provides it, so the stub is unnecessary and must not be written:
@@ -154,6 +161,14 @@ Replace the `test` block in `vite.config.ts` with:
 
 Run: `npm test`
 Expected: 48 tests still passing, plus the 2 probe tests = 50.
+
+This is the step that catches a mis-scoped setup file. `setupFiles` applies to EVERY
+test file, not only the jsdom ones, so an unguarded `window` reference here fails all six
+node-environment files at once. If you see `ReferenceError: window is not defined`, the
+guard in Step 4 is missing or wrong.
+
+Note on reading the probe output: Vitest v4's default reporter suppresses `console.log`
+from passing tests. Run `npm test -- --reporter=verbose` to see the PROBE line.
 
 Then delete the probe file:
 
