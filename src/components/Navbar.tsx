@@ -100,6 +100,7 @@ export default function Navbar() {
             className="md:hidden text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 rounded p-2 transition-all duration-300 hover:bg-gray-800/50"
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
             {isMenuOpen ? (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,9 +115,13 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu with smooth transition */}
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+        <div
+          id="mobile-menu"
+          inert={!isMenuOpen}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
           <div className="md:hidden py-4 border-t border-gray-800">
             {NAV_LINKS.map((link) => (
               <button
