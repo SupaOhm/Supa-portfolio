@@ -104,6 +104,13 @@ base `opacity: 1` — visible, which is the whole point.
 Net: identical rendering to today, but the visible end state is now a real declared value
 rather than an animation artifact.
 
+**ADDITION (found by the final whole-branch review).** The fill-mode change alone left
+these two sites animating under reduced motion, contradicting §6 criterion 7 ("reveals
+land immediately"). §1 and §6 disagreed, and the implementation followed §1. Both sites
+now also gate the animation on `usePrefersReducedMotion()`, which resolves the
+contradiction in favour of §6 — the slice claims to honour reduced motion, so it should do
+so at all eight `fadeIn` sites, not six.
+
 ### Group 3 — the width bar (1 site, no change)
 
 `src/components/About.tsx:251`:
@@ -269,11 +276,16 @@ Append one block:
   }
 
   .animate-blink,
-  .animate-pulse {
+  .animate-pulse,
+  .animate-fade-in {
     animation: none;
   }
 }
 ```
+
+`.animate-fade-in` was missing from an earlier draft of this list and was added after the
+final review flagged it. It is a 1s auto-playing animation used at `Hero.tsx:85`, defined
+in the same file as its two listed siblings.
 
 Deliberately **not** a blanket `* { animation: none }`. The agreed policy is to stop
 auto-playing and decorative motion while keeping short functional transitions (hover
@@ -281,9 +293,26 @@ feedback, menu expand, focus rings) working. WCAG 2.2.2 targets auto-playing con
 over five seconds and 2.3.3 targets large motion; neither is about a 200ms hover fade,
 and removing those costs usability cues for no accessibility gain.
 
-`scroll-behavior: auto` matters because `src/index.css:6-8` sets `smooth` globally, which
-applies to every programmatic scroll including the nav's `scrollIntoView` calls. Full-page
-smooth scrolling is a common vestibular trigger.
+`scroll-behavior: auto` overrides the global `smooth` at `src/index.css:6-8`.
+
+**CORRECTION (found by the final whole-branch review, after implementation).** An earlier
+draft of this section claimed the CSS rule "applies to every programmatic scroll including
+the nav's `scrollIntoView` calls". **That is false.** Per CSSOM View, `scrollIntoView`
+consults the computed `scroll-behavior` property ONLY when the requested behaviour is
+`"auto"`; all three call sites pass `'smooth'` explicitly, which wins. The CSS rule alone
+left every in-page nav click smooth-scrolling under reduced motion — the exact vestibular
+trigger this section exists to remove.
+
+The behaviour is therefore decided at the call site by `currentScrollBehavior()` in
+`src/lib/scrollBehavior.ts`, used by `Navbar.tsx`, `Hero.tsx` and
+`useActiveSection.ts`. The CSS rule is KEPT, because it still correctly covers
+browser-initiated fragment navigation (a direct `/#about` load) and scroll restoration,
+neither of which routes through those call sites.
+
+**Lesson for B2/B3:** this premise — "CSS property X governs JS API call Y" — was asserted
+in the spec, repeated verbatim in the plan, and therefore never questioned by any per-task
+review. When a plan makes a claim about browser behaviour, verifying that claim should be
+its own step.
 
 ### The carousel
 
