@@ -161,8 +161,7 @@ export default function Connect() {
                     : 'bg-gradient-to-r from-gray-800/50 to-gray-700/50 text-gray-300 border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20'
                 }`}
                 style={{
-                  animation: `fadeIn 0.5s ease-out ${index * 100}ms forwards`,
-                  opacity: 0,
+                  animation: `fadeIn 0.5s ease-out ${index * 100}ms both`,
                   width: hoveredLink === link.name ? '224px' : '120px',
                   height: hoveredLink === link.name ? '128px' : '96px',
                   padding: hoveredLink === link.name ? '24px' : '12px 16px',
