@@ -39,7 +39,8 @@ was verified before designing, and what was not.
 
 | Claim | Evidence |
 |---|---|
-| React accepts `inert` as a boolean prop | `react@19.2.3` resolved; `@types/react/index.d.ts:2817` declares `inert?: boolean \| undefined`. Under React 18 the string form `inert=""` was required and the boolean form failed silently. |
+| React DOM emits `inert` correctly for a boolean prop | **Runtime evidence, not just types.** `react-dom-client.production.js:13124` puts `case "inert"` in the same fall-through group as `disabled`, `hidden` and `required`, whose shared body (`:13147-13149`) is `value && … ? setAttribute(key, "") : removeAttribute(key)`. So `inert={true}` emits a bare attribute and `inert={false}` removes it entirely. |
+| Why the type declaration alone was insufficient | `@types/react/index.d.ts:2817` declares `inert?: boolean`, which proves only that a boolean is *accepted*. `inert` is an HTML boolean attribute, so `inert="false"` would still be **true** — React 18 rendered unknown attributes verbatim, making `inert={false}` permanently inert. The type says nothing about which of those two behaviours ships. Hence the bundle check above. |
 | `inert` is within the project's browser target | No `browserslist` is declared and `vite.config.ts` sets no `build.target`, so Vite 7's default `baseline-widely-available` applies. `inert` reached Baseline in April 2023 (Chrome 102, Safari 15.5, Firefox 112). |
 | `inert` removes descendants from the tab order **and** the accessibility tree | HTML Standard, "inert subtrees". This is why it also makes the existing `aria-expanded` attributes truthful. |
 
@@ -126,10 +127,23 @@ These are the only two `focus:outline-none` occurrences in the codebase — one 
 replacement ring, one not.
 
 **Escape to close.** The filter dropdown at `src/components/Projects.tsx:53-54` closes only
-on `mousedown`. It gains a `keydown` listener closing on `Escape`, registered alongside the
-existing outside-click listener and torn down in the same cleanup.
+on `mousedown`.
 
-**Focus restoration.** On Escape, focus returns to the Filter trigger button via a ref.
+It gets its **own** `useEffect` with `[isFilterOpen]` in the dependency array — NOT a
+listener added to the existing outside-click effect, which an earlier draft of this spec
+specified. That effect declares `[]` deps (`Projects.tsx:55`), so a handler registered
+inside it closes over `isFilterOpen === false` forever. The Escape handler needs the
+current value in order to do nothing when the dropdown is already closed; without it, every
+Escape keypress anywhere on the page would yank focus to the Filter button.
+
+**Focus restoration.** On Escape, focus returns to the Filter trigger button.
+
+This requires a **new** ref on the trigger `<button>`. The existing `filterDropdownRef`
+(`Projects.tsx:32`) is attached to the wrapping `<div>` at `Projects.tsx:133`, and calling
+`.focus()` on a `<div>` with no `tabindex` is a **silent no-op** — the dropdown would close
+and focus would still be lost, with nothing to indicate the fix had failed. Add
+`filterTriggerRef` and attach it to the button itself.
+
 Closing a dropdown without restoring focus strands the user at document start — a fix that
 creates a different keyboard defect is not a fix.
 
@@ -211,5 +225,6 @@ in §7, and only there.
 | jsdom's incomplete focus emulation gives false confidence | Addressed by scope: §6 states exactly what the tests do and do not assert. Focusability is checked only by criterion 7. |
 | The `matchMedia` stub is written for a gap that does not exist | The plan verifies the gap empirically before writing the stub, rather than assuming it. |
 | Removing click-to-centre is an unwanted UX regression | Deliberate and recorded here. It is one commit and independently revertible; prev/next/dots cover the same navigation. |
-| Escape handler conflicts with the existing outside-click listener | Both are registered in the same effect with a shared cleanup, so they cannot diverge. |
+| Escape handler reads a stale `isFilterOpen` | It lives in its own effect with `[isFilterOpen]` deps rather than sharing the existing `[]`-deps effect. Caught in spec review; an earlier draft specified the shared effect and would have made every Escape keypress steal focus. |
+| Focus restoration silently does nothing | It uses a new ref on the trigger `<button>`, not the existing `filterDropdownRef` which points at a non-focusable `<div>`. Asserted by a test and by criterion 7. |
 | `aria-controls` points at an id that does not exist | Asserted by a test (§6) and by criterion 7. |
