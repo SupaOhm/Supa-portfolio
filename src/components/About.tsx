@@ -1,6 +1,8 @@
 import { type ReactNode } from 'react';
 import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { useReveal } from '../hooks/useReveal';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { revealStyle } from '../lib/revealStyle';
 
 const GITHUB_USERNAME = 'SupaOhm';
 const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
@@ -65,6 +67,7 @@ function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
 
 export default function About() {
   const { ref: sectionRef, isVisible } = useReveal<HTMLElement>();
+  const reducedMotion = usePrefersReducedMotion();
   const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
 
   return (
@@ -177,10 +180,7 @@ export default function About() {
                   <div 
                     key={info.label}
                     className="hover:translate-x-1 transition-transform duration-200"
-                    style={{
-                      animation: isVisible ? `fadeIn 0.5s ease-out ${index * 100}ms forwards` : 'none',
-                      opacity: isVisible ? 0 : 1,
-                    }}
+                    style={revealStyle(isVisible, index * 100, reducedMotion)}
                   >
                     <span className="text-gray-400 text-sm">{info.label}:</span>
                     <p className={info.highlight ? 'font-semibold text-green-400' : 'font-medium'}>
@@ -208,10 +208,7 @@ export default function About() {
                   <span
                     key={course}
                     className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-sm text-purple-300 hover:bg-purple-500/40 hover:border-purple-400/60 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 cursor-default"
-                    style={{
-                      animation: isVisible ? `fadeIn 0.5s ease-out ${index * 50}ms forwards` : 'none',
-                      opacity: isVisible ? 0 : 1,
-                    }}
+                    style={revealStyle(isVisible, index * 50, reducedMotion)}
                   >
                     {course}
                   </span>
@@ -234,10 +231,7 @@ export default function About() {
                   <div 
                     key={lang.name}
                     className="group/lang"
-                    style={{
-                      animation: isVisible ? `fadeIn 0.5s ease-out ${index * 150}ms forwards` : 'none',
-                      opacity: isVisible ? 0 : 1,
-                    }}
+                    style={revealStyle(isVisible, index * 150, reducedMotion)}
                   >
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-300 group-hover/lang:text-white transition-colors">{lang.name}</span>
@@ -285,10 +279,7 @@ export default function About() {
                   <li 
                     key={fact} 
                     className="flex items-start gap-2 hover:translate-x-2 transition-transform duration-300 group/fact cursor-default"
-                    style={{
-                      animation: isVisible ? `fadeIn 0.5s ease-out ${index * 100}ms forwards` : 'none',
-                      opacity: isVisible ? 0 : 1,
-                    }}
+                    style={revealStyle(isVisible, index * 100, reducedMotion)}
                   >
                     <span className={`${index % 2 === 0 ? 'text-blue-400 group-hover/fact:text-blue-300' : 'text-purple-400 group-hover/fact:text-purple-300'} mt-1 transition-colors group-hover/fact:scale-125`}>
                       •
