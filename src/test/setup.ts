@@ -21,4 +21,26 @@ if (typeof window !== 'undefined') {
       dispatchEvent: vi.fn(),
     }),
   });
+
+  // jsdom does not implement IntersectionObserver (verified by probe). useReveal
+  // constructs one in an effect, so without this every test that renders Skills,
+  // About or Connect throws on mount. The stub records nothing: no test in this
+  // project asserts reveal behaviour, only that the components render.
+  class IntersectionObserverStub {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+    takeRecords(): [] {
+      return [];
+    }
+  }
+
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    value: IntersectionObserverStub,
+  });
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
+    writable: true,
+    value: IntersectionObserverStub,
+  });
 }

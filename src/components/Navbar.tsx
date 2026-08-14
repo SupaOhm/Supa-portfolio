@@ -56,7 +56,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 sm:top-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-full sm:w-[90%] max-w-4xl z-50 transition-all duration-300 sm:border-[1px] ${
+    <nav aria-label="Main" className={`fixed top-0 left-0 right-0 sm:top-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-full sm:w-[90%] max-w-4xl z-50 transition-all duration-300 sm:border-[1px] ${
       isScrolled 
         ? 'bg-gray-950/95 backdrop-blur-md border-b sm:border-blue-500/40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' 
         : 'bg-gray-950/70 backdrop-blur-sm border-b sm:border-gray-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'

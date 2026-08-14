@@ -71,7 +71,7 @@ export default function About() {
   const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
 
   return (
-    <section ref={sectionRef} id="about" className="py-20 px-4 sm:px-6 lg:px-8 relative">
+    <section ref={sectionRef} id="about" aria-labelledby="about-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       {/* Subtle background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
       
@@ -79,7 +79,7 @@ export default function About() {
         <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-300/80 text-center mb-3">
           Professional Summary
         </p>
-        <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8 text-center">
+        <h2 id="about-heading" className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8 text-center">
           About Me
         </h2>
         

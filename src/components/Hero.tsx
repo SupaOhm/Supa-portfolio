@@ -32,8 +32,9 @@ export default function Hero() {
   };
 
   return (
-    <section 
-      id="home" 
+    <section
+      id="home"
+      aria-labelledby="hero-heading"
       className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8 pt-16 overflow-hidden bg-grid-pattern bg-[#030712]"
       onMouseMove={handleMouseMove}
     >
@@ -49,7 +50,7 @@ export default function Hero() {
             <p className="mb-3 font-mono text-xs uppercase tracking-[0.35em] text-gray-400">
               Hola World
             </p>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
+            <h1 id="hero-heading" className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-500">
                 Supakorn
               </span>

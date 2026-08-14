@@ -118,7 +118,7 @@ export default function Projects() {
     : '';
 
   return (
-    <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
+    <section id="projects" aria-labelledby="projects-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
       {/* Live regions. Permanently mounted and rendered outside every conditional
@@ -141,7 +141,7 @@ export default function Projects() {
             <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-400 mb-2">
               // sys.logs.fetch("projects")
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
+            <h2 id="projects-heading" className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
               <span aria-hidden="true" className="text-gray-700 font-light text-2xl">[</span>
               Featured Projects
               <span aria-hidden="true" className="text-gray-700 font-light text-2xl">]</span>
