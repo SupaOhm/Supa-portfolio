@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTypewriter } from '../hooks/useTypewriter';
+import { useCursorGlow } from '../hooks/useCursorGlow';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
 
 // Add or remove items from this array to customize what gets typed
@@ -15,40 +15,9 @@ const WORDS = [
 
 export default function Hero() {
   const displayedText = useTypewriter(WORDS);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [smoothMousePosition, setSmoothMousePosition] = useState({ x: 0, y: 0 });
-  const mouseRef = useRef(mousePosition);
+  const handleMouseMove = useCursorGlow();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  // Keep latest mouse position in a ref to avoid re-registering the loop
-  useEffect(() => {
-    mouseRef.current = mousePosition;
-  }, [mousePosition]);
-
-  // Smooth cursor tracking with easing (single rAF loop)
-  useEffect(() => {
-    let animationFrameId: number;
-
-    const smoothMove = () => {
-      setSmoothMousePosition((prev) => ({
-        x: prev.x + (mouseRef.current.x - prev.x) * 0.1,
-        y: prev.y + (mouseRef.current.y - prev.y) * 0.1,
-      }));
-      animationFrameId = requestAnimationFrame(smoothMove);
-    };
-
-    animationFrameId = requestAnimationFrame(smoothMove);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
 
   // Match Navbar logic: navigate to '/' then scroll, or just scroll if already on '/'
   const handleSectionClick = (id: string) => {
@@ -69,14 +38,7 @@ export default function Hero() {
       onMouseMove={handleMouseMove}
     >
       {/* Primary cursor-following glow - scaled down for structural feel */}
-      <div
-        className="absolute w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] pointer-events-none mix-blend-screen"
-        style={{
-          left: `${smoothMousePosition.x - 200}px`,
-          top: `${smoothMousePosition.y - 200}px`,
-          transition: 'none',
-        }}
-      />
+      <div className="cursor-glow w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] pointer-events-none mix-blend-screen" />
       
       <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-10">
         

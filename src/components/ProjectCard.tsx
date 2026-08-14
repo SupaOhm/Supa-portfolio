@@ -1,43 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../types/project';
+import { useCursorGlow } from '../hooks/useCursorGlow';
 
 interface ProjectCardProps {
   project: Project;
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [smoothMousePosition, setSmoothMousePosition] = useState({ x: 0, y: 0 });
-  const mouseRef = useRef(mousePosition);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  // Keep latest mouse position in a ref
-  useEffect(() => {
-    mouseRef.current = mousePosition;
-  }, [mousePosition]);
-
-  // Smooth cursor tracking with easing (single rAF loop)
-  useEffect(() => {
-    let animationFrameId: number;
-    
-    const smoothMove = () => {
-      setSmoothMousePosition((prev) => ({
-        x: prev.x + (mouseRef.current.x - prev.x) * 0.15,
-        y: prev.y + (mouseRef.current.y - prev.y) * 0.15,
-      }));
-      animationFrameId = requestAnimationFrame(smoothMove);
-    };
-    
-    animationFrameId = requestAnimationFrame(smoothMove);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+  const handleMouseMove = useCursorGlow();
 
   return (
     <article 
@@ -45,22 +14,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       onMouseMove={handleMouseMove}
     >
       {/* Cursor-following gradient effects */}
-      <div
-        className="absolute w-[250px] h-[250px] bg-gradient-to-r from-blue-500/20 via-purple-500/15 to-transparent rounded-full blur-[60px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          left: `${smoothMousePosition.x - 125}px`,
-          top: `${smoothMousePosition.y - 125}px`,
-          transition: 'none',
-        }}
-      />
-      <div
-        className="absolute w-[150px] h-[150px] bg-gradient-to-r from-blue-400/15 to-transparent rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          left: `${smoothMousePosition.x - 75}px`,
-          top: `${smoothMousePosition.y - 75}px`,
-          transition: 'none',
-        }}
-      />
+      <div className="cursor-glow w-[250px] h-[250px] bg-gradient-to-r from-blue-500/20 via-purple-500/15 to-transparent rounded-full blur-[60px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="cursor-glow w-[150px] h-[150px] bg-gradient-to-r from-blue-400/15 to-transparent rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
       {/* Project Image */}
       {project.imageUrl ? (

@@ -1,17 +1,10 @@
-import { useState, useRef, useEffect, type ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { useCursorGlow } from '../hooks/useCursorGlow';
 
 const GITHUB_USERNAME = 'SupaOhm';
 const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
-
-type PointerPosition = { x: number; y: number };
-
-type FullHoverState = {
-  name: string | null;
-  x: number;
-  y: number;
-};
 
 type ContactLink = {
   name: string;
@@ -19,10 +12,6 @@ type ContactLink = {
   detail: string;
   icon: ReactElement;
 };
-
-const INITIAL_POINTER_POSITION: PointerPosition = { x: 0, y: 0 };
-const INITIAL_FULL_HOVER_STATE: FullHoverState = { name: null, x: 0, y: 0 };
-const SMOOTHING_FACTOR = 0.15;
 
 const formatShortDate = (isoDate: string) =>
   new Intl.DateTimeFormat('en-US', {
@@ -76,58 +65,18 @@ const CONTACT_LINKS: ContactLink[] = [
 
 export default function Connect() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-  const [mousePosition, setMousePosition] = useState<PointerPosition>(INITIAL_POINTER_POSITION);
-  const [smoothMousePosition, setSmoothMousePosition] = useState<PointerPosition>(INITIAL_POINTER_POSITION);
   const [showAllDetails, setShowAllDetails] = useState(false);
-  const [fullHover, setFullHover] = useState<FullHoverState>(INITIAL_FULL_HOVER_STATE);
+  const [fullHoverName, setFullHoverName] = useState<string | null>(null);
   const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
   const reducedMotion = usePrefersReducedMotion();
-  const mouseRef = useRef(mousePosition);
-
-  // Keep latest mouse position in a ref
-  useEffect(() => {
-    mouseRef.current = mousePosition;
-  }, [mousePosition]);
-
-  // Smooth cursor tracking with easing (single rAF loop)
-  useEffect(() => {
-    let animationFrameId: number;
-    
-    const smoothMove = () => {
-      setSmoothMousePosition((prev) => ({
-        x: prev.x + (mouseRef.current.x - prev.x) * SMOOTHING_FACTOR,
-        y: prev.y + (mouseRef.current.y - prev.y) * SMOOTHING_FACTOR,
-      }));
-      animationFrameId = requestAnimationFrame(smoothMove);
-    };
-    
-    animationFrameId = requestAnimationFrame(smoothMove);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
+  const handleMouseMove = useCursorGlow();
 
   const handleLinkHover = (name: string | null) => {
     setHoveredLink(name);
   };
 
   const resetFullHover = () => {
-    setFullHover(INITIAL_FULL_HOVER_STATE);
-  };
-
-  const handleFullMouseMove = (name: string, e: React.MouseEvent<HTMLAnchorElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setFullHover({
-      name,
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    setFullHoverName(null);
   };
 
   return (
@@ -172,22 +121,8 @@ export default function Connect() {
                 {/* Cursor-following gradient effects */}
                 {hoveredLink === link.name && (
                   <>
-                    <div
-                      className="absolute w-[160px] h-[160px] bg-gradient-to-r from-blue-400/30 via-purple-400/25 to-transparent rounded-full blur-[50px] pointer-events-none opacity-100"
-                      style={{
-                        left: `${smoothMousePosition.x - 80}px`,
-                        top: `${smoothMousePosition.y - 80}px`,
-                        transition: 'none',
-                      }}
-                    />
-                    <div
-                      className="absolute w-[100px] h-[100px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[30px] pointer-events-none opacity-100"
-                      style={{
-                        left: `${smoothMousePosition.x - 50}px`,
-                        top: `${smoothMousePosition.y - 50}px`,
-                        transition: 'none',
-                      }}
-                    />
+                    <div className="cursor-glow w-[160px] h-[160px] bg-gradient-to-r from-blue-400/30 via-purple-400/25 to-transparent rounded-full blur-[50px] pointer-events-none opacity-100" />
+                    <div className="cursor-glow w-[100px] h-[100px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[30px] pointer-events-none opacity-100" />
                   </>
                 )}
                 
@@ -236,27 +171,15 @@ export default function Connect() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                onMouseEnter={() => setFullHover((prev) => ({ ...prev, name: link.name }))}
+                onMouseEnter={() => setFullHoverName(link.name)}
                 onMouseLeave={resetFullHover}
-                onMouseMove={(e) => handleFullMouseMove(link.name, e)}
+                onMouseMove={handleMouseMove}
                 className="group relative overflow-hidden flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-gray-800/60 to-gray-700/60 border border-gray-700/60 hover:border-blue-400/60 hover:from-blue-900/20 hover:to-purple-900/20 transition-all duration-300"
               >
-                {fullHover.name === link.name && (
+                {fullHoverName === link.name && (
                   <>
-                    <span
-                      className="pointer-events-none absolute w-[140px] h-[140px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-transparent rounded-full blur-[40px] opacity-80"
-                      style={{
-                        left: `${fullHover.x - 70}px`,
-                        top: `${fullHover.y - 70}px`,
-                      }}
-                    />
-                    <span
-                      className="pointer-events-none absolute w-[80px] h-[80px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[24px] opacity-80"
-                      style={{
-                        left: `${fullHover.x - 40}px`,
-                        top: `${fullHover.y - 40}px`,
-                      }}
-                    />
+                    <span className="cursor-glow pointer-events-none w-[140px] h-[140px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-transparent rounded-full blur-[40px] opacity-80" />
+                    <span className="cursor-glow pointer-events-none w-[80px] h-[80px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[24px] opacity-80" />
                   </>
                 )}
                 <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
