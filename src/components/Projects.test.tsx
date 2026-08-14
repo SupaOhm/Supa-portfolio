@@ -86,7 +86,7 @@ describe('filter dropdown keyboard handling', () => {
     const user = userEvent.setup();
     render(<Projects />);
 
-    const viewToggle = screen.getByRole('button', { name: /toggle view/i });
+    const viewToggle = screen.getByRole('button', { name: 'Carousel view' });
     viewToggle.focus();
     expect(viewToggle).toHaveFocus();
 
@@ -121,5 +121,25 @@ describe('carousel navigation dots', () => {
     for (const dot of dots) {
       expect(dot.children).toHaveLength(1);
     }
+  });
+});
+
+describe('view toggle', () => {
+  it('reports its pressed state and keeps a constant accessible name', async () => {
+    const user = userEvent.setup();
+    render(<Projects />);
+
+    // The carousel is the default view, so the toggle starts pressed.
+    const toggle = screen.getByRole('button', { name: 'Carousel view' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(toggle);
+
+    // Same element, same name — only the state changed. A name that changed with
+    // the state would make the control unfindable by its stable label.
+    expect(screen.getByRole('button', { name: 'Carousel view' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 });
