@@ -39,7 +39,7 @@ Palette values are Tailwind v3 defaults: `gray-300 #d1d5db`, `gray-400 #9ca3af`,
 | Dot `bg-gray-600` on `gray-950` | 2.66:1 | 3.0 (1.4.11 UI) | FAIL |
 | Dot `bg-gray-500` on `gray-950` | 4.16:1 | 3.0 (1.4.11 UI) | PASS |
 | Neighbour card body text (current) | 2.46:1 | 4.5 | FAIL |
-| Neighbour card body text (proposed) | 4.52:1 | 4.5 | PASS |
+| Neighbour card body text (shipped in C1) | 4.86:1 | 4.5 | PASS |
 
 **Two corrections to the audit's framing, both material to scope:**
 
@@ -138,6 +138,10 @@ background; an inner `<span>` takes the size and colour classes.
 The dot `<button>` is currently self-closing (`/>`) with no children, so this
 change also converts it to an open/close pair wrapping the new `<span>`.
 
+The inner `<span>` must carry `block`. A `<span>` is `display: inline` by default,
+and width/height do not apply to a non-replaced inline box -- without it the dot
+would collapse and the whole fix would silently do nothing.
+
 The container's `gap-2` becomes `gap-0` so adjacent 24px hit areas abut without
 overlapping.
 
@@ -160,11 +164,19 @@ describe what it controls and stay constant; the pressed state is what changes.
 "Toggle view" plus `aria-pressed` would announce as "Toggle view, pressed", which
 tells the user nothing about which view is active.
 
-**3.2 Filter result count.** A `role="status"` element reporting how many projects
-survive the current filters.
+**3.2 Filter result count.** A `role="status"` element whose text is exactly
+`<n> projects shown` for any `n` other than 1, and `1 project shown` when `n` is 1.
+When `n` is 0 the text is `No projects match the selected filters.`, matching the
+visible empty-state copy already in the component.
 
-**3.3 Carousel position.** A `role="status"` element reporting the centred card as
-`Project <n> of <m>: <title>`.
+**3.3 Carousel position.** A `role="status"` element whose text is exactly
+`Project <n> of <m>: <title>`, where `<n>` is `currentIndex + 1`.
+
+The carousel region's text is the **empty string** whenever there is no centred
+card to report -- in grid view, and when the filtered set is empty. The element
+stays mounted in both cases (see below); only its text empties. Emptying rather
+than unmounting also means switching back to carousel view announces the position
+again, because the text transitions from empty to non-empty.
 
 Both regions are:
 
@@ -220,8 +232,20 @@ About it sits under the "GitHub Activity" `<h3>` at `:105`, making a heading its
 own sibling's child. Both become `<p>` with the same classes: a card label is not
 a document section.
 
-No level *skips* exist in the document — the order is h1 (Hero), then h2 per
-section, then h3s — so no other heading changes are needed.
+**4.4b** `src/components/About.tsx:59` (the `InfoCard` helper) renders its card
+title as `<h3>`, and every `InfoCard` sits under the "Details" `<h3>` at `:166` --
+the identical "heading is its own sibling's child" fault 4.4 fixes at `:128`. This
+was missed in the first pass of this spec and is added here because it is the same
+defect class, in the same file, at one line's cost.
+
+The fix differs from 4.4's, though: an `InfoCard` title ("Personal Information",
+"Education") genuinely labels a region of content, so it stays a heading and is
+demoted to `<h4>`. Only the GitHub display name, which is data rather than a
+section label, becomes a `<p>`.
+
+No level *skips* exist in the document once 4.4b lands — the order is h1 (Hero),
+h2 per section, h3, then h4 under "Details" — so no other heading changes are
+needed.
 
 **4.5 Alt text.** `src/components/ProjectCard.tsx:24`: `alt={project.title}` ->
 `alt=""`. The title is already announced by the adjacent `<h3>` at `:35`; the
@@ -232,6 +256,13 @@ The two GitHub avatar alts (`About.tsx:123`, `Connect.tsx:206`) are already
 correct and are not touched.
 
 ## Testing
+
+**One existing test breaks and must be updated as part of this slice.**
+`src/components/Projects.test.tsx` queries the view toggle by its current name
+(`screen.getByRole('button', { name: /toggle view/i })`) in the test
+"does not steal focus when Escape is pressed with the dropdown closed". Item 3.1
+renames that button to "Carousel view", so the query must move with it. This is a
+rename, not a behaviour change -- the test's assertion is untouched.
 
 Test environment is established: Vitest with `environment: 'node'` globally and
 per-file jsdom opt-in via a `// @vitest-environment jsdom` docblock (Slice B2).
@@ -292,7 +323,10 @@ environment — the Chrome extension is not connected.
    "Skills & Technologies", "Featured Projects", "Get In Touch" -- plus a "Main"
    navigation. Note that "Featured Projects" confirms 1.4 worked: without
    `aria-hidden` on the bracket spans it would read "[ Featured Projects ]".
-9. Confirm the side cards still read as receding — the depth effect should be
+9. Screen reader rotor, headings list: under About, "Details" is followed by its
+   four card titles one level deeper, and neither GitHub display name appears as a
+   heading at all.
+10. Confirm the side cards still read as receding — the depth effect should be
    softened, not lost.
 
 ## Out of scope
