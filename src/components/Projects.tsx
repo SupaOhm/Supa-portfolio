@@ -155,6 +155,8 @@ export default function Projects() {
             <button
               ref={filterTriggerRef}
               onClick={() => setIsFilterOpen((v) => !v)}
+              aria-expanded={isFilterOpen}
+              aria-controls="project-filter-panel"
               className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700/50 hover:border-blue-400/50 hover:text-white transition-all duration-200"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +174,7 @@ export default function Projects() {
             </button>
 
             {isFilterOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-900/95 border border-gray-700/60 rounded-xl shadow-2xl shadow-black/40 backdrop-blur-md z-50">
+              <div id="project-filter-panel" className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-900/95 border border-gray-700/60 rounded-xl shadow-2xl shadow-black/40 backdrop-blur-md z-50">
                 <div className="p-4 space-y-4">
                   {/* Category */}
                   <div>

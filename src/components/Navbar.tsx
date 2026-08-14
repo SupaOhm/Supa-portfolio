@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
@@ -16,6 +16,7 @@ const SCROLL_THRESHOLD = 50;
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,8 +31,16 @@ export default function Navbar() {
         el.scrollIntoView({ behavior: currentScrollBehavior() });
       }
     }
+    // The mobile nav buttons live inside the wrapper that becomes inert when the menu
+    // closes. Per the HTML Standard the UA unfocuses a focused element that becomes
+    // inert, so without this focus would fall to <body> and the next Tab would restart
+    // from the top of the document. preventScroll because we have just scrolled to a
+    // section and focusing must not undo that.
+    if (isMenuOpen) {
+      menuToggleRef.current?.focus({ preventScroll: true });
+    }
     setIsMenuOpen(false);
-  }, [location.pathname, navigate]);
+  }, [isMenuOpen, location.pathname, navigate]);
 
   const isLinkActive = useCallback((linkId: string) => {
     return location.pathname === '/' && activeSection === linkId;
@@ -96,6 +105,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
+            ref={menuToggleRef}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 rounded p-2 transition-all duration-300 hover:bg-gray-800/50"
             aria-label="Toggle menu"
