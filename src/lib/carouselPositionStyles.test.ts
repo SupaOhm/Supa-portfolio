@@ -40,4 +40,24 @@ describe('carousel position styles', () => {
     expect(String(POSITION_STYLES[1].transform)).toContain('rotateY');
     expect(String(POSITION_STYLES[-1].transform)).toContain('rotateY');
   });
+
+  it('dims the neighbour slots with opacity alone, never a filter', () => {
+    for (const map of [POSITION_STYLES, REDUCED_POSITION_STYLES]) {
+      for (const slot of [1, -1]) {
+        // 0.8 keeps in-card body text at 4.86:1 against the card's own
+        // background, clearing the 4.5:1 needed by WCAG 1.4.3. A brightness()
+        // filter would dim text and background together and collapse it to
+        // 2.46:1, as well as forcing a re-raster on every frame.
+        expect(map[slot].opacity, `slot ${slot}`).toBe(0.8);
+      }
+    }
+  });
+
+  it('sets no filter on any slot in either map', () => {
+    for (const map of [POSITION_STYLES, REDUCED_POSITION_STYLES]) {
+      for (const [slot, style] of Object.entries(map)) {
+        expect(style.filter, `slot ${slot}`).toBeUndefined();
+      }
+    }
+  });
 });
