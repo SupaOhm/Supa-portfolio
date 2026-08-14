@@ -46,8 +46,8 @@ export default function Hero() {
         <div className="text-left relative marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-6 sm:p-10 border border-gray-800/50 bg-gray-950/60 backdrop-blur-md">
           <p className="font-mono text-blue-400 mb-4 text-sm uppercase tracking-widest">// Initializing_Profile</p>
           <div className="mb-6 animate-fade-in">
-            <p className="mb-3 font-mono text-xs uppercase tracking-[0.35em] text-gray-500">
-              Hola World 
+            <p className="mb-3 font-mono text-xs uppercase tracking-[0.35em] text-gray-400">
+              Hola World
             </p>
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-500">
@@ -68,9 +68,9 @@ export default function Hero() {
           </div>
           
           <div className="font-mono text-xs sm:text-sm text-gray-400 mb-10 border-l-2 border-gray-700 pl-5 py-2 space-y-2">
-            <p><span className="text-gray-500">PROGRAM    :</span> Computer Engineering, SIIT, Thammasat</p>
-            <p><span className="text-gray-500">YEAR       :</span> 3rd Year [GPA: 3.23]</p>
-            <p><span className="text-gray-500">LOCATION   :</span> Pathum Thani, Thailand</p>
+            <p><span className="text-gray-400">PROGRAM    :</span> Computer Engineering, SIIT, Thammasat</p>
+            <p><span className="text-gray-400">YEAR       :</span> 3rd Year [GPA: 3.23]</p>
+            <p><span className="text-gray-400">LOCATION   :</span> Pathum Thani, Thailand</p>
             <div className="mt-4 pt-4 border-t border-gray-800/50 text-gray-300 max-w-lg leading-relaxed font-sans text-base">
               Fascinated by building full-stack applications, designing APIs, and working with relational and NoSQL databases. Looking for a Software Engineer internship to contribute to reliable systems.
             </div>
@@ -135,7 +135,7 @@ export default function Hero() {
 // Ready to build
 developer.initialize();`}
              </pre>
-             <div className="absolute -bottom-3 -right-3 text-[10px] font-mono text-gray-500 bg-gray-900 px-1 border border-gray-800">
+             <div className="absolute -bottom-3 -right-3 text-[10px] font-mono text-gray-400 bg-gray-900 px-1 border border-gray-800">
                SYS_ACTV
              </div>
            </div>

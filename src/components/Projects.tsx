@@ -119,9 +119,9 @@ export default function Projects() {
               // sys.logs.fetch("projects")
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
-              <span className="text-gray-700 font-light text-2xl">[</span>
+              <span aria-hidden="true" className="text-gray-700 font-light text-2xl">[</span>
               Featured Projects
-              <span className="text-gray-700 font-light text-2xl">]</span>
+              <span aria-hidden="true" className="text-gray-700 font-light text-2xl">]</span>
             </h2>
           </div>
 
@@ -189,7 +189,7 @@ export default function Projects() {
                             className="w-3.5 h-3.5 accent-blue-500 flex-shrink-0"
                           />
                           <span className="text-sm text-gray-300 group-hover:text-white flex-1">{cat}</span>
-                          <span className="text-xs text-gray-500">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
+                          <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
                         </label>
                       ))}
                     </div>
@@ -211,7 +211,7 @@ export default function Projects() {
                           />
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_COLORS[st]}`} />
                           <span className="text-sm text-gray-300 group-hover:text-white flex-1">{STATUS_LABELS[st]}</span>
-                          <span className="text-xs text-gray-500">({PROJECTS.filter((p) => p.status === st).length})</span>
+                          <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.status === st).length})</span>
                         </label>
                       ))}
                     </div>

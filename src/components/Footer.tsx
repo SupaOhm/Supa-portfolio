@@ -11,7 +11,7 @@ export default function Footer() {
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-gray-700/50 to-transparent" />
         <div className="mt-6 text-center">
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-400 text-sm">
             ohm.supakornth@gmail.com
           </p>
         </div>

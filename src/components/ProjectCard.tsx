@@ -26,7 +26,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         />
       ) : (
         <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-gray-900 flex items-center justify-center group-hover:from-blue-600/30 group-hover:via-purple-600/30 transition-all duration-300">
-          <span className="text-gray-500 text-lg">No Image</span>
+          <span className="text-gray-400 text-lg">No Image</span>
         </div>
       )}
 

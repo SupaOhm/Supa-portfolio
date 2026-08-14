@@ -95,3 +95,14 @@ describe('filter dropdown keyboard handling', () => {
     expect(viewToggle).toHaveFocus();
   });
 });
+
+describe('decorative brackets', () => {
+  it('keeps the bracket glyphs out of the projects heading accessible name', () => {
+    render(<Projects />);
+
+    // getByRole's string `name` matcher is an exact, whitespace-normalised match.
+    // Without aria-hidden on the two decorative spans the computed name is
+    // "[ Featured Projects ]" and this query finds nothing.
+    expect(screen.getByRole('heading', { name: 'Featured Projects' })).toBeInTheDocument();
+  });
+});
