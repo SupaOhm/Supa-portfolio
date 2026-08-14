@@ -12,6 +12,14 @@ size, missing ARIA state, missing live regions, and markup semantics. This is th
 last accessibility slice; after it, the audit's accessibility dimension has no
 open Critical, High, or Medium findings.
 
+## Line-reference provenance
+
+All line numbers in this spec were re-verified against `main` at `a082d04`
+(after Slice C1 merged). C1 removed roughly 180 lines across `Hero.tsx`,
+`ProjectCard.tsx`, and `Connect.tsx`, so every reference into those three files
+shifted; references into `Projects.tsx`, `Skills.tsx`, `About.tsx`, `Navbar.tsx`,
+and `Footer.tsx` were unaffected and re-confirmed unchanged.
+
 ## Verified premises
 
 Every number below was recomputed from the source values on 2026-08-14 rather than
@@ -84,11 +92,11 @@ and SC 1.4.3 applies to visible text regardless of interactivity.
 **1.1** Replace `text-gray-500` with `text-gray-400` at all nine text sites:
 
 - `src/components/Footer.tsx:14`
-- `src/components/Hero.tsx:87`, `:109`, `:110`, `:111`, `:176`
-- `src/components/ProjectCard.tsx:74`
+- `src/components/Hero.tsx:49`, `:71`, `:72`, `:73`, `:138`
+- `src/components/ProjectCard.tsx:29`
 - `src/components/Projects.tsx:192`, `:214`
 
-`Hero.tsx:176` and `Projects.tsx:192`/`:214` sit on `gray-900` rather than
+`Hero.tsx:138` and `Projects.tsx:192`/`:214` sit on `gray-900` rather than
 `gray-950`; `gray-400` clears 4.5:1 on both grounds, so one replacement value
 serves every site.
 
@@ -178,11 +186,11 @@ its own heading, and that heading gains a matching `id`:
 
 | Section | File | Heading | New id |
 | --- | --- | --- | --- |
-| `#home` | `Hero.tsx:66` / `:90` | `<h1>` | `hero-heading` |
+| `#home` | `Hero.tsx:35` / `:52` | `<h1>` | `hero-heading` |
 | `#about` | `About.tsx:74` / `:82` | `<h2>` | `about-heading` |
 | `#skills` | `Skills.tsx:17` / `:24` | `<h2>` | `skills-heading` |
 | `#projects` | `Projects.tsx:108` / `:121` | `<h2>` | `projects-heading` |
-| `#connect` | `Connect.tsx:134` / `:139` | `<h2>` | `connect-heading` |
+| `#connect` | `Connect.tsx:83` / `:88` | `<h2>` | `connect-heading` |
 
 Hero's `<h1>` is static text ("Supakorn Prayongyam / SIIT, Thammasat University");
 the typewriter effect is on a different element, so the h1 is safe to use as a
@@ -194,7 +202,7 @@ label source.
 `<div>`-of-`<span>`:
 
 - `src/components/Skills.tsx:39-49` — skill chips
-- `src/components/ProjectCard.tsx:88-97` — project tags
+- `src/components/ProjectCard.tsx:43-52` — project tags
 
 Convert the wrapping `<div>` to `<ul>` and each chip `<span>` to `<li>`, moving
 the existing classes across unchanged. Tailwind preflight already sets
@@ -207,7 +215,7 @@ The Skills chips carry inline `revealStyle(...)` output. That style moves to the
 `transition-all` hover behaviour.
 
 **4.4 Heading nesting.** `src/components/About.tsx:128` and
-`src/components/Connect.tsx:288` render the GitHub display name as `<h3>`. In
+`src/components/Connect.tsx:211` render the GitHub display name as `<h3>`. In
 About it sits under the "GitHub Activity" `<h3>` at `:105`, making a heading its
 own sibling's child. Both become `<p>` with the same classes: a card label is not
 a document section.
@@ -215,12 +223,12 @@ a document section.
 No level *skips* exist in the document — the order is h1 (Hero), then h2 per
 section, then h3s — so no other heading changes are needed.
 
-**4.5 Alt text.** `src/components/ProjectCard.tsx:69`: `alt={project.title}` ->
-`alt=""`. The title is already announced by the adjacent `<h3>` at `:80`; the
+**4.5 Alt text.** `src/components/ProjectCard.tsx:24`: `alt={project.title}` ->
+`alt=""`. The title is already announced by the adjacent `<h3>` at `:35`; the
 current alt makes screen readers say it twice. An empty alt marks the image
 decorative, which is correct when the adjacent text conveys the same information.
 
-The two GitHub avatar alts (`About.tsx:123`, `Connect.tsx:283`) are already
+The two GitHub avatar alts (`About.tsx:123`, `Connect.tsx:206`) are already
 correct and are not touched.
 
 ## Testing
