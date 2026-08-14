@@ -208,7 +208,7 @@ export default function Connect() {
                 loading="lazy"
               />
               <div>
-                <h3 className="text-white text-lg font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</h3>
+                <p className="text-white text-lg font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</p>
                 <p className="text-blue-300 text-sm">@{githubStats?.login ?? GITHUB_USERNAME}</p>
                 <p className="text-gray-400 text-sm mt-1">{githubStats?.bio ?? 'Loading profile...'}</p>
               </div>

@@ -56,10 +56,10 @@ type InfoCardProps = {
 function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
   return (
     <div className={`group p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+      <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
         {icon}
         {title}
-      </h3>
+      </h4>
       {children}
     </div>
   );
@@ -125,7 +125,7 @@ export default function About() {
                   loading="lazy"
                 />
                 <div>
-                  <h3 className="text-white text-base font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</h3>
+                  <p className="text-white text-base font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</p>
                   <p className="text-blue-300 text-xs">@{githubStats?.login ?? GITHUB_USERNAME}</p>
                   <p className="text-gray-400 text-xs mt-0.5 line-clamp-2">{githubStats?.bio ?? 'Loading profile...'}</p>
                 </div>

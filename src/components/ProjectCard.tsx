@@ -21,7 +21,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       {project.imageUrl ? (
         <img
           src={project.imageUrl}
-          alt={project.title}
+          alt=""
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
       ) : (

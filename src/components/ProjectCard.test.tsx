@@ -16,3 +16,14 @@ describe('project tags', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(project.tags.length);
   });
 });
+
+describe('project image', () => {
+  it('marks the image decorative so the title is not announced twice', () => {
+    render(<ProjectCard project={project} />);
+
+    // The adjacent h3 already announces the title. An alt that repeats it makes
+    // a screen reader say the project name twice in a row.
+    expect(screen.getByRole('heading', { name: project.title, level: 3 })).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: project.title })).toBeNull();
+  });
+});
