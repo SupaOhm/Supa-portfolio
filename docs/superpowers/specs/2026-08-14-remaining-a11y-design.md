@@ -97,16 +97,20 @@ serves every site.
 which would become a no-op, so it moves to `hover:bg-gray-400` to preserve a
 visible hover delta. The active dot stays `bg-blue-500` (5.47:1, already passing).
 
-**1.3** Carousel neighbours, `src/lib/carouselPositionStyles.ts`: for slots `1` and
-`-1`, in **both** exported maps, `opacity: 0.7` -> `0.85` and
-`filter: 'brightness(0.7)'` -> `'brightness(0.9)'`.
+**1.3 — STRUCK. Already shipped by Slice C1 (PR #8, merged as `a082d04`).**
 
-Slots `2` and `-2` are `opacity: 0` — invisible, so exempt from 1.4.3. They are
-left unchanged.
+This item originally set slots `1` and `-1` to `opacity: 0.85` +
+`filter: 'brightness(0.9)'` (4.52:1). Slice C1 superseded it while removing the
+per-frame cost of the filter: neighbours are now `opacity: 0.8` with **no filter
+at all**, which measures **4.86:1** — more headroom than this spec's own target,
+and one less rendering context per frame.
 
-B1 established that `REDUCED_POSITION_STYLES` differs from `POSITION_STYLES` only
-in `transform` (no `rotateY`, no `scale`). That invariant must survive this slice:
-opacity, zIndex, and filter stay identical between the two maps.
+`src/lib/carouselPositionStyles.ts` therefore needs **no change in B3**, and
+`src/lib/carouselPositionStyles.test.ts` already asserts both the 0.8 opacity and
+the absence of any `filter`, in both maps.
+
+The verified figure for the "Carousel neighbour card text" row of the table above
+is consequently 4.86:1, not the 4.52:1 originally planned.
 
 **1.4** Decorative brackets, `src/components/Projects.tsx:122` and `:124`: add
 `aria-hidden="true"` to both `<span>`s. Their `text-gray-700` colour (1.95:1) is
@@ -236,18 +240,18 @@ jsdom test files require an explicit `afterEach(cleanup)` because
 - skill chips and project tags expose `list` / `listitem` roles
 - project image has an empty alt (is not exposed as an image with a name)
 
-**Covered by a Node unit test (Group 1.3):**
-
-`POSITION_STYLES` and `REDUCED_POSITION_STYLES` carry the new opacity and filter
-values, and remain identical to each other on every property except `transform`.
+**Group 1.3 needs no test here** — it is struck. Slice C1 already shipped the
+carousel-neighbour change together with its unit tests, which assert `opacity: 0.8`
+on slots `1`/`-1`, the absence of any `filter` on every slot, and B1's invariant
+that the two maps differ only in `transform`.
 
 **NOT covered by any test — this is a real limit, not an oversight:**
 
-- **Contrast (1.1, 1.2, 1.3).** jsdom does not compute colour. It does not resolve
+- **Contrast (1.1, 1.2).** jsdom does not compute colour. It does not resolve
   Tailwind class names to values, does not composite `opacity`, and does not apply
   `filter`. No test in this slice demonstrates that any contrast ratio improved.
-  The unit test above proves the source values changed; it does not prove the
-  rendered result passes.
+  Nothing in B3 changes the carousel dimming any more, so the only contrast work
+  left here is class-name substitution, which no test can validate.
 - **Target size (Group 2).** jsdom has no layout engine. `getBoundingClientRect`
   returns zeros. Nothing asserts the dot hit area is 24x24.
 - **The 8px -> 12px dot gap.** Visual only.
