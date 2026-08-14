@@ -13,6 +13,25 @@
 }
 
 @layer utilities {
+  /* Cursor-following glow. Position comes from --glow-x / --glow-y, written by
+     the useCursorGlow hook on the hovered ancestor; custom properties inherit,
+     so any number of glows can share one writer.
+
+     translate(-50%, -50%) is relative to the element's OWN size, which centres
+     each glow on the cursor regardless of its dimensions — this replaces the
+     per-element `left: x - width/2` arithmetic the inline styles used.
+
+     The var() fallbacks are required: an unset custom property makes the whole
+     transform declaration invalid, leaving the glow unpositioned until the
+     first mousemove. */
+  .cursor-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate3d(var(--glow-x, 0px), var(--glow-y, 0px), 0)
+               translate(-50%, -50%);
+  }
+
   .animate-fade-in {
     animation: fadeIn 1s ease-in;
   }
