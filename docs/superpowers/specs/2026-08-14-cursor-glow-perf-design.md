@@ -60,7 +60,8 @@ those elements carries a large blur (`blur-[60px]`, `blur-[40px]`, `blur-[80px]`
 
 In carousel view each card additionally sits inside `perspective: 2000px` +
 `transformStyle: 'preserve-3d'` + `willChange: 'transform, opacity'`
-(`Projects.tsx:283-284`) with `filter: brightness(...)` from `POSITION_STYLES`, on
+(`Projects.tsx:272` for the perspective wrapper, `:285` for the slot style) with
+`filter: brightness(...)` from `POSITION_STYLES`, on
 top of the card's own `backdrop-blur-sm` (`ProjectCard.tsx:44`).
 
 So per frame, per card: layout -> re-raster a 60px blur -> re-apply
@@ -74,7 +75,7 @@ burning CPU without a visible symptom. This matches the reported asymmetry.
 
 In all three components the glow is already hidden unless hovered:
 
-- `ProjectCard.tsx:48`, `:56` — `opacity-0 group-hover:opacity-100`
+- `ProjectCard.tsx:49`, `:57` — `opacity-0 group-hover:opacity-100`
 - `Connect.tsx:173` — mounted only when `hoveredLink === link.name`
 - Hero — tracks the section pointer
 
@@ -187,15 +188,27 @@ existing size, gradient, and blur classes and losing its now-redundant `absolute
 | File | Elements | Notes |
 | --- | --- | --- |
 | `Hero.tsx` | 1 glow (`:73-78`) | handler stays on the `<section>` (`:69`) |
-| `ProjectCard.tsx` | 2 glows (`:47-62`) | handler stays on the `<article>` (`:45`) |
+| `ProjectCard.tsx` | 2 glows (`:48-63`) | handler stays on the `<article>` (`:45`) |
 | `Connect.tsx` smooth | 2 glows (`:176-190`) | handler on the `<a>` (`:159`) |
 | `Connect.tsx` fullHover | 2 glows (`:247-259`) | handler on the `<a>` (`:241`) |
 
-`Connect`'s `fullHover` keeps its `name` field — it decides which link renders
-glows — driven by the existing `onMouseEnter`/`onMouseLeave`. Only `x` and `y`
-leave the state. `FullHoverState`, `INITIAL_FULL_HOVER_STATE`, `PointerPosition`,
-`INITIAL_POINTER_POSITION`, and `SMOOTHING_FACTOR` are updated or removed to match;
-unused ones must go, since `noUnusedLocals` is on.
+`Connect`'s `fullHover` still needs to know **which** link renders glows, but once
+`x` and `y` move to CSS variables that is all it holds. `FullHoverState` therefore
+collapses to a bare `string | null`, matching the `hoveredLink` state already in
+the same component (`:78`):
+
+```ts
+const [fullHoverName, setFullHoverName] = useState<string | null>(null);
+```
+
+driven by the existing `onMouseEnter` (`:239`) and `onMouseLeave` (`:240`), with
+the render guard at `:244` becoming `fullHoverName === link.name`.
+
+These declarations then have no remaining references and must be deleted, since
+`noUnusedLocals` is on: `PointerPosition` (`:8`), `FullHoverState` (`:10-14`),
+`INITIAL_POINTER_POSITION` (`:23`), `INITIAL_FULL_HOVER_STATE` (`:24`),
+`SMOOTHING_FACTOR` (`:25`), and the `resetFullHover` helper (`:120-122`) if it is
+not reused for the new setter.
 
 ### `src/lib/carouselPositionStyles.ts`
 
@@ -279,7 +292,7 @@ connected.
 ## Out of scope
 
 - `backdrop-blur-sm` on the card (`ProjectCard.tsx:44`) and the permanent
-  `willChange: 'transform, opacity'` on slot wrappers (`Projects.tsx:284`). Both
+  `willChange: 'transform, opacity'` on slot wrappers (`Projects.tsx:285`). Both
   are plausible secondary costs, but removing either changes appearance or risks
   making the 700ms slide janky, and there is no measurement to justify the trade.
   These are the next things to examine if the carousel still stutters.
