@@ -115,13 +115,16 @@ accessible name of "[ Featured Projects ]".
 
 ## Group 2 — Touch target
 
-`src/components/Projects.tsx:316-326`. The dot button currently carries both the
+`src/components/Projects.tsx:315-327`. The dot button currently carries both the
 hit area and the visual appearance on one element, so padding it would change how
 the dot looks. Split the two responsibilities: the `<button>` takes `p-1.5` and no
 background; an inner `<span>` takes the size and colour classes.
 
 12px visual + 6px padding on each side = exactly 24x24. The active dot becomes
 44x24, which also passes.
+
+The dot `<button>` is currently self-closing (`/>`) with no children, so this
+change also converts it to an open/close pair wrapping the new `<span>`.
 
 The container's `gap-2` becomes `gap-0` so adjacent 24px hit areas abut without
 overlapping.
@@ -136,7 +139,7 @@ approach wins.
 
 ## Group 3 — ARIA state and live regions
 
-**3.1 View toggle**, `src/components/Projects.tsx:132-135`. Add
+**3.1 View toggle**, `src/components/Projects.tsx:130-134`. Add
 `aria-pressed={isCarouselView}`. Replace `aria-label="Toggle view"` with
 `aria-label="Carousel view"`.
 
@@ -187,7 +190,7 @@ label source.
 `<div>`-of-`<span>`:
 
 - `src/components/Skills.tsx:39-49` — skill chips
-- `src/components/ProjectCard.tsx:87-96` — project tags
+- `src/components/ProjectCard.tsx:88-97` — project tags
 
 Convert the wrapping `<div>` to `<ul>` and each chip `<span>` to `<li>`, moving
 the existing classes across unchanged. Tailwind preflight already sets
@@ -272,8 +275,11 @@ environment — the Chrome extension is not connected.
 6. Screen reader: changing a filter announces the new project count without
    moving focus.
 7. Screen reader: pressing a carousel arrow announces "Project n of m: <title>".
-8. Screen reader rotor: five landmarks are listed by name (Introduction/About/
-   Skills/Projects/Connect) plus a "Main" navigation.
+8. Screen reader rotor: five landmarks are listed, each named by its own heading
+   text -- "Supakorn Prayongyam SIIT, Thammasat University", "About Me",
+   "Skills & Technologies", "Featured Projects", "Get In Touch" -- plus a "Main"
+   navigation. Note that "Featured Projects" confirms 1.4 worked: without
+   `aria-hidden` on the bracket spans it would read "[ Featured Projects ]".
 9. Confirm the side cards still read as receding — the depth effect should be
    softened, not lost.
 
