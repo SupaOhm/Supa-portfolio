@@ -33,8 +33,10 @@ describe('section landmarks', () => {
         <Hero />
       </MemoryRouter>,
     );
+    // jsdom loads no CSS, so the block-level separators the accname algorithm
+    // would insert in a browser are absent. Match by regex to tolerate both forms.
     expect(
-      screen.getByRole('region', { name: 'SupakornPrayongyamSIIT, Thammasat University' }),
+      screen.getByRole('region', { name: /Supakorn\s*Prayongyam\s*SIIT, Thammasat University/ }),
     ).toBeInTheDocument();
   });
 
