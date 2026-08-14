@@ -30,6 +30,7 @@ export default function Projects() {
   const [selectedStatuses, setSelectedStatuses] = useState<Set<ProjectStatus>>(new Set());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const filterTriggerRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = usePrefersReducedMotion();
   const positionStyles = reducedMotion ? REDUCED_POSITION_STYLES : POSITION_STYLES;
 
@@ -53,6 +54,26 @@ export default function Projects() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Close the filter dropdown on Escape and return focus to its trigger.
+  // This is a SEPARATE effect with [isFilterOpen] in its deps: the outside-click
+  // effect above declares [], so a handler registered there would close over
+  // isFilterOpen === false forever and steal focus on every Escape keypress.
+  useEffect(() => {
+    if (!isFilterOpen) {
+      return;
+    }
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFilterOpen(false);
+        filterTriggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isFilterOpen]);
 
   const toggleCategory = (cat: ProjectCategory) =>
     setSelectedCategories((prev) => {
@@ -132,7 +153,10 @@ export default function Projects() {
         <div className="flex flex-wrap justify-center items-center gap-2 mb-8">
           <div className="relative" ref={filterDropdownRef}>
             <button
+              ref={filterTriggerRef}
               onClick={() => setIsFilterOpen((v) => !v)}
+              aria-expanded={isFilterOpen}
+              aria-controls="project-filter-panel"
               className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700/50 hover:border-blue-400/50 hover:text-white transition-all duration-200"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +174,7 @@ export default function Projects() {
             </button>
 
             {isFilterOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-900/95 border border-gray-700/60 rounded-xl shadow-2xl shadow-black/40 backdrop-blur-md z-50">
+              <div id="project-filter-panel" className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-900/95 border border-gray-700/60 rounded-xl shadow-2xl shadow-black/40 backdrop-blur-md z-50">
                 <div className="p-4 space-y-4">
                   {/* Category */}
                   <div>
@@ -210,20 +234,32 @@ export default function Projects() {
           {activeFilterCount > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
               {[...selectedCategories].map((cat) => (
-                <span key={cat} onClick={() => toggleCategory(cat)} className="flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150">
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleCategory(cat)}
+                  aria-label={`Remove ${cat} filter`}
+                  className="flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150"
+                >
                   {cat}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </span>
+                </button>
               ))}
               {[...selectedStatuses].map((st) => (
-                <span key={st} onClick={() => toggleStatus(st)} className="flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150">
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => toggleStatus(st)}
+                  aria-label={`Remove ${STATUS_LABELS[st]} filter`}
+                  className="flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150"
+                >
                   {STATUS_LABELS[st]}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </span>
+                </button>
               ))}
             </div>
           )}
@@ -243,9 +279,10 @@ export default function Projects() {
                       <div
                         key={project.id}
                         ref={isCenter ? centerCardRef : null}
-                        className={`w-[280px] sm:w-[360px] transition-all duration-700 ease-out ${filteredProjects.length === 1 ? '' : 'absolute cursor-pointer'}`}
-                        style={{ ...positionStyles[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity', pointerEvents: Math.abs(pos) <= 1 ? 'auto' : 'none' }}
-                        onClick={() => { if (!isCenter) setCurrentIndex(idx); }}
+                        data-testid="carousel-card"
+                        inert={!isCenter}
+                        className={`w-[280px] sm:w-[360px] transition-all duration-700 ease-out ${filteredProjects.length === 1 ? '' : 'absolute'}`}
+                        style={{ ...positionStyles[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
                       >
                         <div className={`${isCenter ? 'ring-4 ring-blue-500/60 shadow-[0_0_50px_rgba(59,130,246,0.5)]' : ''} rounded-xl overflow-hidden`}>
                           <ProjectCard project={project} />
