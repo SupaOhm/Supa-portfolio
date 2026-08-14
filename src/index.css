@@ -21,9 +21,10 @@
      each glow on the cursor regardless of its dimensions — this replaces the
      per-element `left: x - width/2` arithmetic the inline styles used.
 
-     The var() fallbacks are required: an unset custom property makes the whole
-     transform declaration invalid, leaving the glow unpositioned until the
-     first mousemove. */
+     The var() fallbacks are required: an unset custom property makes the
+     transform declaration invalid at computed-value time, so `transform`
+     computes to `none` and the glow renders un-shifted at `top: 0; left: 0`
+     until the first mousemove. */
   .cursor-glow {
     position: absolute;
     top: 0;

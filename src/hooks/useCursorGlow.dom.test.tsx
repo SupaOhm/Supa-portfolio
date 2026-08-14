@@ -15,6 +15,16 @@ function GlowHost() {
   return <div data-testid="host" onMouseMove={handleMouseMove} />;
 }
 
+function TwoGlowHosts() {
+  const handleMouseMove = useCursorGlow();
+  return (
+    <>
+      <div data-testid="host-a" onMouseMove={handleMouseMove} />
+      <div data-testid="host-b" onMouseMove={handleMouseMove} />
+    </>
+  );
+}
+
 /** Replaces window.matchMedia so usePrefersReducedMotion sees `reduce`. */
 function stubReducedMotion(matches: boolean) {
   vi.stubGlobal('matchMedia', (query: string) => ({
@@ -103,5 +113,53 @@ describe('useCursorGlow', () => {
     expect(host.style.getPropertyValue('--glow-x')).toBe('100px');
     expect(host.style.getPropertyValue('--glow-y')).toBe('40px');
     expect(frames).toHaveLength(0);
+  });
+
+  it('snaps on switching elements and never leaks the new element position onto the old one', () => {
+    const frames = captureFrames();
+    render(<TwoGlowHosts />);
+    const hostA = screen.getByTestId('host-a');
+    const hostB = screen.getByTestId('host-b');
+
+    // First move onto A: snaps.
+    fireEvent.mouseMove(hostA, { clientX: 10, clientY: 10 });
+    expect(hostA.style.getPropertyValue('--glow-x')).toBe('10px');
+    expect(hostA.style.getPropertyValue('--glow-y')).toBe('10px');
+
+    // Second move, still on A: schedules a frame (does not snap).
+    fireEvent.mouseMove(hostA, { clientX: 100, clientY: 40 });
+    expect(frames).toHaveLength(1);
+
+    // Move onto B: element switch, must snap immediately to B's coordinates.
+    fireEvent.mouseMove(hostB, { clientX: 30, clientY: 20 });
+    expect(hostB.style.getPropertyValue('--glow-x')).toBe('30px');
+    expect(hostB.style.getPropertyValue('--glow-y')).toBe('20px');
+
+    // Run any pending/newly-scheduled frames. The loop must never write B's
+    // target position onto A.
+    let guard = 0;
+    while (guard < 20 && frames.length > guard) {
+      frames[guard](0);
+      guard += 1;
+    }
+
+    expect(hostA.style.getPropertyValue('--glow-x')).not.toBe('30px');
+    expect(hostA.style.getPropertyValue('--glow-y')).not.toBe('20px');
+  });
+
+  it('cancels a pending frame on unmount', () => {
+    const frames = captureFrames();
+    const cancel = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', cancel);
+    render(<GlowHost />);
+    const host = screen.getByTestId('host');
+
+    fireEvent.mouseMove(host, { clientX: 0, clientY: 0 });
+    fireEvent.mouseMove(host, { clientX: 100, clientY: 40 });
+    expect(frames).toHaveLength(1);
+
+    cleanup();
+
+    expect(cancel).toHaveBeenCalledWith(1);
   });
 });
