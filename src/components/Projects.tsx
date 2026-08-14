@@ -314,14 +314,18 @@ export default function Projects() {
 
             {/* Navigation Dots */}
             {filteredProjects.length > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
+              <div className="flex justify-center gap-0 mt-8">
                 {filteredProjects.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentIndex(i)}
-                    className={`transition-all duration-300 rounded-full ${currentIndex === i ? 'bg-blue-500 w-8 h-3' : 'bg-gray-600 hover:bg-gray-500 w-3 h-3'}`}
+                    className="group p-1.5 rounded-full"
                     aria-label={`Go to project ${i + 1}`}
-                  />
+                  >
+                    <span
+                      className={`block transition-all duration-300 rounded-full ${currentIndex === i ? 'bg-blue-500 w-8 h-3' : 'bg-gray-500 group-hover:bg-gray-400 w-3 h-3'}`}
+                    />
+                  </button>
                 ))}
               </div>
             )}

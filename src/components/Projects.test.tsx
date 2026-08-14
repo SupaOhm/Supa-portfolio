@@ -3,6 +3,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Projects from './Projects';
+import { PROJECTS } from '../data/projects';
 
 // @testing-library/react only auto-registers its cleanup when a global `afterEach`
 // exists, which requires vitest's `test.globals: true`. This project does not set it,
@@ -104,5 +105,21 @@ describe('decorative brackets', () => {
     // Without aria-hidden on the two decorative spans the computed name is
     // "[ Featured Projects ]" and this query finds nothing.
     expect(screen.getByRole('heading', { name: 'Featured Projects' })).toBeInTheDocument();
+  });
+});
+
+describe('carousel navigation dots', () => {
+  it('exposes one uniquely named button per project and renders a visual child inside each', () => {
+    render(<Projects />);
+
+    const dots = screen.getAllByRole('button', { name: /^Go to project \d+$/ });
+    expect(dots).toHaveLength(PROJECTS.length);
+
+    // The hit area and the visual dot are separate elements: the button owns the
+    // padding, an inner element owns the size and colour. Without the child the
+    // dot is invisible even though the button is still 24x24.
+    for (const dot of dots) {
+      expect(dot.children).toHaveLength(1);
+    }
   });
 });
