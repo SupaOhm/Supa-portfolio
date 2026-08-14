@@ -104,9 +104,32 @@ export default function Projects() {
 
   const activeFilterCount = selectedCategories.size + selectedStatuses.size;
 
+  const filterStatusText =
+    filteredProjects.length === 0
+      ? 'No projects match the selected filters.'
+      : `${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'} shown`;
+
+  // `reset()` runs in an effect after a filter change, so for one render
+  // currentIndex can still point past the end of the newly filtered array.
+  // Indexing is therefore guarded rather than assumed in range.
+  const centredProject = isCarouselView ? filteredProjects[currentIndex] : undefined;
+  const carouselStatusText = centredProject
+    ? `Project ${currentIndex + 1} of ${filteredProjects.length}: ${centredProject.title}`
+    : '';
+
   return (
     <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
+      {/* Live regions. Permanently mounted and rendered outside every conditional
+          branch: a region inserted into the DOM at the same moment its text
+          appears is not reliably announced. Only the text content changes. */}
+      <p role="status" data-testid="filter-status" className="sr-only">
+        {filterStatusText}
+      </p>
+      <p role="status" data-testid="carousel-status" className="sr-only">
+        {carouselStatusText}
+      </p>
 
       <div className="max-w-7xl mx-auto relative z-10 marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-4 sm:p-8 border-[1px] border-gray-800/60 bg-gray-950/40 backdrop-blur-sm">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b-[1px] border-gray-800/60 pb-8 relative">
