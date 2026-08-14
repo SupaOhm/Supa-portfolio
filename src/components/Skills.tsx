@@ -36,17 +36,17 @@ export default function Skills() {
               style={revealStyle(isVisible, categoryIndex * 120, reducedMotion)}
             >
               <h3 className="text-sm font-semibold text-blue-300 mb-4 tracking-wide">{category}</h3>
-              <div className="flex flex-wrap gap-2.5">
+              <ul className="flex flex-wrap gap-2.5">
                 {skills.map((skill, index) => (
-                  <span
+                  <li
                     key={skill}
                     className="px-3.5 py-1.5 bg-gray-800/80 text-gray-300 rounded-full text-sm border border-gray-700/80 hover:bg-blue-500/15 hover:text-blue-200 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 cursor-default"
                     style={revealStyle(isVisible, (categoryIndex * 120) + (index * 45), reducedMotion, 450)}
                   >
                     {skill}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
