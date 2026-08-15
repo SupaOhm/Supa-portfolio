@@ -113,33 +113,89 @@ describe('earlier slices still hold', () => {
     expect(cards.filter((card) => !card.hasAttribute('inert'))).toHaveLength(1);
   });
 
-  it('still applies reveal styling to the skill chips as list items', () => {
+  it('still honours reduced motion for the skill chips as list items', () => {
+    // Both overrides are required for this test to discriminate anything.
+    //
+    // The shared IntersectionObserver stub in src/test/setup.ts never invokes
+    // its callback, so `isVisible` stays false for every jsdom render of Skills
+    // — and revealStyle returns `animation: 'none'` whenever isVisible is false,
+    // REGARDLESS of the reduced flag. Asserting 'none' against the shared stub
+    // therefore passes even if reduced-motion support is deleted outright.
+    // Firing the callback on observe() is what makes the flag observable.
+    const originalObserver = globalThis.IntersectionObserver;
     const originalMatchMedia = window.matchMedia;
-    Object.defineProperty(window, 'matchMedia', {
+
+    class FiringObserver {
+      // An explicit field, not a constructor parameter property: this project
+      // enables `erasableSyntaxOnly`, under which parameter properties are a
+      // compile error (TS1294) even though the tests themselves still run.
+      private readonly callback: IntersectionObserverCallback;
+
+      constructor(callback: IntersectionObserverCallback) {
+        this.callback = callback;
+      }
+
+      observe(): void {
+        this.callback(
+          [{ isIntersecting: true } as IntersectionObserverEntry],
+          this as unknown as IntersectionObserver,
+        );
+      }
+      unobserve(): void {}
+      disconnect(): void {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return [];
+      }
+    }
+
+    const setReducedMotion = (matches: boolean) => {
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: (query: string) => ({
+          matches,
+          media: query,
+          onchange: null,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        }),
+      });
+    };
+
+    Object.defineProperty(globalThis, 'IntersectionObserver', {
       writable: true,
-      value: (query: string) => ({
-        matches: true,
-        media: query,
-        onchange: null,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      }),
+      value: FiringObserver,
     });
 
     try {
+      setReducedMotion(true);
       render(<Skills />);
-      const chip = screen.getByText('TypeScript');
+      const reducedChip = screen.getByText('TypeScript');
 
-      // The chip became an <li>; revealStyle's output must have travelled with
-      // it, and under reduced motion must carry no running animation.
-      expect(chip.tagName).toBe('LI');
-      expect(chip.getAttribute('style')).toBeTruthy();
-      expect(chip.style.animation === '' || chip.style.animation === 'none').toBe(true);
+      // The chip became an <li>; revealStyle's output must have travelled with it.
+      expect(reducedChip.tagName).toBe('LI');
+      expect(reducedChip.style.opacity).toBe('1');
+      expect(reducedChip.style.animation).toBe('none');
+
+      cleanup();
+
+      setReducedMotion(false);
+      render(<Skills />);
+      const movingChip = screen.getByText('TypeScript');
+
+      // Same element, motion allowed: the reveal animation must actually run,
+      // which is what proves the assertion above was reading the reduced flag
+      // rather than the not-yet-visible default.
+      expect(movingChip.tagName).toBe('LI');
+      expect(movingChip.style.animation).toContain('fadeIn');
     } finally {
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         value: originalMatchMedia,
+      });
+      Object.defineProperty(globalThis, 'IntersectionObserver', {
+        writable: true,
+        value: originalObserver,
       });
     }
   });
