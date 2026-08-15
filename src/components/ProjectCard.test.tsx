@@ -27,12 +27,17 @@ describe('project image', () => {
     expect(screen.queryByRole('img', { name: project.title })).toBeNull();
   });
 
-  it('defers loading and decoding so the below-the-fold cards do not block paint', () => {
+  it('sets loading=lazy and decoding=async on the project image', () => {
     render(<ProjectCard project={project} />);
 
-    // Projects sits far below the fold; eagerly fetching 11 images competes with
-    // above-the-fold work. queryByRole cannot find it (alt="" makes it
-    // presentational and removes it from the accessibility tree), so query the DOM.
+    // Asserts the attributes are present, nothing more. jsdom implements no
+    // lazy loading, so no test here can show a request was actually deferred —
+    // that is a DevTools check in the slice's manual checklist. The motivation
+    // is that Projects sits far below the fold and eagerly fetching 11 images
+    // competes with above-the-fold work.
+    //
+    // queryByRole cannot find this element: alt="" makes it presentational and
+    // removes it from the accessibility tree, so query the DOM directly.
     const image = document.querySelector('img');
     expect(image).not.toBeNull();
     expect(image).toHaveAttribute('loading', 'lazy');

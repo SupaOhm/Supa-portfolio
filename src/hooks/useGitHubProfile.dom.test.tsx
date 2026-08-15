@@ -72,13 +72,23 @@ describe('useGitHubProfile wiring', () => {
     expect(fetchCount).toBe(2);
   });
 
-  it('still resolves for the remaining consumer when the other unmounts mid-flight', async () => {
+  it('renders the remaining consumer after a sibling unmounts mid-flight', async () => {
     const { rerender } = render(<Pair showAbout />);
 
-    // Unmount "about" before the shared request settles. If the hook passed a
-    // per-consumer AbortSignal into the shared promise, this abort would take
-    // "connect" down with it and the assertion below would time out. This is
-    // the exact production regression the no-AbortSignal design prevents.
+    // SMOKE TEST ONLY — it does not guard the no-AbortSignal design, despite
+    // looking like it should. Verified adversarially: it passes against an
+    // unwired hook AND against a variant with a real per-consumer
+    // AbortController restored.
+    //
+    // The reason is structural. Cancelling the shared request could only be
+    // introduced inside getCachedGitHubProfile, and that function takes no
+    // AbortSignal at all (src/lib/githubCache.ts) — so the hook cannot
+    // reintroduce the bug even deliberately. The design is protected by an
+    // absent parameter, not by this assertion.
+    //
+    // What this DOES cover: a sibling unmounting mid-flight leaves the
+    // survivor rendering real data rather than throwing or blanking. Real
+    // StrictMode double-invocation is a manual check, not provable here.
     rerender(<Pair showAbout={false} />);
 
     await waitFor(() => {
