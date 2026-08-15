@@ -98,6 +98,20 @@ React renders `<Navbar />`, nothing, `<Footer />` — a **blank shell with no
 explanation**, which is worse than the honest 404 it replaced. So the catch-all
 and the `NotFound` route are a single decision, not two.
 
+**Verified against Vercel's documentation, not assumed.** Two claims this
+design rests on were checked rather than reasoned about:
+
+- `vercel.json` reference: *"precedence is given to the filesystem prior to
+  rewrites being applied."* So `/og.png` and the eleven project `.webp` files
+  keep serving; the catch-all does **not** swallow static assets.
+- The catch-all form used here is Vercel's own documented SPA example,
+  verbatim: `{ "source": "/(.*)", "destination": "/index.html" }`.
+
+**Do not convert this to the legacy `routes` property.** `routes` requires an
+explicit `{ "handle": "filesystem" }` phase to get that ordering; `rewrites`,
+per the same docs, *"checks the filesystem by default."* Rewriting this config
+as `routes` without the handle phase would 404 every image on the site.
+
 **Accepted limitation:** a Vercel rewrite cannot set a status code, so
 `/nonexistent-xyz` will return **HTTP 200** with 404 content. This is a soft
 404: correct for a human, imperfect for a crawler. Returning a true 404 status
@@ -211,12 +225,36 @@ C2), so the file is collected without further config changes.
 
 1. **`src/pages/RedirectToSection.dom.test.tsx`** (jsdom) — render `<App>` in a
    `MemoryRouter` at `/about`, `/projects`, `/connect`; assert the hero `<h1>`
-   is in the document. Asserting on the rendered heading rather than on a
-   mocked `navigate` call is deliberate: it proves `Home` actually mounted,
-   which a spy on `navigate` would not.
+   is in the document **and** that the scroll landed on the right section.
+   Asserting on the rendered heading rather than on a mocked `navigate` call is
+   deliberate: it proves `Home` actually mounted, which a spy on `navigate`
+   would not.
+
+   **`scrollIntoView` must be stubbed, or this test throws.** Probed on this
+   project's jsdom: `typeof element.scrollIntoView === 'undefined'`. `Home`'s
+   effect reaches it via `scrollToSection` (`useActiveSection.ts:90`) inside a
+   `setTimeout(…, 0)`, so the failure would surface as a `TypeError` in a
+   macrotask *after* the test body — confusing to diagnose and easy to
+   misattribute. No existing test hits this, because none of them supply a
+   `targetId`; this slice is the first to exercise that path.
+
+   The stub belongs in `src/test/setup.ts`, alongside the `matchMedia` and
+   `IntersectionObserver` stubs already there and documented the same way. Make
+   it a `vi.fn()` rather than a no-op: the mock's `this` binding is what lets
+   the test assert *which* element was scrolled to, upgrading the assertion
+   from "Home mounted" to "Home mounted and scrolled to `#about`". The stub is
+   the reason the stronger assertion is available at all.
 2. **`src/pages/NotFound.dom.test.tsx`** (jsdom) — render at
    `/nonexistent-xyz`; assert the 404 copy renders and the home link is
    present.
+   Rendering `<App>` mounts `About` and `Connect`, which both fetch on mount.
+   Follow the convention already set in `landmarks.test.tsx:18` and
+   `integration.a11y.test.tsx:27` — stub `fetch` with a never-settling promise
+   so the components hold their static fallback copy and no state update lands
+   after the test body. Also call `resetGitHubCache()` in `beforeEach`:
+   `githubCache.ts` holds a module-level `inFlight` map that otherwise leaks
+   between test files.
+
 3. **`scripts/head-metadata.test.ts`** (node) — assert each tag from D3 is
    present in `index.html` with its exact value, and read the `public/og.png`
    IHDR header to assert the shipped file is genuinely 1200×630. Asserting
@@ -229,9 +267,16 @@ Recorded here so the manual checklist inherits it rather than the branch
 appearing better-verified than it is:
 
 - That Vercel honors `vercel.json` — the rewrite only takes effect on a real
-  deploy. **No test in this repo can exercise it.** `vite dev` and
-  `vite preview` both serve an SPA fallback natively, so they will pass whether
-  or not `vercel.json` is correct, or even present.
+  deploy. **No test in this repo can exercise it.** This was measured, not
+  assumed: with no `vercel.json` in the repo at all, `vite preview` already
+  returns **200 and the SPA shell** for `/about`, `/projects`, `/connect`, and
+  `/nonexistent-xyz`. A local HTTP check would pass identically before and
+  after this slice.
+- **A local HTTP check of `/og.png` is actively misleading.** In the same probe,
+  `vite preview` returned **200 for `/og.png` when no such file existed** — the
+  SPA fallback served `index.html` under the image's URL. This is why the
+  metadata test reads `public/og.png` from disk and parses its IHDR header
+  instead of requesting it over HTTP: the HTTP check passes on a missing file.
 - That crawlers render the card. Requires the live URL in a real validator.
 - That the `og.png` bytes look like the intended design — the test proves
   dimensions, not appearance.
