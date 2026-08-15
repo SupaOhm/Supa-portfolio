@@ -1,5 +1,8 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { resizeArgs, parsePixelWidth, TARGET_WIDTH, WEBP_QUALITY } from './optimize-images';
+import { PROJECTS } from '../src/data/projects';
 
 describe('resizeArgs', () => {
   it('resizes when the source is wider than the target', () => {
@@ -34,5 +37,25 @@ describe('encoder constants', () => {
     // The spec's 6.82 MB -> 288 KB table was produced at exactly these settings.
     expect(TARGET_WIDTH).toBe(800);
     expect(WEBP_QUALITY).toBe(82);
+  });
+});
+
+describe('project image references', () => {
+  it('points every non-empty imageUrl at a file that exists', () => {
+    // Catches a rename typo in projects.ts, which would otherwise ship as a
+    // silently broken image: the src 404s and the card renders an empty box.
+    const missing = PROJECTS.filter(
+      (project) => project.imageUrl && !existsSync(join('public', project.imageUrl)),
+    ).map((project) => project.imageUrl);
+
+    expect(missing).toEqual([]);
+  });
+
+  it('uses only .webp, so no original sneaks back into public/', () => {
+    const notWebp = PROJECTS.map((project) => project.imageUrl)
+      .filter((url): url is string => url !== '' && url !== undefined)
+      .filter((url) => !url.endsWith('.webp'));
+
+    expect(notWebp).toEqual([]);
   });
 });
