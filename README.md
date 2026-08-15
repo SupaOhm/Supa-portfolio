@@ -52,6 +52,8 @@ npm run lint
 ```
 
 > Requires Node ^20.19 or >=22.12 (Vite 7). Run `npm test` for the unit test suite and `npm run typecheck` for a standalone type check.
+>
+> Two additional scripts (`npm run images`, `npm run og`) re-encode source assets in `assets-src/` into files under `public/`. Both are macOS-and-local only, never run in CI, and require Node 22.18+/23.6+ — see `CLAUDE.md` for details.
 
 ---
 
@@ -71,7 +73,9 @@ src/
 ├── data/
 │   └── projects.ts       # PROJECTS array — the source of project content
 ├── pages/
-│   └── Home.tsx          # Composes all sections; handles scroll-to-section on load
+│   ├── Home.tsx               # Composes all sections; handles scroll-to-section on load
+│   ├── RedirectToSection.tsx  # /about, /projects, /connect: redirects to / with a section target
+│   └── NotFound.tsx           # Catch-all route for any other URL
 ├── types/
 │   └── project.ts        # Project type + category/status string-literal unions
 ├── App.tsx               # Router + layout shell
@@ -79,18 +83,22 @@ src/
 └── index.css             # Global styles, keyframes, and animations
 ```
 
-Project images are static assets in `public/images/projects/`, referenced by absolute path (e.g. `/images/projects/expense.webp`). Originals live in `assets-src/projects/` (outside `public/`, never deployed) and are re-encoded to the `.webp` files under `public/images/projects/` by `npm run images`.
+`vercel.json`, at the repo root, is the production deploy config: it rewrites every unmatched path to `index.html` so client-side routes like `/about` resolve instead of 404ing, while still letting Vercel serve static files (like `public/images/...`) directly.
+
+Project images are static assets in `public/images/projects/`, referenced by absolute path (e.g. `/images/projects/expense.webp`). Originals live in `assets-src/projects/` (outside `public/`, never deployed) and are re-encoded to the `.webp` files under `public/images/projects/` by `npm run images`. The same pattern produces the Open Graph card: `assets-src/og/og.html` is rendered by `npm run og` into `public/og.png`.
 
 ---
 
 ## 🧭 How Navigation Works
 
-`App.tsx` declares routes (`/`, `/about`, `/projects`, `/connect`), but the real experience is a **single scrolling page**: `pages/Home.tsx` stacks `Hero`, `About`, `Skills`, `Projects`, and `Connect`.
+`App.tsx` declares routes for `/`, `/about`, `/projects`, `/connect`, and a catch-all `*`, but the real experience is a **single scrolling page**: `pages/Home.tsx` (mounted at `/`) stacks `Hero`, `About`, `Skills`, `Projects`, and `Connect`.
 
+- `/about`, `/projects`, and `/connect` don't render their own page content — each renders `RedirectToSection`, which immediately redirects to `/` carrying a target section ID, so a direct link to `/projects` lands you on the single page, scrolled to Projects.
+- Any other URL renders `NotFound`. This only works in production because `vercel.json` rewrites every unmatched path to `index.html` — without it, Vercel's static host would 404 before React Router ever sees the URL.
 - The **navbar** observes each section (threshold ~0.6) to highlight the active one and triggers `scrollIntoView` for smooth jumps.
 - When you arrive at `/` from elsewhere, `Home.tsx` reads `location.state.targetId` (or the URL hash) and scrolls to that section on mount.
 
-When extending navigation, treat the standalone routes as secondary — the primary path renders everything inside `Home`.
+When extending navigation, treat `/about`, `/projects`, `/connect` as redirect-only entry points, not as pages — the primary path renders everything inside `Home`.
 
 ---
 
