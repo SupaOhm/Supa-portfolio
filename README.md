@@ -2,7 +2,7 @@
 
 A modern, interactive developer portfolio built with **React 19**, **TypeScript**, and **Tailwind CSS**. It presents projects, skills, and live GitHub activity as a single scrolling page with smooth section navigation, a 3D project carousel, and a dark, animated UI.
 
-🔗 **Live:** `https://github.com/SupaOhm/Supa-portfolio`
+🔗 **Live:** https://supakornohm.vercel.app
 
 ---
 
