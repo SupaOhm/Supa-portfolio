@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { MAX_BYTES } from './render-og';
 
 // Resolved from this file's own URL rather than process.cwd(), so the test does
 // not depend on which directory vitest was invoked from.
@@ -81,5 +82,41 @@ describe('README live link', () => {
 
   it('no longer advertises the repository URL as the live site', () => {
     expect(readme).not.toContain('**Live:** `https://github.com/SupaOhm/Supa-portfolio`');
+  });
+});
+
+describe('public/og.png', () => {
+  // Read lazily inside each test rather than in the describe body. A
+  // describe-level read of a missing file throws during collection and takes
+  // this whole file's other 13 tests down with a confusing error, instead of
+  // failing one test with a clear ENOENT.
+  //
+  // The `readRepoFile` helper above cannot be reused: it decodes as UTF-8,
+  // which corrupts binary bytes.
+  const readPng = (): Buffer =>
+    readFileSync(fileURLToPath(new URL('../public/og.png', import.meta.url)));
+
+  /**
+   * Reads dimensions straight from the IHDR chunk: bytes 0-7 are the PNG
+   * signature, 8-11 the chunk length, 12-15 the type, then width and height as
+   * big-endian uint32s.
+   */
+  const dimensions = (buffer: Buffer): { width: number; height: number } => {
+    expect(buffer.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  };
+
+  it('is exactly the 1200x630 the og:image tags advertise', () => {
+    // Asserted from the file's own bytes rather than by requesting the URL:
+    // probed, vite preview returns 200 for /og.png even when no such file
+    // exists, because the SPA fallback serves index.html under the image's URL.
+    // An HTTP check therefore passes on a missing file.
+    expect(dimensions(readPng())).toEqual({ width: 1200, height: 630 });
+  });
+
+  it('stays under the size budget', () => {
+    // Imported, not retyped: the cap also gates the warning in render-og.ts,
+    // and two hardcoded copies would drift the moment one is tuned.
+    expect(readPng().byteLength).toBeLessThanOrEqual(MAX_BYTES);
   });
 });
