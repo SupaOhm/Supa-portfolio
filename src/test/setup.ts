@@ -43,4 +43,20 @@ if (typeof window !== 'undefined') {
     writable: true,
     value: IntersectionObserverStub,
   });
+
+  // jsdom does not implement scrollIntoView (probed: `typeof` is 'undefined').
+  // Home's mount effect reaches it through scrollToSection
+  // (useActiveSection.ts:90) whenever a targetId is present, inside a
+  // setTimeout(…, 0) — so without this stub the failure surfaces as a
+  // TypeError in a macrotask AFTER the test body, which is easy to
+  // misattribute to something else entirely.
+  //
+  // A vi.fn() rather than a no-op: the mock records each call's `this` in
+  // `mock.contexts`, which is what lets a test assert WHICH element was
+  // scrolled to.
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    writable: true,
+    configurable: true,
+    value: vi.fn(),
+  });
 }
