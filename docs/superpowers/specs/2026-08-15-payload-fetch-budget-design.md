@@ -7,7 +7,7 @@
 
 ## Goal
 
-Cut the deployed image payload from 6.82 MB to ~288 KB, and cut GitHub API
+Cut the deployed image payload from 6.82 MB to ~278 KB, and cut GitHub API
 traffic from 4 requests per page load to 2 on a cold session and 0 on a warm
 one. This is the remainder of Slice C, deferred when C1 was pulled forward to
 avoid colliding with B3 in `carouselPositionStyles.ts`.
@@ -40,10 +40,17 @@ is wider:
 | `arduino.jpg` | 118.0 KB | 19.4 KB | 6.1x | 800x463 |
 | `baka.jpg` | 101.7 KB | 21.9 KB | 4.6x | 800x450 |
 | `revrace.jpeg` | 8.1 KB | 16.3 KB | **0.5x** | 800x448 |
-| **Total** | **6.82 MB** | **288 KB** | **24.3x** | 95.9% saved |
+| **Total (naive)** | **6.82 MB** | **288 KB** | **24.3x** | 95.9% saved |
+| **Total (shipped)** | **6.82 MB** | **278 KB** | **24.5x** | 95.9% saved |
 
 `revrace.jpeg` is the exception that constrains the design: its source is
 300x168, so a blanket `-resize 800 0` **doubles** its size. See "No upscaling".
+
+The two total rows differ only in that file. The naive row is what the trial
+encode produced with `revrace` upscaled to 16.3 KB; the shipped row is what the
+no-upscale clamp actually produces, leaving it at 6.6 KB — smaller than its own
+8.1 KB original. `288 - 16.3 + 6.6 = 278.3`. Measured on the committed output:
+284,952 bytes across 11 files.
 
 `ProjectCard.tsx:22-26` sets no `loading` and no `decoding`, so all 11 load
 eagerly on first paint even though the Projects section is far below the fold.
