@@ -111,3 +111,24 @@ describe('fetchGitHubProfile', () => {
     expect(profile.sinceYear).toBe(2019);
   });
 });
+
+describe('fetchGitHubProfile stays uncached', () => {
+  it('hits the network on every direct call', async () => {
+    // The seven characterization tests above all assume each call is live. If
+    // a cache ever moves INSIDE fetchGitHubProfile they start contaminating one
+    // another in confusing ways; this test fails first, with a clearer message.
+    let count = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string | URL) => {
+        count += 1;
+        return String(url).includes('/repos') ? ok([]) : ok(userBody());
+      }),
+    );
+
+    await fetchGitHubProfile('testuser');
+    await fetchGitHubProfile('testuser');
+
+    expect(count).toBe(4);
+  });
+});

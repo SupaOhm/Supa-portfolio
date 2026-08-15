@@ -7,7 +7,7 @@ export const PROJECTS: Project[] = [
     description:
       'Built a full-stack expense management web application with a React frontend and Express/MongoDB backend. Implemented secure CRUD operations, real-time expense calculations, and API integration with Axios to deliver a smooth end-to-end user workflow.',
     tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'RESTful APIs', 'Axios'],
-    imageUrl: '/images/projects/expense.png',
+    imageUrl: '/images/projects/expense.webp',
     githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
     status: 'completed',
     categories: ['Web', 'Backend', 'Database'],
@@ -18,7 +18,7 @@ export const PROJECTS: Project[] = [
     description:
       'Developed a full-stack web application for reporting and managing lost items with user authentication and admin approval workflows. Structured the system around a normalized MySQL database, secure CRUD operations, and a responsive interface for reliable day-to-day use.',
     tags: ['PHP', 'MySQL', 'HTML/CSS', 'Session Auth', 'Bootstrap'],
-    imageUrl: '/images/projects/lostfound.png',
+    imageUrl: '/images/projects/lostfound.webp',
     githubUrl: 'https://github.com/SupaOhm/Lost-and-Found-Management-System',
     status: 'completed',
     categories: ['Web', 'Backend', 'Database'],
@@ -29,7 +29,7 @@ export const PROJECTS: Project[] = [
     description:
       'Developed a Scientific Computing project to analyze how age, education level, and years of experience influence salary using multiple least-squares regression models. Built the workflow in Python with Jupyter Notebook, performed data cleaning and encoding, compared linear, polynomial, logarithmic, and exponential models using R², and identified polynomial regression (degree 3) as the best-performing approach for salary prediction.',
     tags: ['Python', 'Jupyter Notebook', 'Pandas', 'NumPy', 'Matplotlib', 'Scikit-learn', 'Regression Analysis', 'Data Analysis'],
-    imageUrl: '/images/projects/scicom.png',
+    imageUrl: '/images/projects/scicom.webp',
     githubUrl: '',
     status: 'completed',
     categories: ['Data', 'AI'],
@@ -40,7 +40,7 @@ export const PROJECTS: Project[] = [
     description:
       'Built a lightweight Windows command-line utility to prevent system sleep and display shutdown during long-running tasks. Focused on solving a practical productivity problem through a simple, dependable developer tool.',
     tags: ['Python', 'CLI', 'Windows', 'Operating System'],
-    imageUrl: '/images/projects/nosleep.jpg',
+    imageUrl: '/images/projects/nosleep.webp',
     githubUrl: 'https://github.com/SupaOhm/NoSleep-CLI',
     status: 'completed',
     categories: ['Tools'],
@@ -51,7 +51,7 @@ export const PROJECTS: Project[] = [
     description:
       'Built an educational embedded systems game on Arduino Uno R3 to help users practice binary-to-decimal conversion. Integrated LEDs and interactive game logic to create a hands-on learning experience with immediate visual feedback.',
     tags: ['C++', 'Arduino', 'Embedded Systems'],
-    imageUrl: '/images/projects/arduino.jpg',
+    imageUrl: '/images/projects/arduino.webp',
     githubUrl: 'https://github.com/SupaOhm/Binary-Matching-Arduino-Game',
     status: 'completed',
     categories: ['Embedded'],
@@ -62,7 +62,7 @@ export const PROJECTS: Project[] = [
     description:
       'Designed and implemented a normalized relational database for an e-commerce platform. Produced EERD models, translated them into relational schemas, and optimized MySQL queries for consistent and efficient data retrieval.',
     tags: ['MySQL', 'Database Design', 'Normalization'],
-    imageUrl: '/images/projects/db.png',
+    imageUrl: '/images/projects/db.webp',
     githubUrl: 'https://github.com/SupaOhm/onlineshop-DB',
     status: 'completed',
     categories: ['Database'],
@@ -73,7 +73,7 @@ export const PROJECTS: Project[] = [
     description:
       'Designed a mobile bus routing prototype as part of an HCI course project, applying usability and accessibility principles throughout the design process. Conducted user research, refined information hierarchy, and iterated on interface flows to improve overall user experience.',
     tags: ['Figma', 'HCI', 'Mobile Design', 'UX/UI', 'Usability', 'User Research'],
-    imageUrl: '/images/projects/hci.png',
+    imageUrl: '/images/projects/hci.webp',
     githubUrl: '',
     status: 'completed',
     categories: ['Design'],
@@ -95,7 +95,7 @@ export const PROJECTS: Project[] = [
     description:
       'Designed a mobile-first platform for car enthusiasts to capture, analyze, and share real-world driving performance. Built the product concept around live GPS telemetry, 0-100 km/h timing, route history, performance dashboards, and community-facing comparison features, with emphasis on modular architecture, real-time data processing, and API-driven system design.',
     tags: ['Full-Stack Development', 'Mobile Development', 'GPS Data Processing', 'Real-Time Systems', 'RESTful APIs', 'Performance Analytics', 'Community Platform'],
-    imageUrl: '/images/projects/revrace.jpeg',
+    imageUrl: '/images/projects/revrace.webp',
     githubUrl: '',
     status: 'in-progress',
     categories: ['Mobile', 'Cloud', 'Backend'],
@@ -106,7 +106,7 @@ export const PROJECTS: Project[] = [
     description:
       'Co-developed a software engineering project for generating personalized outfit recommendations from user-uploaded photos. Designed a modular recommendation pipeline combining body-type analysis, style preference modeling, and wardrobe-aware filtering, supported by formal SRS documentation, UML use cases, BPMN workflows, and RESTful API planning.',
     tags: ['Software Engineering', 'System Design', 'SRS Documentation', 'BPMN', 'UML', 'RESTful APIs', 'AI', 'Computer Vision'],
-    imageUrl: '/images/projects/dressme.png',
+    imageUrl: '/images/projects/dressme.webp',
     githubUrl: '',
     status: 'in-progress',
     categories: ['Mobile', 'AI', 'Backend'],
@@ -117,7 +117,7 @@ export const PROJECTS: Project[] = [
     description:
       'Designed a multi-tenant cloud security platform for real-time log ingestion and threat detection. Combined signature-based detection with machine learning-driven anomaly analysis, with a focus on scalable stream processing, cloud-native architecture, and practical security monitoring for shared environments.',
     tags: ['IEEE', 'Research', 'Machine Learning', 'Cloud Computing', 'Cybersecurity'],
-    imageUrl: '/images/projects/IDSaaS.png',
+    imageUrl: '/images/projects/IDSaaS.webp',
     githubUrl: '',
     status: 'in-progress',
     categories: ['Security', 'Cloud', 'AI'],
@@ -128,7 +128,7 @@ export const PROJECTS: Project[] = [
     description:
       'Collaborating with BAKA Co., Ltd. to redesign Baka Index, a sugarcane analytics platform powered by Google Earth Engine. Conducting user research with farmers, evaluating usability pain points, and translating findings into clearer interaction flows and higher-fidelity Figma prototypes.',
     tags: ['Figma', 'UX/UI Research', 'Google Earth Engine'],
-    imageUrl: '/images/projects/baka.jpg',
+    imageUrl: '/images/projects/baka.webp',
     githubUrl: '',
     status: 'in-progress',
     categories: ['Design'],

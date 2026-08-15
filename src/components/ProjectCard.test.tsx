@@ -26,4 +26,21 @@ describe('project image', () => {
     expect(screen.getByRole('heading', { name: project.title, level: 3 })).toBeInTheDocument();
     expect(screen.queryByRole('img', { name: project.title })).toBeNull();
   });
+
+  it('sets loading=lazy and decoding=async on the project image', () => {
+    render(<ProjectCard project={project} />);
+
+    // Asserts the attributes are present, nothing more. jsdom implements no
+    // lazy loading, so no test here can show a request was actually deferred —
+    // that is a DevTools check in the slice's manual checklist. The motivation
+    // is that Projects sits far below the fold and eagerly fetching 11 images
+    // competes with above-the-fold work.
+    //
+    // queryByRole cannot find this element: alt="" makes it presentational and
+    // removes it from the accessibility tree, so query the DOM directly.
+    const image = document.querySelector('img');
+    expect(image).not.toBeNull();
+    expect(image).toHaveAttribute('loading', 'lazy');
+    expect(image).toHaveAttribute('decoding', 'async');
+  });
 });
