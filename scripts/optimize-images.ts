@@ -3,6 +3,17 @@ import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { basename, extname, join } from 'node:path';
 
 /**
+ * Run via `npm run images` (`node scripts/optimize-images.ts`), executed as a
+ * bare `.ts` file. That relies on Node's unflagged native type stripping,
+ * which only ships from Node 22.18 / 23.6 onward — the project's `engines`
+ * floor (Node 20.x, or 22.12–22.17) throws a parse error before you ever
+ * reach the `sips`/`cwebp` install hints below. `engines` in package.json is
+ * intentionally NOT raised for this: the app itself runs fine on Node 20,
+ * this script is a dev-only, manually-run tool. Also requires macOS (for
+ * `sips`) and `cwebp` (`brew install webp`).
+ */
+
+/**
  * Widest slot any project image renders into is ~400 CSS px: the carousel card
  * is `w-[360px]` (Projects.tsx:308) and the grid at lg:grid-cols-3 inside
  * max-w-7xl lands near 400px. 800 covers that at 2x DPR.

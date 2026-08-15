@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` — type-check (`tsc -b`) then build to `dist/`
 - `npm run lint` — run ESLint over the repo
 - `npm run preview` — serve the production build locally
+- `npm run images` — re-encode project image originals in `assets-src/projects/` into the 800px `.webp` files under `public/images/projects/` (`scripts/optimize-images.ts`). Manual/local only, never run in CI. Requires macOS (`sips`) and `cwebp` (`brew install webp`), plus Node 22.18+/23.6+ specifically for this command — it executes a bare `.ts` file, which needs Node's unflagged native type stripping and fails on the project's Node 20 `engines` floor with a parse error rather than a friendly message.
 
 `npm test` runs the Vitest suite (34 tests, `environment: 'node'`, no jsdom); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
 
@@ -21,11 +22,15 @@ Single-page React 19 portfolio built with Vite, TypeScript, and Tailwind CSS v3.
 
 When editing navigation, treat the standalone `/about`, `/projects`, `/connect` routes as secondary — the primary path renders everything inside `Home`.
 
-**Project data lives in `src/data/projects.ts`** as the `PROJECTS: Project[]` array (the README's claim that projects live in `Projects.tsx` is outdated). The `Project` type and the allowed `ProjectCategory` / `ProjectStatus` string-literal unions are defined in `src/types/project.ts` — add new categories/statuses there first, since they are `as const` tuples that drive both typing and filter UI. Project images are static assets under `public/images/projects/` referenced by absolute path (e.g. `/images/projects/expense.png`).
+**Project data lives in `src/data/projects.ts`** as the `PROJECTS: Project[]` array (the README's claim that projects live in `Projects.tsx` is outdated). The `Project` type and the allowed `ProjectCategory` / `ProjectStatus` string-literal unions are defined in `src/types/project.ts` — add new categories/statuses there first, since they are `as const` tuples that drive both typing and filter UI. Project images are static assets under `public/images/projects/` referenced by absolute path (e.g. `/images/projects/expense.webp`). Originals live in `assets-src/projects/`, outside `public/` so Vite never deploys them but they stay in-repo so the encoder script stays reproducible; `public/images/projects/` holds the generated 800px `.webp` files that `src/data/projects.ts` actually references.
 
 **GitHub integration** is duplicated in both `About.tsx` (compact snapshot) and `Connect.tsx` (detailed insights). Each component hardcodes `GITHUB_USERNAME = 'SupaOhm'` and fetches `https://api.github.com/users/<user>` plus the repos endpoint client-side. There is no auth token, so these calls are subject to GitHub's unauthenticated rate limit (60 req/hr/IP) — expect failures during heavy local reloading and handle them gracefully.
 
 **Projects.tsx** holds the most complex UI: a 3D perspective carousel (center card scaled/full brightness, neighbors rotated and dimmed for depth) plus a grid view toggle and category filtering with count badges. Animations are CSS/Tailwind-driven; global keyframes live in `src/index.css`.
+
+**`assets-src/projects/` vs `public/images/projects/`**: `assets-src/projects/` holds the original, unoptimized project images. It lives outside `public/`, so Vite never bundles or deploys it, but it stays in-repo (not gitignored) so `npm run images` (the `scripts/optimize-images.ts` encoder) can be re-run reproducibly against the same sources. `public/images/projects/` holds only the generated, 800px-wide `.webp` output that `src/data/projects.ts` actually references — that's what ships.
+
+**`scripts/` is a separate TypeScript project from `src/`.** It's covered by `tsconfig.node.json` (not `tsconfig.app.json`) and by vitest's `include` (`scripts/**/*.test.ts`), which is how `scripts/optimize-images.ts` can import `node:child_process`, `node:fs`, and `node:path`. The trap: `tsconfig.app.json` sets `"types": ["vite/client"]` with no Node types, so **nothing under `src/` may import a `node:` module** — such an import passes `npm test` (vitest doesn't type-check) but fails `npm run typecheck` with TS2307 (cannot find module). This has cost real debugging time twice; if `npm test` is green but `npm run typecheck` fails on a `node:` import, the import is in the wrong tree.
 
 ## Conventions
 

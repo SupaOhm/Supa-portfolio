@@ -1113,7 +1113,7 @@ jsdom has no network stack, no layout engine, and no real sessionStorage.
 - [ ] On first paint at the top of the page, project images have NOT been
       requested yet. They appear only as the Projects section scrolls into view.
       (This is the only real evidence `loading="lazy"` does anything.)
-- [ ] `revrace.webp` transfers around 8 KB. A ~16 KB figure means the
+- [ ] `revrace.webp` transfers around 6.4 KB (6,604 bytes). A ~16 KB figure means the
       no-upscale clamp regressed.
 - [ ] Every card renders an image. A broken/empty box means a `.webp` path in
       `projects.ts` does not match a file.

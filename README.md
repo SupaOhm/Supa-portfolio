@@ -79,7 +79,7 @@ src/
 └── index.css             # Global styles, keyframes, and animations
 ```
 
-Project images are static assets in `public/images/projects/`, referenced by absolute path (e.g. `/images/projects/expense.png`).
+Project images are static assets in `public/images/projects/`, referenced by absolute path (e.g. `/images/projects/expense.webp`). Originals live in `assets-src/projects/` (outside `public/`, never deployed) and are re-encoded to the `.webp` files under `public/images/projects/` by `npm run images`.
 
 ---
 
@@ -105,7 +105,7 @@ Projects live in **`src/data/projects.ts`** as the `PROJECTS: Project[]` array:
   title: 'Full-Stack Expense Management',
   description: 'A full-stack expense app with a React frontend and Express/MongoDB backend…',
   tags: ['MongoDB', 'Express.js', 'React', 'Node.js'],
-  imageUrl: '/images/projects/expense.png',
+  imageUrl: '/images/projects/expense.webp',
   githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
   status: 'completed',          // 'completed' | 'in-progress' | 'planned'
   categories: ['Web', 'Backend', 'Database'],
