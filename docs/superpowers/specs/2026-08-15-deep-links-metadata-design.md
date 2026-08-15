@@ -170,15 +170,34 @@ Local tooling was probed before choosing: `rsvg-convert`, ImageMagick, PIL, and
 node-canvas are all **absent**. Available: Chrome, `sips`, `cwebp`, `qlmanage`.
 `qlmanage` cannot reliably produce an exact non-square output size.
 
-So the source is `assets-src/og/og.html`, rendered in Chrome at exactly
-1200×630, screenshotted to `public/og.png`, and normalized with
-`sips -z 630 1200` to guarantee exact dimensions regardless of device pixel
-ratio.
+So the source is `assets-src/og/og.html`, rendered by **headless Chrome** to
+`public/og.png`. This was probed end-to-end before being chosen, and the
+mechanism is scriptable rather than manual:
+
+```
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+  --screenshot=public/og.png --window-size=1200,630 file://…/og.html
+```
+
+Probe result: a 1200×630 PNG, 9,538 bytes, dimensions exact. So it becomes an
+`npm run og` script rather than a hand-driven browser step — a meaningful
+upgrade over the manual process originally sketched here, since the image
+becomes regenerable by one command.
+
+`--force-device-scale-factor=1` is what pins the output to exactly 1200×630;
+without it the screenshot scales with the host display's DPR. `sips -z 630
+1200` still runs afterwards as a cheap guarantee rather than a correction.
+
+Two operational notes for whoever runs it: headless Chrome prints
+`task_policy_set … (os/kern) invalid argument` to stderr on macOS — this is
+harmless noise, not a failure, and the exit code is what matters. And like
+`npm run images`, this is **macOS-and-local only**: it depends on Chrome at a
+hardcoded `/Applications` path and must never run in CI.
 
 This follows the convention Slice C2 already established: **sources live in
 `assets-src/` (in-repo, outside `public/`, never deployed); generated output
-lives in `public/` and is what ships.** As with `npm run images`, the render
-step is manual and local — it depends on a browser and never runs in CI.
+lives in `public/` and is what ships.**
 
 Screenshotting the live hero was rejected: the hero is a tall column with a
 `5.5rem` `<h1>`, so a 1.91:1 crop cuts mid-headline, and the image would go
@@ -244,6 +263,10 @@ C2), so the file is collected without further config changes.
    the test assert *which* element was scrolled to, upgrading the assertion
    from "Home mounted" to "Home mounted and scrolled to `#about`". The stub is
    the reason the stronger assertion is available at all.
+
+   The access path is `mock.contexts`, verified by probe on this project's
+   Vitest 4.1: after `el.scrollIntoView()` on an element with `id="about"`,
+   `Element.prototype.scrollIntoView.mock.contexts[0].id === 'about'`.
 2. **`src/pages/NotFound.dom.test.tsx`** (jsdom) — render at
    `/nonexistent-xyz`; assert the 404 copy renders and the home link is
    present.
