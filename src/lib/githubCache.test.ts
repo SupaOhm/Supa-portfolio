@@ -126,6 +126,60 @@ describe('getCachedGitHubProfile', () => {
     expect(profile.login).toBe('testuser');
   });
 
+  it('does not evict a newer in-flight entry when a stale request settles after a reset', async () => {
+    // Reproduces the review finding: resetGitHubCache() can run while a
+    // request is still in flight (Task 5's hook tests do this in
+    // beforeEach). A later caller for the same username then installs a
+    // NEW entry, and the FIRST request's own `.finally()` must not delete
+    // that newer entry out from under it when it eventually settles.
+    const calls = countingFetch();
+    const firstStorage = fakeStorage();
+    const secondStorage = fakeStorage();
+    const thirdStorage = fakeStorage();
+
+    // Starts fetching immediately and installs an in-flight entry for
+    // 'testuser'. Not awaited yet, so it is still pending.
+    const firstRequest = getCachedGitHubProfile('testuser', firstStorage);
+
+    // Let the first request progress to its second (repos) fetch call before
+    // introducing the second caller. Two same-shaped chains started in the
+    // same tick would otherwise settle within the same microtask batch (both
+    // `.finally()` callbacks fire before this test can observe the state in
+    // between), which would hide the bug. Starting the second caller only
+    // once the first is already on its LAST leg guarantees the first
+    // finishes well before the second — which still has a full two-fetch
+    // round trip ahead of it — can possibly settle.
+    while (calls.count < 2) {
+      await Promise.resolve();
+    }
+
+    // Simulate resetGitHubCache() running mid-flight.
+    resetGitHubCache();
+
+    // A second caller for the SAME username installs a brand new in-flight
+    // entry, since the map was just cleared.
+    const secondRequest = getCachedGitHubProfile('testuser', secondStorage);
+
+    // Let the first request settle. Its `.finally()` runs now.
+    await firstRequest;
+
+    // The second caller has only just started (still on its own first fetch
+    // call) and cannot have settled yet. A third caller, made immediately
+    // after the first request's cleanup, must join the second request's
+    // promise rather than starting a brand new fetch. Without the identity
+    // guard, the first request's `.finally()` would have deleted the second
+    // request's entry, so this call would see an empty map and kick off a
+    // duplicate fetch instead.
+    const thirdRequest = getCachedGitHubProfile('testuser', thirdStorage);
+    expect(thirdRequest).toBe(secondRequest);
+
+    await secondRequest;
+
+    // 2 calls for the first request (user + repos) and 2 for the second.
+    // The third caller must not have triggered any of its own.
+    expect(calls.count).toBe(4);
+  });
+
   it('lets the next caller retry after a failed fetch', async () => {
     // A rejected promise must not stay in the in-flight map, or every later
     // mount inherits the same rejection and the section never recovers.

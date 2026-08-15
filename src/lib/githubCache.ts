@@ -125,7 +125,14 @@ export function getCachedGitHubProfile(
     .finally(() => {
       // Drop the entry either way. Keeping a rejected promise here would make
       // every later mount inherit the same failure with no way to retry.
-      inFlight.delete(username);
+      //
+      // Identity-guarded: if resetGitHubCache() ran while this request was in
+      // flight, a later caller may have installed a NEW promise under the same
+      // key. An unconditional delete would evict that newer entry and cause a
+      // surprise duplicate fetch.
+      if (inFlight.get(username) === request) {
+        inFlight.delete(username);
+      }
     });
 
   inFlight.set(username, request);
