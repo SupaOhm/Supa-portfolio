@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getCachedGitHubProfile } from '../lib/githubCache';
 
 type GitHubUserResponse = {
   login: string;
@@ -125,19 +126,25 @@ export function useGitHubProfile(username: string): {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const controller = new AbortController();
+    // Guards setState only. It deliberately does NOT reach the network: the
+    // request is shared with the other consumer of this hook, so cancelling it
+    // here would cancel it for them. Under StrictMode this effect's own
+    // cleanup would otherwise abort the fetch its second run is awaiting.
+    let applies = true;
 
     const loadProfile = async () => {
       try {
         setIsLoading(true);
-        const result = await fetchGitHubProfile(username, controller.signal);
-        setProfile(result);
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
+        const result = await getCachedGitHubProfile(username);
+        if (applies) {
+          setProfile(result);
+        }
+      } catch {
+        if (applies) {
           setProfile(null);
         }
       } finally {
-        if (!controller.signal.aborted) {
+        if (applies) {
           setIsLoading(false);
         }
       }
@@ -146,7 +153,7 @@ export function useGitHubProfile(username: string): {
     loadProfile();
 
     return () => {
-      controller.abort();
+      applies = false;
     };
   }, [username]);
 
