@@ -56,10 +56,10 @@ type InfoCardProps = {
 function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
   return (
     <div className={`group p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+      <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
         {icon}
         {title}
-      </h3>
+      </h4>
       {children}
     </div>
   );
@@ -71,7 +71,7 @@ export default function About() {
   const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
 
   return (
-    <section ref={sectionRef} id="about" className="py-20 px-4 sm:px-6 lg:px-8 relative">
+    <section ref={sectionRef} id="about" aria-labelledby="about-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       {/* Subtle background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
       
@@ -79,7 +79,7 @@ export default function About() {
         <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-300/80 text-center mb-3">
           Professional Summary
         </p>
-        <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8 text-center">
+        <h2 id="about-heading" className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8 text-center">
           About Me
         </h2>
         
@@ -125,7 +125,7 @@ export default function About() {
                   loading="lazy"
                 />
                 <div>
-                  <h3 className="text-white text-base font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</h3>
+                  <p className="text-white text-base font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</p>
                   <p className="text-blue-300 text-xs">@{githubStats?.login ?? GITHUB_USERNAME}</p>
                   <p className="text-gray-400 text-xs mt-0.5 line-clamp-2">{githubStats?.bio ?? 'Loading profile...'}</p>
                 </div>

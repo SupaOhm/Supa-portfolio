@@ -14,14 +14,14 @@ export default function Skills() {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <section ref={sectionRef} id="skills" className="py-20 px-4 sm:px-6 lg:px-8 relative">
+    <section ref={sectionRef} id="skills" aria-labelledby="skills-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
 
       <div className="max-w-5xl mx-auto relative z-10">
         <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-300/80 text-center mb-3">
           Technical Snapshot
         </p>
-        <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-3 text-center">
+        <h2 id="skills-heading" className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-3 text-center">
           Skills & Technologies
         </h2>
         <p className="text-gray-400 text-sm sm:text-base text-center mb-10 max-w-3xl mx-auto">
@@ -36,17 +36,17 @@ export default function Skills() {
               style={revealStyle(isVisible, categoryIndex * 120, reducedMotion)}
             >
               <h3 className="text-sm font-semibold text-blue-300 mb-4 tracking-wide">{category}</h3>
-              <div className="flex flex-wrap gap-2.5">
+              <ul className="flex flex-wrap gap-2.5">
                 {skills.map((skill, index) => (
-                  <span
+                  <li
                     key={skill}
                     className="px-3.5 py-1.5 bg-gray-800/80 text-gray-300 rounded-full text-sm border border-gray-700/80 hover:bg-blue-500/15 hover:text-blue-200 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 cursor-default"
                     style={revealStyle(isVisible, (categoryIndex * 120) + (index * 45), reducedMotion, 450)}
                   >
                     {skill}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
         </div>

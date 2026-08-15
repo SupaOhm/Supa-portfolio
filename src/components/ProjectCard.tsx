@@ -21,12 +21,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       {project.imageUrl ? (
         <img
           src={project.imageUrl}
-          alt={project.title}
+          alt=""
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
       ) : (
         <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-gray-900 flex items-center justify-center group-hover:from-blue-600/30 group-hover:via-purple-600/30 transition-all duration-300">
-          <span className="text-gray-500 text-lg">No Image</span>
+          <span className="text-gray-400 text-lg">No Image</span>
         </div>
       )}
 
@@ -40,16 +40,16 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </p>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <ul className="flex flex-wrap gap-2 mb-4">
           {project.tags.map((tag) => (
-            <span
+            <li
               key={tag}
               className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-gray-300 rounded-md text-xs border border-blue-500/20 hover:border-blue-400/50 hover:text-blue-300 transition-all duration-200"
             >
               {tag}
-            </span>
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Links and Status */}
         <div className="flex items-center justify-between">

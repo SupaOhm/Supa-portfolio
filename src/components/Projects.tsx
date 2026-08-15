@@ -104,9 +104,32 @@ export default function Projects() {
 
   const activeFilterCount = selectedCategories.size + selectedStatuses.size;
 
+  const filterStatusText =
+    filteredProjects.length === 0
+      ? 'No projects match the selected filters.'
+      : `${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'} shown`;
+
+  // `reset()` runs in an effect after a filter change, so for one render
+  // currentIndex can still point past the end of the newly filtered array.
+  // Indexing is therefore guarded rather than assumed in range.
+  const centredProject = isCarouselView ? filteredProjects[currentIndex] : undefined;
+  const carouselStatusText = centredProject
+    ? `Project ${currentIndex + 1} of ${filteredProjects.length}: ${centredProject.title}`
+    : '';
+
   return (
-    <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
+    <section id="projects" aria-labelledby="projects-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
+      {/* Live regions. Permanently mounted and rendered outside every conditional
+          branch: a region inserted into the DOM at the same moment its text
+          appears is not reliably announced. Only the text content changes. */}
+      <p role="status" data-testid="filter-status" className="sr-only">
+        {filterStatusText}
+      </p>
+      <p role="status" data-testid="carousel-status" className="sr-only">
+        {carouselStatusText}
+      </p>
 
       <div className="max-w-7xl mx-auto relative z-10 marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-4 sm:p-8 border-[1px] border-gray-800/60 bg-gray-950/40 backdrop-blur-sm">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b-[1px] border-gray-800/60 pb-8 relative">
@@ -118,10 +141,10 @@ export default function Projects() {
             <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-400 mb-2">
               // sys.logs.fetch("projects")
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
-              <span className="text-gray-700 font-light text-2xl">[</span>
+            <h2 id="projects-heading" className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
+              <span aria-hidden="true" className="text-gray-700 font-light text-2xl">[</span>
               Featured Projects
-              <span className="text-gray-700 font-light text-2xl">]</span>
+              <span aria-hidden="true" className="text-gray-700 font-light text-2xl">]</span>
             </h2>
           </div>
 
@@ -130,7 +153,8 @@ export default function Projects() {
           <button
             onClick={() => setIsCarouselView((v) => !v)}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-700/50 text-gray-300 rounded-lg hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white transition-all duration-300 border border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
-            aria-label="Toggle view"
+            aria-pressed={isCarouselView}
+            aria-label="Carousel view"
           >
             {isCarouselView ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,7 +213,7 @@ export default function Projects() {
                             className="w-3.5 h-3.5 accent-blue-500 flex-shrink-0"
                           />
                           <span className="text-sm text-gray-300 group-hover:text-white flex-1">{cat}</span>
-                          <span className="text-xs text-gray-500">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
+                          <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
                         </label>
                       ))}
                     </div>
@@ -211,7 +235,7 @@ export default function Projects() {
                           />
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_COLORS[st]}`} />
                           <span className="text-sm text-gray-300 group-hover:text-white flex-1">{STATUS_LABELS[st]}</span>
-                          <span className="text-xs text-gray-500">({PROJECTS.filter((p) => p.status === st).length})</span>
+                          <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.status === st).length})</span>
                         </label>
                       ))}
                     </div>
@@ -314,14 +338,18 @@ export default function Projects() {
 
             {/* Navigation Dots */}
             {filteredProjects.length > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
+              <div className="flex justify-center gap-0 mt-8">
                 {filteredProjects.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentIndex(i)}
-                    className={`transition-all duration-300 rounded-full ${currentIndex === i ? 'bg-blue-500 w-8 h-3' : 'bg-gray-600 hover:bg-gray-500 w-3 h-3'}`}
+                    className="group p-1.5 rounded-full"
                     aria-label={`Go to project ${i + 1}`}
-                  />
+                  >
+                    <span
+                      className={`block transition-all duration-300 rounded-full ${currentIndex === i ? 'bg-blue-500 w-8 h-3' : 'bg-gray-500 group-hover:bg-gray-400 w-3 h-3'}`}
+                    />
+                  </button>
                 ))}
               </div>
             )}
