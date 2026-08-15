@@ -26,4 +26,16 @@ describe('project image', () => {
     expect(screen.getByRole('heading', { name: project.title, level: 3 })).toBeInTheDocument();
     expect(screen.queryByRole('img', { name: project.title })).toBeNull();
   });
+
+  it('defers loading and decoding so the below-the-fold cards do not block paint', () => {
+    render(<ProjectCard project={project} />);
+
+    // Projects sits far below the fold; eagerly fetching 11 images competes with
+    // above-the-fold work. queryByRole cannot find it (alt="" makes it
+    // presentational and removes it from the accessibility tree), so query the DOM.
+    const image = document.querySelector('img');
+    expect(image).not.toBeNull();
+    expect(image).toHaveAttribute('loading', 'lazy');
+    expect(image).toHaveAttribute('decoding', 'async');
+  });
 });
