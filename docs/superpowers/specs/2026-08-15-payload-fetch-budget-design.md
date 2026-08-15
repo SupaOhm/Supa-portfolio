@@ -173,6 +173,18 @@ This is the same failure shape as the B3 `erasableSyntaxOnly` incident: only
 The image-existence test therefore lives at `scripts/optimize-images.test.ts`,
 not in `src/`.
 
+Two config changes make that directory real, and **both** are required:
+
+- `tsconfig.node.json` include gains `"scripts"` — otherwise the files are
+  never typechecked.
+- `vite.config.ts:13` include gains `'scripts/**/*.test.ts'` — the current
+  value is `['src/**/*.test.{ts,tsx}']`, so without this the tests are
+  **silently never collected** and the suite reports green having run nothing.
+
+Importing `PROJECTS` from `src/data/projects.ts` inside a `scripts/` test
+crosses a tsconfig project boundary. Probed against both `npm test` and
+`npm run typecheck`: it passes once `"scripts"` is in the node include.
+
 ### The shared fetch must not be cancellable by one consumer
 
 `main.tsx:8` wraps the app in `StrictMode`, and `useGitHubProfile.ts:128`
@@ -238,6 +250,7 @@ Do not "improve" the alt text; doing so silently reverts shipped a11y work.
 
 **Modify**
 - `tsconfig.node.json` — include `scripts`
+- `vite.config.ts:13` — vitest `include` gains `'scripts/**/*.test.ts'`
 - `package.json` — add `"images": "node scripts/optimize-images.ts"`
 - `public/images/projects/` — 11 `.webp` replace 11 originals
 - `src/data/projects.ts` — 11 `imageUrl` values to `.webp`
@@ -255,14 +268,14 @@ Do not "improve" the alt text; doing so silently reverts shipped a11y work.
 
 | # | Task | Deliverable | Tests |
 |---|---|---|---|
-| 1 | Encoder script | `optimize-images.ts`, `resizeArgs`, tsconfig include, npm script | +3 |
+| 1 | Encoder script | `optimize-images.ts`, `resizeArgs`, `parsePixelWidth`, tsconfig + vitest includes, npm script | +6 |
 | 2 | Encode and repoint | run script, relocate originals, `.webp` paths, existence test | +2 |
 | 3 | Lazy loading | `loading="lazy"` `decoding="async"` | +2 |
 | 4 | Cache module | `githubCache.ts` — dedupe, TTL, fallback | +6 |
-| 5 | Wire the hook | `useGitHubProfile` consumes cache; abort guards state | +2 |
+| 5 | Wire the hook | `useGitHubProfile` consumes cache; abort guards state | +3 |
 | 6 | Manual checks | Network-panel verification doc | — |
 
-100 tests today, ~115 after. Task 2's existence test is worth its keep: it
+100 tests today, 118 after. Task 2's existence test is worth its keep: it
 catches a rename typo in `projects.ts` that would otherwise ship as a silently
 broken image.
 
