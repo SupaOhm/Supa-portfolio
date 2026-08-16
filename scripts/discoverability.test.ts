@@ -140,7 +140,14 @@ describe('index.html JSON-LD', () => {
     expect(person?.alternateName).toBe('Supakorn Ohm');
     expect(person?.jobTitle).toBe('Computer Engineering Student');
     expect(person?.url).toBe(`${ORIGIN}/`);
-    expect(person?.image).toBe(`${ORIGIN}/og.png`);
+  });
+
+  it('publishes no Person image', () => {
+    // Deliberate: schema.org Person.image means a depiction of the person, and
+    // the only image in the repo is og.png, a text branding card with no
+    // photograph. Declaring it invites a knowledge panel to show a banner
+    // where a headshot belongs. Restore this only with a real photo.
+    expect(nodeOfType('Person')).not.toHaveProperty('image');
   });
 
   it('states the university as a current affiliation, not alumniOf', () => {
