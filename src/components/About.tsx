@@ -103,14 +103,14 @@ export default function About() {
         {/* GitHub Stats */}
         <div className="mt-10 mb-8">
           <h3 className="text-xl font-semibold text-white mb-6 text-center">
-            GitHub Activity
+            GitHub Activity{' '}
             <a 
               href={GITHUB_PROFILE_URL}
               target="_blank" 
               rel="noopener noreferrer"
               className="ml-3 text-sm text-blue-400 hover:text-blue-300 transition-colors"
             >
-              @{GITHUB_USERNAME} ↗
+              @{GITHUB_USERNAME} <span aria-hidden="true">↗</span>
             </a>
           </h3>
           
