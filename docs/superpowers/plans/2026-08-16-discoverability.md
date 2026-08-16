@@ -455,7 +455,9 @@ describe('index.html JSON-LD', () => {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `npm test -- scripts/discoverability.test.ts`
-Expected: **FAIL**, 12 new failures (`carries exactly one ld+json block` reports `[]` has length 0; the rest fail on an empty graph). The 11 Task 2 tests still pass.
+Expected: **FAIL**, 11 new failures (`carries exactly one ld+json block` reports `[]` has length 0; the rest fail on an empty graph). The 11 Task 2 tests still pass.
+
+One of the 12 new tests — `publishes no email address` — **passes vacuously at this point** and that is expected, not a problem to fix: with no block present there is no `Person` node to carry an email and `rawLd` is the empty string, so both its assertions are trivially satisfied. It only becomes meaningful once the block exists in Step 3, and Step 5's sabotage table is what proves it discriminates. Do not treat its green as a signal that something is wrong.
 
 - [ ] **Step 3: Add the JSON-LD block to index.html**
 
