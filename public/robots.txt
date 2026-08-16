@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://supakornohm.vercel.app/sitemap.xml
