@@ -93,7 +93,7 @@ export const PROJECTS: Project[] = [
     id: '11',
     title: 'RevRace - GPS Performance Tracking Platform',
     description:
-      'Designed a mobile-first platform for car enthusiasts to capture, analyze, and share real-world driving performance. Built the product concept around live GPS telemetry, 0-100 km/h timing, route history, performance dashboards, and community-facing comparison features, with emphasis on modular architecture, real-time data processing, and API-driven system design.',
+      'Published 0-100 km/h figures come from a closed track and a professional driver. RevRace measures the car you actually own on the road you actually drive: live GPS telemetry, timed runs, route history, and dashboards that put your numbers beside other drivers’. Built mobile-first around real-time data processing and a modular, API-driven architecture.',
     tags: ['Full-Stack Development', 'Mobile Development', 'GPS Data Processing', 'Real-Time Systems', 'RESTful APIs', 'Performance Analytics', 'Community Platform'],
     imageUrl: '/images/projects/revrace.webp',
     githubUrl: '',
@@ -115,7 +115,7 @@ export const PROJECTS: Project[] = [
     id: '8',
     title: 'Intrusion Detection System as a Service (IDSaaS)',
     description:
-      'Designed a multi-tenant cloud security platform for real-time log ingestion and threat detection. Combined signature-based detection with machine learning-driven anomaly analysis, with a focus on scalable stream processing, cloud-native architecture, and practical security monitoring for shared environments.',
+      'Signature-based detection only catches attacks someone has already named. IDSaaS pairs it with machine-learning anomaly analysis so unnamed behaviour surfaces too, then runs both over real-time log ingestion for many tenants at once. The hard parts are stream processing that scales and keeping detection trustworthy in a shared environment.',
     tags: ['IEEE', 'Research', 'Machine Learning', 'Cloud Computing', 'Cybersecurity'],
     imageUrl: '/images/projects/IDSaaS.webp',
     githubUrl: '',
@@ -126,7 +126,7 @@ export const PROJECTS: Project[] = [
     id: '9',
     title: 'Baka Platform UX/UI Overhaul',
     description:
-      'Collaborating with BAKA Co., Ltd. to redesign Baka Index, a sugarcane analytics platform powered by Google Earth Engine. Conducting user research with farmers, evaluating usability pain points, and translating findings into clearer interaction flows and higher-fidelity Figma prototypes.',
+      'Baka Index is a sugarcane analytics platform built on Google Earth Engine, and its users are farmers rather than analysts. Working with BAKA Co., Ltd., I run user research with those farmers, find where the current interface loses them, and translate the findings into clearer interaction flows and higher-fidelity Figma prototypes.',
     tags: ['Figma', 'UX/UI Research', 'Google Earth Engine'],
     imageUrl: '/images/projects/baka.webp',
     githubUrl: '',
