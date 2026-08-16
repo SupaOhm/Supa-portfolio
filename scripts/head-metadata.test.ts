@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { MAX_BYTES } from './render-og';
+import { ORIGIN } from './site-origin';
 
 // Resolved from this file's own URL rather than process.cwd(), so the test does
 // not depend on which directory vitest was invoked from.
@@ -11,7 +12,6 @@ const readRepoFile = (relative: string): string =>
 const html = readRepoFile('index.html');
 const readme = readRepoFile('README.md');
 
-const ORIGIN = 'https://supakornohm.vercel.app';
 const DESCRIPTION =
   'Supakorn Ohm — Computer Engineering student at SIIT, Thammasat. Full-stack projects in React, TypeScript, and Node. Seeking a Software Engineer internship.';
 // `&` must be written `&amp;` in HTML, so the file contains the encoded form.
