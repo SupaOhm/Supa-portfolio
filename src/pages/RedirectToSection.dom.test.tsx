@@ -1,9 +1,17 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { render, screen, cleanup, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import App from '../App';
 import { resetGitHubCache } from '../lib/githubCache';
+
+// Test-only probe: renders the router's current location.search into the DOM
+// so a test can observe where the redirect actually landed. Not part of
+// production code — it is rendered alongside <App />, not inside it.
+function LocationSearchProbe() {
+  const location = useLocation();
+  return <div data-testid="location-search">{location.search}</div>;
+}
 
 afterEach(cleanup);
 
@@ -26,6 +34,7 @@ const renderAt = (path: string) =>
   render(
     <MemoryRouter initialEntries={[path]}>
       <App />
+      <LocationSearchProbe />
     </MemoryRouter>,
   );
 
@@ -57,5 +66,13 @@ describe.each([
       // "the right section scrolled".
       expect((spy.mock.contexts[0] as Element).id).toBe(sectionId);
     });
+  });
+});
+
+describe('query string preservation', () => {
+  it('carries a campaign query string through the redirect to /', () => {
+    renderAt('/projects?utm_source=linkedin');
+
+    expect(screen.getByTestId('location-search')).toHaveTextContent('?utm_source=linkedin');
   });
 });

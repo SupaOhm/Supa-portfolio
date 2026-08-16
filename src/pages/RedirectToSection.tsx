@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface RedirectToSectionProps {
   id: string;
@@ -27,10 +27,22 @@ interface RedirectToSectionProps {
  */
 export default function RedirectToSection({ id }: RedirectToSectionProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    navigate('/', { replace: true, state: { targetId: id } });
-  }, [navigate, id]);
+    // Preserves the query string (e.g. ?utm_source=linkedin) across the
+    // redirect, so shared campaign links keep their tracking params instead
+    // of losing them the moment the visitor lands.
+    navigate(
+      { pathname: '/', search: location.search },
+      { replace: true, state: { targetId: id } },
+    );
+    // Depends on location.search rather than the whole location object:
+    // `location` is a new reference on every navigation (including the one
+    // this effect itself triggers), which would refire the effect after
+    // every redirect and loop. location.search is a primitive string, so it
+    // only changes when the actual query string changes.
+  }, [navigate, id, location.search]);
 
   return null;
 }

@@ -54,11 +54,6 @@ function main(): void {
   // macOS. It is harmless noise, not a failure — the exit code is what matters.
   execFileSync(CHROME_BIN, chromeArgs(source, output), { stdio: 'inherit' });
 
-  // Belt and braces: --force-device-scale-factor=1 should already have produced
-  // exact dimensions, so this normalises rather than corrects. Note sips takes
-  // HEIGHT then WIDTH.
-  execFileSync('sips', ['-z', String(OG_HEIGHT), String(OG_WIDTH), output], { stdio: 'ignore' });
-
   const bytes = statSync(output).size;
   console.log(`public/og.png: ${OG_WIDTH}x${OG_HEIGHT}, ${bytes} bytes`);
   if (bytes > MAX_BYTES) {
