@@ -11,14 +11,40 @@ Before the deploy, both paths returned the SPA shell: `200`,
 `text/html; charset=utf-8`, `1509` bytes. Anything still matching that shape
 means the catch-all swallowed the file.
 
-- [ ] `curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}\n" https://supakornohm.vercel.app/robots.txt`
+- [x] `curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}\n" https://supakornohm.vercel.app/robots.txt`
       → `200`, a `text/plain` content type, and a size that is **not** 1509.
-- [ ] `curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}\n" https://supakornohm.vercel.app/sitemap.xml`
+- [x] `curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}\n" https://supakornohm.vercel.app/sitemap.xml`
       → `200`, an XML content type (`application/xml` or `text/xml`), size **not** 1509.
-- [ ] `curl -sS https://supakornohm.vercel.app/robots.txt` prints the four
+- [x] `curl -sS https://supakornohm.vercel.app/robots.txt` prints the four
       expected lines, not HTML.
-- [ ] The existing static assets still resolve, confirming nothing regressed:
+- [x] The existing static assets still resolve, confirming nothing regressed:
       `/og.png` is `image/png` and `/images/projects/expense.webp` is `image/webp`.
+
+### Measured 2026-08-16, immediately after PR #12 merged as 9ed150b
+
+**The claim no test could prove is now proven.** Both files are served as
+files, at exactly their on-disk byte sizes, not rewritten to the SPA shell:
+
+| Path | Status | Content-Type | Bytes | Pre-deploy was |
+|---|---|---|---|---|
+| `/robots.txt` | 200 | `text/plain; charset=utf-8` | 76 | 200 `text/html` 1509 |
+| `/sitemap.xml` | 200 | `application/xml` | 174 | 200 `text/html` 1509 |
+
+Both bodies fetched and confirmed correct: `robots.txt` prints its four lines,
+`sitemap.xml` its single `<loc>`. Neither is HTML.
+
+**No regression.** Static assets still resolve with true content types
+(`/og.png` `image/png`, `/icon.png` `image/png`,
+`/images/projects/expense.webp` `image/webp`), and every SPA route still
+returns the shell (`/`, `/about`, `/projects`, `/connect`, and
+`/nonexistent-xyz` — the last being D2's accepted soft 404).
+
+**JSON-LD verified in the LIVE served HTML**, not just the source file:
+parsed straight off the wire, `@graph` is `[Person, WebSite]`,
+`name` is `Supakorn Prayongyam`, the WebSite name carries a literal `&`
+("Supakorn Ohm — Computer Engineering Student & Developer"), and **no `email`
+key is present**. The entity-encoding trap did not bite in production, and the
+deliberate omission survived the build.
 
 ## Structured data validators (browser, account-free)
 
