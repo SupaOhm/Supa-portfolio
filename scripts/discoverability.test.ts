@@ -199,3 +199,30 @@ describe('index.html JSON-LD', () => {
     expect(String(nodeOfType('WebSite')?.name)).toContain(' & ');
   });
 });
+
+describe('origin consistency', () => {
+  // Every file that hardcodes the deployed origin. When a custom domain lands,
+  // these are exactly the files to edit — and this test names any that were
+  // missed instead of leaving a stale URL for a search engine to find.
+  const FILES_WITH_HARDCODED_ORIGIN = [
+    'index.html',
+    'README.md',
+    'public/robots.txt',
+    'public/sitemap.xml',
+  ];
+
+  it.each(FILES_WITH_HARDCODED_ORIGIN)('every origin in %s matches ORIGIN', (relative) => {
+    const contents = readRepoFile(relative);
+    // Matches any absolute URL, then keeps the ones pointing at this site.
+    // Catches a wrong TLD (…vercel.com) as well as a wrong subdomain, which a
+    // literal `vercel.app` search would miss.
+    const ours = (contents.match(/https?:\/\/[^\s"'<>)\]]+/g) ?? []).filter((u) =>
+      u.toLowerCase().includes('supakornohm'),
+    );
+
+    expect(ours.length).toBeGreaterThan(0);
+    for (const url of ours) {
+      expect(url.startsWith(ORIGIN)).toBe(true);
+    }
+  });
+});
