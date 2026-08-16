@@ -81,3 +81,121 @@ describe('public/sitemap.xml', () => {
     expect(sitemap).not.toContain('<lastmod>');
   });
 });
+
+const html = readRepoFile('index.html');
+const connectSource = readRepoFile('src/components/Connect.tsx');
+
+/**
+ * HTML attribute values carry entity-encoded text (`&amp;`), while `<script>`
+ * content is raw text that is NOT entity-decoded. Comparing one against the
+ * other requires decoding the attribute side.
+ */
+const decodeEntities = (s: string): string =>
+  s
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
+
+const ldBlocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+const rawLd = ldBlocks[0]?.[1] ?? '';
+
+type LdNode = Record<string, unknown> & { '@type'?: string; '@id'?: string };
+const graph: LdNode[] = (() => {
+  try {
+    const parsed = JSON.parse(rawLd) as { '@graph'?: LdNode[] };
+    return parsed['@graph'] ?? [];
+  } catch {
+    return [];
+  }
+})();
+const nodeOfType = (type: string): LdNode | undefined =>
+  graph.find((n) => n['@type'] === type);
+
+describe('index.html JSON-LD', () => {
+  it('carries exactly one ld+json block', () => {
+    // Multiple blocks are legal but split the graph across documents, which
+    // breaks the @id references between Person and WebSite below.
+    expect(ldBlocks).toHaveLength(1);
+  });
+
+  it('parses as JSON', () => {
+    expect(() => JSON.parse(rawLd)).not.toThrow();
+  });
+
+  it('declares the schema.org context', () => {
+    expect((JSON.parse(rawLd) as Record<string, unknown>)['@context']).toBe('https://schema.org');
+  });
+
+  it('contains exactly one Person and one WebSite', () => {
+    expect(graph.filter((n) => n['@type'] === 'Person')).toHaveLength(1);
+    expect(graph.filter((n) => n['@type'] === 'WebSite')).toHaveLength(1);
+  });
+
+  it('identifies the person', () => {
+    const person = nodeOfType('Person');
+    expect(person?.['@id']).toBe(`${ORIGIN}/#person`);
+    expect(person?.name).toBe('Supakorn Prayongyam');
+    expect(person?.alternateName).toBe('Supakorn Ohm');
+    expect(person?.jobTitle).toBe('Computer Engineering Student');
+    expect(person?.url).toBe(`${ORIGIN}/`);
+    expect(person?.image).toBe(`${ORIGIN}/og.png`);
+  });
+
+  it('states the university as a current affiliation, not alumniOf', () => {
+    // PERSONAL_INFO in About.tsx lists an in-progress degree and "Looking for
+    // Internships"; alumniOf would assert completed study.
+    const person = nodeOfType('Person');
+    expect(person?.alumniOf).toBeUndefined();
+    expect(person?.affiliation).toEqual({
+      '@type': 'CollegeOrUniversity',
+      name: 'Sirindhorn International Institute of Technology, Thammasat University',
+    });
+  });
+
+  it('links the same profiles the Connect section links', () => {
+    // Derived from Connect.tsx rather than retyped, so the structured data
+    // cannot drift away from the links a visitor actually sees.
+    const github = connectSource.match(/href:\s*'(https:\/\/github\.com\/[^']+)'/)?.[1];
+    const linkedin = connectSource.match(/href:\s*'(https:\/\/linkedin\.com\/[^']+)'/)?.[1];
+    expect(github).toBeDefined();
+    expect(linkedin).toBeDefined();
+    expect(nodeOfType('Person')?.sameAs).toEqual([github, linkedin]);
+  });
+
+  it('publishes no email address', () => {
+    // Deliberate (spec E3): the address currently appears only in JS-rendered
+    // markup, so a harvester that does not run JS finds none. Adding it here
+    // would put it in static HTML and hand it to every scraper.
+    expect(nodeOfType('Person')).not.toHaveProperty('email');
+    expect(rawLd).not.toContain('@gmail.com');
+  });
+
+  it('joins the WebSite to the Person by @id reference', () => {
+    const site = nodeOfType('WebSite');
+    const personId = nodeOfType('Person')?.['@id'];
+    expect(site?.['@id']).toBe(`${ORIGIN}/#website`);
+    expect(site?.about).toEqual({ '@id': personId });
+    expect(site?.publisher).toEqual({ '@id': personId });
+  });
+
+  it('keeps the WebSite name identical to the document title', () => {
+    const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? '';
+    expect(nodeOfType('WebSite')?.name).toBe(decodeEntities(title));
+  });
+
+  it('keeps the WebSite description identical to the meta description', () => {
+    const description =
+      html.match(/<meta\s+name="description"\s+content="([^"]*)"/i)?.[1] ?? '';
+    expect(nodeOfType('WebSite')?.description).toBe(decodeEntities(description));
+  });
+
+  it('uses a literal ampersand, not an HTML entity', () => {
+    // HTML5 treats <script> content as raw text and does NOT decode entities
+    // there. An `&amp;` inside JSON-LD is read as the five literal characters
+    // "&amp;", silently putting a wrong site name into the structured data.
+    expect(rawLd).not.toContain('&amp;');
+    expect(String(nodeOfType('WebSite')?.name)).toContain(' & ');
+  });
+});
