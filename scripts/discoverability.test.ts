@@ -172,6 +172,13 @@ describe('index.html JSON-LD', () => {
     expect(rawLd).not.toContain('@gmail.com');
   });
 
+  it('identifies the website', () => {
+    const site = nodeOfType('WebSite');
+    expect(site?.['@id']).toBe(`${ORIGIN}/#website`);
+    expect(site?.url).toBe(`${ORIGIN}/`);
+    expect(site?.inLanguage).toBe('en');
+  });
+
   it('joins the WebSite to the Person by @id reference', () => {
     const site = nodeOfType('WebSite');
     const personId = nodeOfType('Person')?.['@id'];
@@ -223,6 +230,27 @@ describe('origin consistency', () => {
     expect(ours.length).toBeGreaterThan(0);
     for (const url of ours) {
       expect(url.startsWith(ORIGIN)).toBe(true);
+    }
+  });
+
+  // The OG card template writes the origin as a BARE HOST with no scheme, so
+  // the URL scan above finds nothing in it. This second pass catches the host
+  // wherever it appears, with or without a scheme.
+  const HOST = new URL(ORIGIN).host;
+  const FILES_WITH_HARDCODED_HOST = [
+    'index.html',
+    'README.md',
+    'public/robots.txt',
+    'public/sitemap.xml',
+    'assets-src/og/og.html',
+  ];
+
+  it.each(FILES_WITH_HARDCODED_HOST)('every host in %s matches ORIGIN', (relative) => {
+    const contents = readRepoFile(relative);
+    const hosts = contents.match(/supakornohm[a-z0-9.-]*\.[a-z]{2,}/gi) ?? [];
+    expect(hosts.length).toBeGreaterThan(0);
+    for (const host of hosts) {
+      expect(host.toLowerCase()).toBe(HOST);
     }
   });
 });

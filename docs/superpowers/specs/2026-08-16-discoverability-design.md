@@ -166,8 +166,10 @@ An `@graph` with two nodes joined by `@id` reference:
 ```
 
 Every value above is taken from data already in the repo: the full name and
-education from `About.tsx`'s `PERSONAL_INFO`, the skills from `Skills.tsx`'s
-`SKILL_CATEGORIES`, the languages from `About.tsx`'s `LANGUAGES`, the profile
+education from `About.tsx`'s `PERSONAL_INFO`, most skills from `Skills.tsx`'s
+`SKILL_CATEGORIES` (with "Full-stack web development" drawn instead from the
+meta description in `index.html`, which has no literal counterpart in
+`SKILL_CATEGORIES`), the languages from `About.tsx`'s `LANGUAGES`, the profile
 URLs from `Connect.tsx`, and the title and description from `index.html`.
 
 **`email` is deliberately omitted.** Today the address appears only inside
@@ -258,7 +260,7 @@ passes `npm test` and fails `npm run typecheck` with TS2307.
 |---|---|
 | `robots.txt` has a `User-agent: *` group allowing `/` | An accidental disallow silently deindexing the site |
 | `robots.txt` `Sitemap:` line is an absolute URL equal to `ORIGIN + '/sitemap.xml'` | A relative or stale sitemap reference |
-| `sitemap.xml` parses as XML and declares the sitemaps.org 0.9 namespace | A malformed file that search engines reject wholesale |
+| `sitemap.xml` declares the sitemaps.org 0.9 namespace, and its `urlset`/`url`/`loc` tags are balanced (no XML parser is installed, so tag counting stands in for well-formedness) | A malformed file that search engines reject wholesale |
 | `sitemap.xml` contains exactly one `<loc>`, equal to `ORIGIN + '/'` | Silent growth of the URL set |
 | `sitemap.xml` contains no `/about`, `/projects` or `/connect` | Someone "helpfully" adding the redirect-only routes, undoing E2's reasoning |
 | `index.html` contains exactly one `ld+json` block, and it `JSON.parse`s | An unescaped character silently invalidating the whole block |
@@ -266,7 +268,7 @@ passes `npm test` and fails `npm run typecheck` with TS2307.
 | `Person.sameAs` equals the GitHub and LinkedIn URLs derived from `Connect.tsx` | The profile links diverging between the page and the structured data |
 | `Person` has no `email` key | E3's deliberate omission being reversed without the reasoning being revisited |
 | `WebSite.name` / `.description` equal the `<title>` / `meta[name=description]` content | Structured data drifting from the head metadata it is supposed to describe |
-| Every `https://…vercel.app` occurrence across all three files equals `ORIGIN` | Origin drift, especially during the future domain migration |
+| Every `https://…vercel.app` occurrence across four source files equals `ORIGIN`, plus a second scan of the bare host (with or without a scheme) across those four files and `assets-src/og/og.html` | Origin drift, especially during the future domain migration |
 
 Each assertion is to be confirmed to fail against a deliberately broken input
 before the task is considered done — a test that has never been seen red is not
