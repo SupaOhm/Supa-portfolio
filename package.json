@@ -10,7 +10,8 @@
     "test": "vitest run",
     "typecheck": "tsc -b --noEmit",
     "preview": "vite preview",
-    "images": "node scripts/optimize-images.ts"
+    "images": "node scripts/optimize-images.ts",
+    "og": "node scripts/render-og.ts"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

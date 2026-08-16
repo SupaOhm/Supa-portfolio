@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+
+      body {
+        position: relative;
+        background: #030712;
+        color: #f3f4f6;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+
+      /* Echoes the cursor-following glows the live site uses on its cards. */
+      .glow {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(110px);
+      }
+      .glow-a { width: 620px; height: 620px; top: -220px; left: -140px;
+                background: rgba(59, 130, 246, 0.28); }
+      .glow-b { width: 520px; height: 520px; bottom: -240px; right: -120px;
+                background: rgba(168, 85, 247, 0.22); }
+
+      .frame {
+        position: absolute;
+        inset: 44px;
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        background: rgba(3, 7, 18, 0.6);
+        padding: 66px 72px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* The site's signature corner markers (index.css .marker-cross). */
+      .frame::before, .frame::after,
+      .corners::before, .corners::after {
+        content: '';
+        position: absolute;
+        background-color: rgba(156, 163, 175, 0.4);
+      }
+      .frame::before { top: 16px; left: -1px; width: 34px; height: 1px; }
+      .frame::after  { top: -1px; left: 16px; width: 1px; height: 34px; }
+      .corners::before { bottom: 16px; right: -1px; width: 34px; height: 1px; }
+      .corners::after  { bottom: -1px; right: 16px; width: 1px; height: 34px; }
+
+      .eyebrow {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 21px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #60a5fa;
+        margin-bottom: 30px;
+      }
+
+      h1 {
+        font-size: 104px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 0.92;
+      }
+      .given {
+        background: linear-gradient(90deg, #93c5fd 0%, #a5f3fc 45%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .family { color: #f3f4f6; }
+
+      .affiliation {
+        margin-top: 26px;
+        font-size: 30px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        color: #d1d5db;
+      }
+
+      .rule {
+        margin: 44px 0 30px;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(96,165,250,0.5), rgba(75,85,99,0.15));
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 22px;
+        color: #9ca3af;
+      }
+      .footer .url { color: #93c5fd; }
+    </style>
+  </head>
+  <body>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="frame">
+      <div class="corners"></div>
+      <p class="eyebrow">// Computer_Engineering</p>
+      <h1>
+        <span class="given">Supakorn</span>
+        <span class="family">Prayongyam</span>
+      </h1>
+      <p class="affiliation">SIIT, Thammasat University</p>
+      <div class="rule"></div>
+      <div class="footer">
+        <span>Full-stack &middot; React &middot; TypeScript &middot; Node</span>
+        <span class="url">supakornohm.vercel.app</span>
+      </div>
+    </div>
+  </body>
+</html>
