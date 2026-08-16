@@ -64,9 +64,14 @@ no main-thread block over 50ms.** The original carousel lag is measurably gone.
 
 ## Still not verified for the neighbouring slices
 
-- [ ] B1 reduced motion — no checklist file exists; forcing
-      `prefers-reduced-motion: reduce` needs a real system setting or CDP
-      emulation, neither of which was used here.
-- [ ] B2 keyboard access — no checklist file exists; needs a real tab-order
-      walk with a visible focus indicator.
+- [x] B1 reduced motion — **done 2026-08-16** via CDP
+      `Emulation.setEmulatedMedia` with `prefers-reduced-motion: reduce`, which
+      is the CDP emulation route this note anticipated. `matchMedia` matches,
+      `scroll-behavior` computes `auto`, the three animation classes all compute
+      `animation-name: none`, and a page-wide sweep found zero running
+      animations. Recorded in `2026-08-14-b3-a11y.md`.
+- [x] B2 keyboard access — **done 2026-08-16**: 26 Tab stops walked with real
+      CDP key events, all with a visible focus indicator, none landing inside an
+      `inert` subtree, and Escape restoring focus to the filter trigger.
+      Recorded in `2026-08-14-b3-a11y.md`.
 - [ ] Slice A correctness baseline — no checklist file exists.
