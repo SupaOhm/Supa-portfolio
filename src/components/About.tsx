@@ -31,7 +31,7 @@ const PERSONAL_INFO = [
   { label: 'Email', value: 'ohm.supakornth@gmail.com' },
   { label: 'Location', value: 'Pathum Thani | Bangkok, Thailand' },
   { label: 'Education', value: 'Computer Engineering | SIIT, Thammasat U.' },
-  { label: 'Year', value: '3rd Year | GPA 3.23' },
+  { label: 'Year', value: '4th Year | GPA 3.24 | Expected June 2027' },
   { label: 'Focus', value: 'Cybersecurity | AI & RAG Systems' },
   { label: 'Recognition', value: 'IEEE IMC 2026 Best Paper Award' },
   { label: 'Availability', value: 'Looking for Internships', highlight: true },
