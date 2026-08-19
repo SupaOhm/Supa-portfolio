@@ -4,14 +4,14 @@ import { useCursorGlow } from '../hooks/useCursorGlow';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
 import { ACADEMIC_YEAR, GPA, INSTITUTION, LOCATION, PROGRAM } from '../data/profile';
 
-// Add or remove items from this array to customize what gets typed
+// Add or remove items from this array to customize what gets typed.
+// Each entry should be a role the work behind it can back up.
 const WORDS = [
   'Computer Engineering Student',
-  'Software Dev',
-  'Tech Enthusiast', 
-  'Quick Learner',
-  'Problem Solver',
-  'Full-stack Dev',
+  'Security Researcher',
+  'AI & RAG Developer',
+  'Backend Engineer',
+  'Full-Stack Developer',
 ];
 
 export default function Hero() {
