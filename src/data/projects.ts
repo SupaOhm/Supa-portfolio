@@ -2,10 +2,31 @@ import type { Project } from '../types/project';
 
 export const PROJECTS: Project[] = [
   {
+    id: 'esnidsaas',
+    title: 'ESNIDSaaS - Network Intrusion Detection as a Service',
+    description:
+      'Best Paper Award at IEEE IMC 2026 (CISOSE 2026, Fukuoka). A cloud-native, multi-tenant network intrusion detection service: Kafka ingestion, tenant-scoped stream routing and Spark Structured Streaming preprocessing feed a hybrid detector combining signature rules, behavioural rules, Random Forest anomaly scoring with split-conformal calibration, and HistGBM. On CIC-IDS2017 it reached 0.9557 accuracy and 0.8479 F1 at a 0.735% false-alarm rate, and edge-side deduplication suppressed up to 100% of replayed telemetry before it ever reached the cloud.',
+    tags: ['Apache Kafka', 'Spark Structured Streaming', 'Machine Learning', 'Multi-Tenant Architecture', 'Cloud-Native', 'Network Security'],
+    imageUrl: '/images/projects/IDSaaS.webp',
+    githubUrl: '',
+    status: 'completed',
+    categories: ['Security', 'Cloud', 'AI'],
+  },
+  {
+    id: 'opsbot',
+    title: 'OpsBot - Multi-Agent RAG Assistant',
+    description:
+      'Built as AI Developer Intern at Mizuhada Group: a retrieval-augmented assistant over internal SOPs and live warehouse and inventory data, where a coordinator agent routes each query between a document-retrieval agent and a read-only database agent. Topic-aware hybrid retrieval resolves follow-ups by embedding with an LLM query-rewrite fallback, Postgres holds multi-turn session memory, and answers stream to a React/TypeScript client over SSE. An automated ingestion pipeline syncs intranet SOPs through PDF/OCR conversion and heading-aware chunking; an evaluation harness measured a 100% source match rate.',
+    tags: ['FastAPI', 'Google ADK', 'ChromaDB', 'Gemini API', 'RAG', 'PostgreSQL', 'React'],
+    githubUrl: '',
+    status: 'completed',
+    categories: ['AI', 'Backend', 'Web'],
+  },
+  {
     id: 'baka-ux-overhaul',
     title: 'Baka Platform UX/UI Overhaul',
     description:
-      'Baka Index is a sugarcane analytics platform built on Google Earth Engine, and its users are farmers rather than analysts. Working with BAKA Co., Ltd., I run user research with those farmers, find where the current interface loses them, and translate the findings into clearer interaction flows and higher-fidelity Figma prototypes.',
+      'Baka Index is a farming analytics platform built on Google Earth Engine, and its users are farmers rather than analysts. As UX/UI Research and Design Intern at BAKA Co., Ltd. I ran stakeholder requirement analysis and delivered a redesign report covering user flows, interface structure and implementation direction, and am now iterating on company feedback before building the finalised features, including the geospatial analytics workflows and frontend work.',
     tags: ['Figma', 'UX/UI Research', 'Google Earth Engine'],
     imageUrl: '/images/projects/baka.webp',
     githubUrl: '',
@@ -13,15 +34,14 @@ export const PROJECTS: Project[] = [
     categories: ['Design'],
   },
   {
-    id: 'idsaas',
-    title: 'Intrusion Detection System as a Service (IDSaaS)',
+    id: 'acklab',
+    title: 'AckLab - Interactive Networking Learning Platform',
     description:
-      'Signature-based detection only catches attacks someone has already named. IDSaaS pairs it with machine-learning anomaly analysis so unnamed behaviour surfaces too, then runs both over real-time log ingestion for many tenants at once. The hard parts are stream processing that scales and keeping detection trustworthy in a shared environment.',
-    tags: ['IEEE', 'Research', 'Machine Learning', 'Cloud Computing', 'Cybersecurity'],
-    imageUrl: '/images/projects/IDSaaS.webp',
-    githubUrl: '',
-    status: 'in-progress',
-    categories: ['Security', 'Cloud', 'AI'],
+      'A networking course you operate rather than read: guided lessons paired with hands-on labs for subnet calculation, binary conversion, DNS flow, OSI model exploration, routing path simulation, TCP behaviour and packet-level inspection. Synchronised packet animation, protocol state transitions and timeline playback tie them into one continuous path. Feature-based Next.js frontend under strict TypeScript, shipped as a deployable Docker application with GitHub Actions CI.',
+    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Docker', 'GitHub Actions'],
+    githubUrl: 'https://github.com/SupaOhm/AckLab',
+    status: 'completed',
+    categories: ['Web', 'Tools'],
   },
   {
     id: 'revrace',
@@ -35,17 +55,6 @@ export const PROJECTS: Project[] = [
     categories: ['Mobile', 'Cloud', 'Backend'],
   },
   {
-    id: 'expense-tracker',
-    title: 'Full-Stack Expense Management',
-    description:
-      'Built a full-stack expense management web application with a React frontend and Express/MongoDB backend. Implemented secure CRUD operations, real-time expense calculations, and API integration with Axios to deliver a smooth end-to-end user workflow.',
-    tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'RESTful APIs', 'Axios'],
-    imageUrl: '/images/projects/expense.webp',
-    githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
-    status: 'completed',
-    categories: ['Web', 'Backend', 'Database'],
-  },
-  {
     id: 'dressme',
     title: 'DressMe - AI-Powered Virtual Styling Assistant',
     description:
@@ -55,6 +64,17 @@ export const PROJECTS: Project[] = [
     githubUrl: '',
     status: 'in-progress',
     categories: ['Mobile', 'AI', 'Backend'],
+  },
+  {
+    id: 'expense-tracker',
+    title: 'Full-Stack Expense Management',
+    description:
+      'Built a full-stack expense management web application with a React frontend and Express/MongoDB backend. Implemented secure CRUD operations, real-time expense calculations, and API integration with Axios to deliver a smooth end-to-end user workflow.',
+    tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'RESTful APIs', 'Axios'],
+    imageUrl: '/images/projects/expense.webp',
+    githubUrl: 'https://github.com/SupaOhm/Expense-Tracker',
+    status: 'completed',
+    categories: ['Web', 'Backend', 'Database'],
   },
   {
     id: 'lost-and-found',

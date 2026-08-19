@@ -150,6 +150,14 @@ describe('index.html JSON-LD', () => {
     expect(nodeOfType('Person')).not.toHaveProperty('image');
   });
 
+  it('records the IEEE Best Paper Award', () => {
+    // The strongest credential on the site; schema.org Person.award is the only
+    // field that states it in machine-readable form.
+    const award = nodeOfType('Person')?.award as string | undefined;
+    expect(award).toContain('Best Paper Award');
+    expect(award).toContain('IEEE IMC 2026');
+  });
+
   it('states the university as a current affiliation, not alumniOf', () => {
     // PERSONAL_INFO in About.tsx lists an in-progress degree and "Looking for
     // Internships"; alumniOf would assert completed study.

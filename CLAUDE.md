@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run images` — re-encode project image originals in `assets-src/projects/` into the 800px `.webp` files under `public/images/projects/` (`scripts/optimize-images.ts`). Manual/local only, never run in CI. Requires macOS (`sips`) and `cwebp` (`brew install webp`), plus Node 22.18+/23.6+ specifically for this command — it executes a bare `.ts` file, which needs Node's unflagged native type stripping and fails on the project's Node 20 `engines` floor with a parse error rather than a friendly message.
 - `npm run og` — render `assets-src/og/og.html` to the 1200×630 `public/og.png` Open Graph card (`scripts/render-og.ts`) via headless Chrome, with the Chrome binary path hardcoded for macOS. Manual/local only, never run in CI — same trap as `npm run images`: it executes a bare `.ts` file, which needs Node 22.18+/23.6+ for unflagged native type stripping and fails on the project's Node 20 `engines` floor with a parse error rather than a friendly message.
 
-`npm test` runs the Vitest suite (185 tests across 24 files, `environment: 'node'`, no jsdom); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
+`npm test` runs the Vitest suite (186 tests across 24 files, `environment: 'node'`, no jsdom); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
 
 ## Architecture
 

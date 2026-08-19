@@ -4,8 +4,8 @@ import { revealStyle } from '../lib/revealStyle';
 
 const SKILL_CATEGORIES = {
   Languages: ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
-  'Frameworks, Libraries, and Tools': ['React', 'Node.js', 'Express.js', '.NET', 'Tailwind CSS', 'Bootstrap', 'Mongoose', 'Axios', 'Postman', 'MySQL', 'MongoDB', 'Git', 'Figma', 'CLI'],
-  'Core Concepts': ['Data Structures and Algorithms', 'Object-Oriented Programming', 'Operating Systems', 'Database Design', 'API Fundamentals', 'REST APIs', 'Software Engineering', 'UX/UI Design', 'Microcontrollers', 'Version Control', 'Cloud Computing', 'Cybersecurity Principles', 'Cryptography Fundamentals'],
+  'Frameworks, Libraries, and Tools': ['React', 'Next.js', 'Node.js', 'Express.js', 'FastAPI', '.NET', 'Tailwind CSS', 'Bootstrap', 'Docker', 'GitHub Actions', 'Apache Kafka', 'Apache Spark', 'ChromaDB', 'Mongoose', 'Axios', 'Postman', 'MySQL', 'PostgreSQL', 'MongoDB', 'Pandas', 'MATLAB', 'Git', 'Figma', 'CLI'],
+  'Core Concepts': ['Data Structures and Algorithms', 'Object-Oriented Programming', 'Operating Systems', 'Database Design', 'API Fundamentals', 'REST APIs', 'Software Engineering', 'UX/UI Design', 'Microcontrollers', 'Version Control', 'Cloud Computing', 'Computer Networks', 'Network Security', 'Cryptography Fundamentals', 'RAG', 'Agentic AI', 'Machine Learning', 'Stream Processing', 'Multi-Tenant Architecture', 'CI/CD'],
   'Soft Skills': ['Quick Learning', 'Communication', 'Problem-Solving', 'Adaptability', 'Time Management', 'Work Ethic', 'Collaboration', 'Growth Mindset'],
 } as const;
 
