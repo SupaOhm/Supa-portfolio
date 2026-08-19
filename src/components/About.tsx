@@ -30,19 +30,21 @@ const PERSONAL_INFO = [
   { label: 'Full Name', value: 'Supakorn Prayongyam' },
   { label: 'Email', value: 'ohm.supakornth@gmail.com' },
   { label: 'Location', value: 'Pathum Thani | Bangkok, Thailand' },
-  { label: 'Education', value: 'Computer Engineering | SIIT, Thammasat U.' },
+  { label: 'Education', value: 'Computer Engineering | SIIT, Thammasat U. (Expected June 2027)' },
+  { label: 'Focus', value: 'Cybersecurity | AI & RAG Systems' },
+  { label: 'Recognition', value: 'IEEE IMC 2026 Best Paper Award' },
   { label: 'Availability', value: 'Looking for Internships', highlight: true },
 ];
 
 const LANGUAGES = [
   { name: 'Thai', level: 'Native', percentage: 100 },
-  { name: 'English', level: 'Fluent', percentage: 85 },
+  { name: 'English', level: 'TU-GET CBT 90 (2024)', percentage: 85 },
 ];
 
 const FUN_FACTS = [
-  'I love trying new things',
+  'I build tools to fix my own annoyances (see: NoSleep)',
+  'Comfortable from Arduino C++ up to Spark Structured Streaming',
   'Always learning new technologies',
-  'Passionate about software development',
   'I learn fast through practical experience',
 ];
 
@@ -85,18 +87,21 @@ export default function About() {
         
         <div className="space-y-6 text-gray-300">
           <p className="text-base sm:text-lg leading-relaxed">
-            I'm a <span className="font-semibold">Computer Engineering student</span> at SIIT, Thammasat University with experience in software development,
-            backend systems, and database design. I have a strong foundation in object-oriented programming,
-            data structures and algorithms, and software engineering principles.
+            I'm a <span className="font-semibold">Computer Engineering student</span> at SIIT, Thammasat University, specializing in
+            <span className="font-semibold"> cybersecurity and AI/RAG systems</span>. I co-authored ESNIDSaaS, a cloud-native multi-tenant
+            network intrusion detection service built on Kafka and Spark Structured Streaming, which won the
+            <span className="font-semibold"> Best Paper Award at IEEE IMC 2026</span> (CISOSE 2026) in Fukuoka, Japan.
           </p>
           <p className="text-base sm:text-lg leading-relaxed">
-            Through academic and industry-collaborative projects, I've gained hands-on experience building
-            <span className="font-semibold"> full-stack web applications</span>, designing RESTful APIs, and working with both relational (MySQL) and
-            NoSQL (MongoDB) databases. Currently, I'm assigned to collaborate with BAKA Co., Ltd. on redesigning their agricultural platform's UX/UI.
+            As an <span className="font-semibold">AI Developer Intern at Mizuhada Group</span> I built OpsBot, a multi-agent retrieval-augmented
+            assistant over internal SOPs and live warehouse data, using FastAPI, ChromaDB and the Gemini API. I'm currently a
+            <span className="font-semibold"> UX/UI Research &amp; Design Intern at BAKA Co., Ltd.</span>, where I delivered a redesign report for
+            Baka Index, their Google Earth Engine farming analytics platform, and am now implementing the agreed changes.
           </p>
           <p className="text-base sm:text-lg leading-relaxed">
-            I'm seeking a <span className="font-semibold">Software Engineer internship</span> where I can contribute to building reliable, well-structured systems
-            while continuing to grow and learn from experienced engineers.
+            Alongside that I work across <span className="font-semibold">TypeScript, React, Python, Docker and CI/CD</span>, with a foundation in
+            distributed systems, network security and backend engineering — and a preference for systems whose behaviour you can measure
+            rather than assume.
           </p>
         </div>
         
