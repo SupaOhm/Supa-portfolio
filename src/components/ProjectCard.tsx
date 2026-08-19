@@ -1,5 +1,6 @@
 import type { Project } from '../types/project';
 import { useCursorGlow } from '../hooks/useCursorGlow';
+import ProjectPlaceholder from './ProjectPlaceholder';
 
 interface ProjectCardProps {
   project: Project;
@@ -27,9 +28,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
       ) : (
-        <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-gray-900 flex items-center justify-center group-hover:from-blue-600/30 group-hover:via-purple-600/30 transition-all duration-300">
-          <span className="text-gray-400 text-lg">No Image</span>
-        </div>
+        <ProjectPlaceholder project={project} />
       )}
 
       {/* Project Content */}
