@@ -3,6 +3,7 @@ import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { useReveal } from '../hooks/useReveal';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
+import { ACADEMIC_YEAR, EXPECTED_GRADUATION, GPA } from '../data/profile';
 
 const GITHUB_USERNAME = 'SupaOhm';
 const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
@@ -31,7 +32,7 @@ const PERSONAL_INFO = [
   { label: 'Email', value: 'ohm.supakornth@gmail.com' },
   { label: 'Location', value: 'Pathum Thani | Bangkok, Thailand' },
   { label: 'Education', value: 'Computer Engineering | SIIT, Thammasat U.' },
-  { label: 'Year', value: '4th Year | GPA 3.24 | Expected June 2027' },
+  { label: 'Year', value: `${ACADEMIC_YEAR} | GPA ${GPA} | Expected ${EXPECTED_GRADUATION}` },
   { label: 'Focus', value: 'Cybersecurity | AI & RAG Systems' },
   { label: 'Recognition', value: 'IEEE IMC 2026 Best Paper Award' },
   { label: 'Availability', value: 'Looking for Internships', highlight: true },

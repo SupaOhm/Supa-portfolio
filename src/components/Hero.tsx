@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { useCursorGlow } from '../hooks/useCursorGlow';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
+import { ACADEMIC_YEAR, GPA, INSTITUTION, LOCATION, PROGRAM } from '../data/profile';
 
 // Add or remove items from this array to customize what gets typed
 const WORDS = [
@@ -69,11 +70,11 @@ export default function Hero() {
           </div>
           
           <div className="font-mono text-xs sm:text-sm text-gray-400 mb-10 border-l-2 border-gray-700 pl-5 py-2 space-y-2">
-            <p><span className="text-gray-400">PROGRAM    :</span> Computer Engineering, SIIT, Thammasat</p>
-            <p><span className="text-gray-400">YEAR       :</span> 3rd Year [GPA: 3.23]</p>
-            <p><span className="text-gray-400">LOCATION   :</span> Pathum Thani, Thailand</p>
+            <p><span className="text-gray-400">PROGRAM    :</span> {PROGRAM}, {INSTITUTION}</p>
+            <p><span className="text-gray-400">YEAR       :</span> {ACADEMIC_YEAR} [GPA: {GPA}]</p>
+            <p><span className="text-gray-400">LOCATION   :</span> {LOCATION}</p>
             <div className="mt-4 pt-4 border-t border-gray-800/50 text-gray-300 max-w-lg leading-relaxed font-sans text-base">
-              Fascinated by building full-stack applications, designing APIs, and working with relational and NoSQL databases. Looking for a Software Engineer internship to contribute to reliable systems.
+              Cybersecurity and AI/RAG systems. Co-author of ESNIDSaaS, winner of the Best Paper Award at IEEE IMC 2026. Building things whose behaviour you can measure, and looking for a Software Engineer internship.
             </div>
           </div>
           
