@@ -1,7 +1,13 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ACADEMIC_YEAR, GPA } from '../src/data/profile';
+import {
+  ACADEMIC_YEAR,
+  EMAIL,
+  GITHUB_USERNAME,
+  GPA,
+  LINKEDIN_HANDLE,
+} from '../src/data/profile';
 
 /**
  * Hero and About both state the academic year and GPA. They were hardcoded
@@ -45,5 +51,47 @@ describe('profile facts are not duplicated into components', () => {
     expect(ACADEMIC_YEAR).toMatch(/^\d(?:st|nd|rd|th) Year$/);
     expect(Number(GPA)).toBeGreaterThan(0);
     expect(Number(GPA)).toBeLessThanOrEqual(4);
+  });
+});
+
+/**
+ * The same drift shape, one fact further out. The GitHub username was declared
+ * separately in About and Connect, the email was typed into About, Connect and
+ * Footer, and the profile URL was hardcoded a fourth time in Navbar — five
+ * copies with nothing forcing them to agree. Changing a handle meant finding
+ * every one of them by memory.
+ *
+ * These scan for the literal value rather than a shape, so they stay correct
+ * when the value changes: update src/data/profile.ts and the guard follows.
+ */
+describe('contact identity is not duplicated into components', () => {
+  it.each(componentSources.map((s) => s.name))(
+    '%s hardcodes no email address',
+    (name) => {
+      const { contents } = componentSources.find((s) => s.name === name)!;
+      expect(contents).not.toContain(EMAIL);
+    },
+  );
+
+  it.each(componentSources.map((s) => s.name))(
+    '%s hardcodes no GitHub username',
+    (name) => {
+      const { contents } = componentSources.find((s) => s.name === name)!;
+      expect(contents).not.toContain(GITHUB_USERNAME);
+    },
+  );
+
+  it.each(componentSources.map((s) => s.name))(
+    '%s hardcodes no LinkedIn handle',
+    (name) => {
+      const { contents } = componentSources.find((s) => s.name === name)!;
+      expect(contents).not.toContain(LINKEDIN_HANDLE);
+    },
+  );
+
+  it('exports contact values in a usable shape', () => {
+    expect(EMAIL).toMatch(/^[^@\s]+@[^@\s]+\.[^@\s]+$/);
+    expect(GITHUB_USERNAME).not.toContain('/');
+    expect(LINKEDIN_HANDLE.startsWith('/')).toBe(true);
   });
 });

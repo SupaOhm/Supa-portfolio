@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { ORIGIN } from './site-origin';
+import { GITHUB_PROFILE_URL, LINKEDIN_URL } from '../src/data/profile';
 
 // Resolved from this file's own URL rather than process.cwd(), so the test does
 // not depend on which directory vitest was invoked from.
@@ -83,7 +84,6 @@ describe('public/sitemap.xml', () => {
 });
 
 const html = readRepoFile('index.html');
-const connectSource = readRepoFile('src/components/Connect.tsx');
 
 /**
  * HTML attribute values carry entity-encoded text (`&amp;`), while `<script>`
@@ -170,13 +170,12 @@ describe('index.html JSON-LD', () => {
   });
 
   it('links the same profiles the Connect section links', () => {
-    // Derived from Connect.tsx rather than retyped, so the structured data
-    // cannot drift away from the links a visitor actually sees.
-    const github = connectSource.match(/href:\s*'(https:\/\/github\.com\/[^']+)'/)?.[1];
-    const linkedin = connectSource.match(/href:\s*'(https:\/\/linkedin\.com\/[^']+)'/)?.[1];
-    expect(github).toBeDefined();
-    expect(linkedin).toBeDefined();
-    expect(nodeOfType('Person')?.sameAs).toEqual([github, linkedin]);
+    // Compared against src/data/profile.ts, the constants Connect renders,
+    // rather than retyped here — so the structured data cannot drift away
+    // from the links a visitor actually sees. This used to regex the hrefs
+    // out of Connect.tsx source; that broke the moment the hrefs became
+    // imported constants, which is exactly the refactor it should survive.
+    expect(nodeOfType('Person')?.sameAs).toEqual([GITHUB_PROFILE_URL, LINKEDIN_URL]);
   });
 
   it('publishes no email address', () => {

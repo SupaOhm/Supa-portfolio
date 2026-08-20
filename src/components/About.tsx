@@ -3,10 +3,16 @@ import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { useReveal } from '../hooks/useReveal';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
-import { ACADEMIC_YEAR, EXPECTED_GRADUATION, GPA } from '../data/profile';
-
-const GITHUB_USERNAME = 'SupaOhm';
-const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
+import {
+  ACADEMIC_YEAR,
+  EMAIL,
+  EXPECTED_GRADUATION,
+  FULL_NAME,
+  GITHUB_AVATAR_URL,
+  GITHUB_PROFILE_URL,
+  GITHUB_USERNAME,
+  GPA,
+} from '../data/profile';
 
 const RELEVANT_COURSES = [
   'Data Structures and Algorithms',
@@ -28,8 +34,8 @@ const RELEVANT_COURSES = [
 ];
 
 const PERSONAL_INFO = [
-  { label: 'Full Name', value: 'Supakorn Prayongyam' },
-  { label: 'Email', value: 'ohm.supakornth@gmail.com' },
+  { label: 'Full Name', value: FULL_NAME },
+  { label: 'Email', value: EMAIL },
   { label: 'Location', value: 'Pathum Thani | Bangkok, Thailand' },
   { label: 'Education', value: 'Computer Engineering | SIIT, Thammasat U.' },
   { label: 'Year', value: `${ACADEMIC_YEAR} | GPA ${GPA} | Expected ${EXPECTED_GRADUATION}` },
@@ -126,7 +132,7 @@ export default function About() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
-                  src={githubStats?.avatarUrl ?? `https://github.com/${GITHUB_USERNAME}.png`}
+                  src={githubStats?.avatarUrl ?? GITHUB_AVATAR_URL}
                   alt={`${GITHUB_USERNAME} GitHub avatar`}
                   className="w-12 h-12 rounded-full border border-gray-600 object-cover"
                   loading="lazy"

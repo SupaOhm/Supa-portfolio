@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
+import { GITHUB_PROFILE_URL } from '../data/profile';
 
 const NAV_LINKS = [
   { id: 'home', label: 'Home' },
@@ -75,7 +76,7 @@ export default function Navbar() {
 
             {/* GitHub Icon Button */}
             <a
-              href="https://github.com/SupaOhm"
+              href={GITHUB_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-blue-400 transition-all duration-300 hover:scale-110 p-2 hover:bg-blue-500/10 rounded-lg"

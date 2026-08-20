@@ -1,3 +1,5 @@
+import { EMAIL } from '../data/profile';
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -12,7 +14,7 @@ export default function Footer() {
         <div className="h-px bg-gradient-to-r from-transparent via-gray-700/50 to-transparent" />
         <div className="mt-6 text-center">
           <p className="text-gray-400 text-sm">
-            ohm.supakornth@gmail.com
+            {EMAIL}
           </p>
         </div>
       </div>
