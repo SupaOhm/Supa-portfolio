@@ -31,6 +31,16 @@ export interface MatchMediaDouble {
   removeListenerCount(): number;
 }
 
+/**
+ * Limitation: this double tracks a single `matches` value and a single
+ * "last query" shared across every call to `matchMedia()` on the same
+ * instance. That's fine for the single-query consumers this project has
+ * today (one hook, one media query, one double per test), but if a test
+ * ever drove two distinct media queries off one instance, `setMatches`
+ * would notify both queries' listeners identically and `queries()` would
+ * interleave both call streams. No consumer needs that today, so this is
+ * documented rather than built.
+ */
 export function createMatchMedia(options: { reduced?: boolean } = {}): MatchMediaDouble {
   let matches = options.reduced ?? false;
   const listeners = new Set<(event: MediaQueryListEvent) => void>();
@@ -65,15 +75,26 @@ export function createMatchMedia(options: { reduced?: boolean } = {}): MatchMedi
   return {
     matchMedia,
     install() {
-      const previous = Object.getOwnPropertyDescriptor(window, 'matchMedia');
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        configurable: true,
-        value: matchMedia,
-      });
+      // Plain assignment, not Object.defineProperty: setup.ts installs this
+      // property with `configurable` left unspecified, which defaults to
+      // false on a brand-new property. Restoring via defineProperty would
+      // need to promote configurable back to true, which V8 forbids once a
+      // property has been defined non-configurable — it throws
+      // "Cannot redefine property" before the restore closure is even
+      // returned. Assignment sidesteps the whole descriptor dance: it only
+      // needs `writable`, which setup.ts does set to true, and it doesn't
+      // care about `configurable` in either direction. Capture the previous
+      // *value* (and whether the property existed at all) and restore by
+      // assignment too, for symmetry.
+      const hadOwn = Object.prototype.hasOwnProperty.call(window, 'matchMedia');
+      const previous = window.matchMedia;
+      window.matchMedia = matchMedia;
       return () => {
-        if (previous) {
-          Object.defineProperty(window, 'matchMedia', previous);
+        if (hadOwn) {
+          window.matchMedia = previous;
+        } else {
+          // @ts-expect-error - removing a property that was never defined by us
+          delete window.matchMedia;
         }
       };
     },
@@ -134,14 +155,39 @@ export function createIntersectionObserver(): IntersectionObserverDouble {
 
   return {
     install() {
-      const previousWindow = Object.getOwnPropertyDescriptor(window, 'IntersectionObserver');
-      const previousGlobal = Object.getOwnPropertyDescriptor(globalThis, 'IntersectionObserver');
-      const descriptor = { writable: true, configurable: true, value: Stub };
-      Object.defineProperty(window, 'IntersectionObserver', descriptor);
-      Object.defineProperty(globalThis, 'IntersectionObserver', descriptor);
+      // Plain assignment, not Object.defineProperty: setup.ts defines
+      // window.IntersectionObserver with `configurable` left unspecified,
+      // which defaults to false since jsdom has no native
+      // IntersectionObserver for this to be redefining. defineProperty here
+      // would need to promote configurable false -> true, which is
+      // forbidden and throws "Cannot redefine property: IntersectionObserver"
+      // — this is exactly the bug this double exists to fix. matchMedia's
+      // twin install() escapes this only because jsdom's Window.prototype
+      // already exposes matchMedia, so setup.ts's equally partial descriptor
+      // there inherits configurable: true from the prototype's own
+      // property. Assignment needs no configurable promotion in either
+      // case, so use it for both and keep the two installers symmetric.
+      // Capture the previous *value* (and whether the property existed at
+      // all) and restore by assignment too.
+      const hadOwnWindow = Object.prototype.hasOwnProperty.call(window, 'IntersectionObserver');
+      const hadOwnGlobal = Object.prototype.hasOwnProperty.call(globalThis, 'IntersectionObserver');
+      const previousWindow = window.IntersectionObserver;
+      const previousGlobal = globalThis.IntersectionObserver;
+      window.IntersectionObserver = Stub as unknown as typeof IntersectionObserver;
+      globalThis.IntersectionObserver = Stub as unknown as typeof IntersectionObserver;
       return () => {
-        if (previousWindow) Object.defineProperty(window, 'IntersectionObserver', previousWindow);
-        if (previousGlobal) Object.defineProperty(globalThis, 'IntersectionObserver', previousGlobal);
+        if (hadOwnWindow) {
+          window.IntersectionObserver = previousWindow;
+        } else {
+          // @ts-expect-error - removing a property that was never defined by us
+          delete window.IntersectionObserver;
+        }
+        if (hadOwnGlobal) {
+          globalThis.IntersectionObserver = previousGlobal;
+        } else {
+          // @ts-expect-error - removing a property that was never defined by us
+          delete globalThis.IntersectionObserver;
+        }
       };
     },
     lastOptions: () => lastOptions,
