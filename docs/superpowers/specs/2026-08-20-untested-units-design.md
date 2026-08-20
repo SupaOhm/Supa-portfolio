@@ -130,7 +130,7 @@ limit, from a test suite that runs on every change.
 ## Scope
 
 Eight files: one new test-double module and seven new test files, for a total of
-**31 tests**.
+**32 tests**.
 
 ### `src/test/doubles.ts` (new module, no tests of its own)
 
@@ -163,7 +163,7 @@ Per D1.
 4. Passes `threshold` through to the observer options.
 5. Disconnects on unmount.
 
-### `src/hooks/useActiveSection.dom.test.tsx` — 8 tests
+### `src/hooks/useActiveSection.dom.test.tsx` — 9 tests
 
 1. Returns the first id in `sectionIds` before any scroll.
 2. The section occupying the most viewport height becomes active.
@@ -173,8 +173,9 @@ Per D1.
 5. Recomputes on `scroll`.
 6. Recomputes on `transitionend` on `#about` (the expand/collapse case).
 7. Removes both the scroll and the `transitionend` listener on unmount.
-8. `scrollToSection`: a missing id is a no-op; an existing id calls
-   `scrollIntoView` after the `setTimeout(…, 0)`, with the behaviour
+8. `scrollToSection` is a no-op when the id is not on the page.
+9. `scrollToSection` calls `scrollIntoView` on the target **after** the
+   `setTimeout(…, 0)` and not before, with the behaviour
    `currentScrollBehavior()` returned.
 
 ### `src/components/Footer.test.tsx` — 2 tests
