@@ -11,7 +11,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run images` — re-encode project image originals in `assets-src/projects/` into the 800px `.webp` files under `public/images/projects/` (`scripts/optimize-images.ts`). Manual/local only, never run in CI. Requires macOS (`sips`) and `cwebp` (`brew install webp`), plus Node 22.18+/23.6+ specifically for this command — it executes a bare `.ts` file, which needs Node's unflagged native type stripping and fails on the project's Node 20 `engines` floor with a parse error rather than a friendly message.
 - `npm run og` — render `assets-src/og/og.html` to the 1200×630 `public/og.png` Open Graph card (`scripts/render-og.ts`) via headless Chrome, with the Chrome binary path hardcoded for macOS. Manual/local only, never run in CI — same trap as `npm run images`: it executes a bare `.ts` file, which needs Node 22.18+/23.6+ for unflagged native type stripping and fails on the project's Node 20 `engines` floor with a parse error rather than a friendly message.
 
-`npm test` runs the Vitest suite (214 tests across 26 files, `environment: 'node'`, no jsdom); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
+`npm test` runs the Vitest suite (280 tests across 34 files); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
+
+The suite's default `environment` is `'node'`. Files that need a DOM opt in individually with `// @vitest-environment jsdom` as their **first line** — there is no global jsdom. `src/test/setup.ts` runs for every file regardless, and guards its whole body behind `typeof window !== 'undefined'` for exactly that reason.
+
+**`src/test/setup.ts` stubs `matchMedia`, `IntersectionObserver` and `scrollIntoView` deliberately inert** — `matchMedia` always reports `matches: false` and its `addEventListener` never fires; the `IntersectionObserver` stub records nothing. That is correct for its job (stopping component tests throwing on mount) but it means a test written against the default environment for reduced-motion or reveal behaviour **passes while asserting nothing**. `src/test/doubles.ts` exists for that case: controllable versions of those globals plus `stubRect`, imported only by the files that drive them, so `setup.ts` never has to change under the tests that depend on it. jsdom also performs no layout, so every `getBoundingClientRect()` returns zeros while `innerHeight` is 768 — `stubRect` is what makes geometry-dependent tests real rather than vacuous.
 
 ## Architecture
 
