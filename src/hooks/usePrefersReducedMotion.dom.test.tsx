@@ -34,6 +34,10 @@ describe('usePrefersReducedMotion', () => {
     const { result } = renderHook(() => usePrefersReducedMotion());
 
     expect(result.current).toBe(false);
+    // Pins the literal query string the hook asks matchMedia for. Without this,
+    // the hook could query any string (or a typo'd one) and still pass every
+    // other assertion in this file, since createMatchMedia answers any query.
+    expect(media.queries()).toContain('(prefers-reduced-motion: reduce)');
   });
 
   it('follows the setting changing while the page is open', () => {

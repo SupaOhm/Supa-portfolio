@@ -51,6 +51,24 @@ describe('useReveal', () => {
     expect(result.current.isVisible).toBe(true);
   });
 
+  it('observes the ref element', () => {
+    const observer = createIntersectionObserver();
+    restore = observer.install();
+
+    const { element } = renderReveal();
+
+    expect(observer.observed()).toContain(element);
+  });
+
+  it('defaults the threshold to 0.1 when none is given', () => {
+    const observer = createIntersectionObserver();
+    restore = observer.install();
+
+    renderReveal();
+
+    expect(observer.lastOptions()?.threshold).toBe(0.1);
+  });
+
   it('reveals once and stays revealed', () => {
     // The hook disconnects after the first intersection on purpose. If it kept
     // observing, scrolling a revealed section back out of view would hide it

@@ -3,15 +3,19 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { renderHook, cleanup } from '@testing-library/react';
 import { act } from 'react';
 import { useActiveSection, scrollToSection } from './useActiveSection';
-import { stubRect } from '../test/doubles';
+import { stubRect, createMatchMedia } from '../test/doubles';
 
 const IDS = ['home', 'about', 'projects'] as const;
+
+let restoreMatchMedia: (() => void) | undefined;
 
 afterEach(() => {
   cleanup();
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
+  restoreMatchMedia?.();
+  restoreMatchMedia = undefined;
 });
 
 /** Creates the three sections and gives each a fake layout box. */
@@ -103,6 +107,29 @@ describe('useActiveSection', () => {
     expect(result.current).toBe('about');
   });
 
+  it('stays below threshold just under the cutoff and activates just over it', () => {
+    // DEFAULT_VISIBILITY_THRESHOLD is 0.1 and jsdom's window.innerHeight is 768,
+    // so the occupancy cutoff is 76.8px of visible height (visibleHeight / 768).
+    // 60px (60/768 ≈ 0.078) sits clearly below that; 120px (120/768 ≈ 0.156)
+    // sits clearly above it — both comfortably clear of rounding at the boundary.
+    mountSections({
+      home: { top: 5000, bottom: 5100 }, // fully off-screen: 0 occupancy
+      about: { top: 0, bottom: 60 }, // 60px visible — below threshold
+      projects: { top: 5000, bottom: 5100 },
+    });
+
+    const { result } = renderHook(() => useActiveSection(IDS));
+    // Below threshold: nothing clears 0.1, so the initial id is retained.
+    expect(result.current).toBe('home');
+
+    stubRect(document.getElementById('about')!, { top: 0, bottom: 120 }); // 120px — above threshold
+    act(() => {
+      window.dispatchEvent(new Event('scroll'));
+    });
+
+    expect(result.current).toBe('about');
+  });
+
   it('does nothing at all when disabled', () => {
     mountSections({ about: { top: 0, bottom: 768 } });
     const addSpy = vi.spyOn(window, 'addEventListener');
@@ -155,8 +182,27 @@ describe('scrollToSection', () => {
 
     expect(scrollSpy).toHaveBeenCalledTimes(1);
     expect(scrollSpy.mock.contexts).toContain(target);
-    // setup.ts's matchMedia stub reports matches:false, so the behaviour
-    // currentScrollBehavior() returns here is 'smooth'.
+    // setup.ts's matchMedia stub reports matches:false, so currentScrollBehavior()
+    // returns 'smooth' here too — this assertion alone would still pass with a
+    // hardcoded 'smooth' at the call site. It only proves the *default* value is
+    // reached, not that the behaviour argument is actually wired through to
+    // currentScrollBehavior(); the reduced-motion test below proves the wiring.
     expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'smooth' });
+  });
+
+  it('scrolls with behavior "auto" when reduced motion is preferred', () => {
+    vi.useFakeTimers();
+    const media = createMatchMedia({ reduced: true });
+    restoreMatchMedia = media.install();
+
+    const target = document.createElement('section');
+    target.id = 'projects';
+    document.body.appendChild(target);
+    const scrollSpy = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+    scrollToSection('projects');
+    vi.runAllTimers();
+
+    expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'auto' });
   });
 });
