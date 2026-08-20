@@ -23,7 +23,7 @@ direct test:
 | `src/hooks/useActiveSection.ts` | 92 | `Navbar.test.tsx` renders `Navbar`, which calls it; no test drives scroll |
 | `src/components/Hero.tsx` | 160 | `landmarks.test.tsx`, and `integration.a11y.test.tsx` via `Home` |
 | `src/components/Connect.tsx` | 302 | `landmarks.test.tsx`, and `integration.a11y.test.tsx` via `Home` |
-| `src/components/Footer.tsx` | 23 | nothing — no test renders it |
+| `src/components/Footer.tsx` | 23 | nothing — it is mounted at `App.tsx:19`, and no test renders `App` |
 
 "Reached indirectly" is doing very little work here. The landmark and a11y
 integration tests assert that these components *render* and expose correct
@@ -73,13 +73,22 @@ hand-rolled copies are free to drift into disagreeing about what a
 
 The module exports:
 
-- `createMatchMedia({ reduced })` — a real implementation whose `setMatches(bool)`
-  dispatches an actual `change` event to every registered listener, and which
-  records `removeEventListener` calls so unsubscription can be proven rather
-  than assumed.
+- `createMatchMedia({ reduced })` — whose `setMatches(bool)` invokes every
+  registered `change` listener, and which records `removeEventListener` calls so
+  unsubscription can be proven rather than assumed.
 - `createIntersectionObserver()` — captures the constructor callback **and its
   options**, so `threshold` is assertable; exposes `trigger(entries)`; records
   `observe` and `disconnect` calls.
+
+**Probed, not assumed:** in this jsdom version both `MediaQueryListEvent` and
+`IntersectionObserverEntry` are `undefined` — neither global constructor exists.
+So the doubles cannot construct or `dispatchEvent` a real event. `setMatches`
+and `trigger` must call the registered listeners **directly**, passing a minimal
+object literal (`{ matches, media }` / the entry fields the hook reads) cast to
+the DOM type. `usePrefersReducedMotion` types its handler as
+`(event: MediaQueryListEvent) => void`, so this cast is required to typecheck,
+not optional. An implementer who writes `new MediaQueryListEvent('change')`
+because it is the obvious thing will get a `ReferenceError`.
 
 Both install and restore per test. **Restore puts back the original `setup.ts`
 stub rather than deleting the global** — deleting it would break any later test
@@ -101,10 +110,13 @@ existing test stays green — a failure with no other detector.
 ### D3. `useActiveSection` tests must stub `getBoundingClientRect`
 
 The hook decides the active section entirely from rect geometry against
-`window.innerHeight`. jsdom returns all-zero rects, so without stubbing, every
-section computes an occupancy of `0`, the `> 0.1` threshold never passes, and
-the hook appears to do nothing while the tests pass. Each test in this file
-stubs rects per element. This is the most expensive file in the slice and the
+`window.innerHeight`. Probed values: jsdom reports `window.innerHeight` as
+**768** (a usable denominator) but every `getBoundingClientRect()` returns
+**all zeros**. So without stubbing, every section computes an occupancy of `0`,
+the `> 0.1` threshold never passes, and the hook appears to do nothing while
+its tests pass. `getBoundingClientRect` is `writable: true` on
+`Element.prototype`, so per-element stubbing works; each test in this file does
+it. This is the most expensive file in the slice and the
 reason its estimate is roughly double the others'.
 
 ### D4. `Connect` mocks `useGitHubProfile`
@@ -118,7 +130,7 @@ limit, from a test suite that runs on every change.
 ## Scope
 
 Eight files: one new test-double module and seven new test files, for a total of
-**30 tests**.
+**31 tests**.
 
 ### `src/test/doubles.ts` (new module, no tests of its own)
 
@@ -140,7 +152,7 @@ Per D1.
 3. Flips live when a `change` event fires.
 4. Removes its listener on unmount.
 
-### `src/hooks/useReveal.dom.test.tsx` — 4 tests
+### `src/hooks/useReveal.dom.test.tsx` — 5 tests
 
 1. `isVisible` is `false` before any intersection.
 2. Becomes `true` when the observer callback reports an intersecting entry.
@@ -148,7 +160,8 @@ Per D1.
    and `isVisible` stays `true` when a later non-intersecting entry arrives. If
    this regressed, revealed content would flicker on scroll-back — invisible in
    code review, obvious to a visitor.
-4. Passes `threshold` through to the observer options, and disconnects on unmount.
+4. Passes `threshold` through to the observer options.
+5. Disconnects on unmount.
 
 ### `src/hooks/useActiveSection.dom.test.tsx` — 8 tests
 
@@ -201,6 +214,13 @@ stable and the effect does not re-subscribe today. A caller passing an array
 literal would re-subscribe on every render. The slice pins the current
 stable-reference expectation; if the re-subscribe proves reachable from real
 call sites, it is fixed separately rather than folded in here.
+
+`useReveal` has the same shape — `threshold` sits in its dependency array — but
+it was checked and is **not** reachable: both call sites (`Skills.tsx:13`,
+`About.tsx:79`) invoke `useReveal<HTMLElement>()` with no argument, so the
+parameter default is a stable primitive. This is recorded so that nobody
+"fixes" a non-problem, and so the fact is on file if a future caller passes a
+threshold explicitly.
 
 ---
 
