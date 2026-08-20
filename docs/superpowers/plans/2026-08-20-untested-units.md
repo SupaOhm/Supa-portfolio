@@ -1178,7 +1178,23 @@ git checkout src/components/Connect.tsx src/data/profile.ts
 Run after each: `npx vitest run src/components/Connect.test.tsx`
 Expected: the named test FAILS.
 
-Note: Break 3 also fails `scripts/profile-drift.test.ts` and `scripts/discoverability.test.ts`. That is correct — three independent guards catching one wrong value is the design working.
+Note: Break 3 fails **exactly one** test — `scripts/discoverability.test.ts`'s
+"links the same profiles the Connect section links". Measured, after this plan
+was first written, which claimed three guards would fire. They do not, and the
+reason is worth understanding rather than treating as a gap:
+
+- `discoverability.test.ts` catches it because `index.html` hardcodes the
+  literal profile URL in its JSON-LD. That hardcoded copy is an **independent
+  value**, so a mismatch is detectable.
+- `scripts/profile-drift.test.ts` does not, and should not. Its job is "no
+  component hardcodes this literal", and that stays true when the constant
+  changes.
+- This task's own link test does not either: it asserts the rendered `href`
+  equals `LINKEDIN_URL`, and both sides move together. Its job is "the constant
+  reaches the DOM", not "the constant is correct".
+
+Only a second, independently-authored copy of a value can catch that value being
+wrong. There is exactly one such copy here, and exactly one test fires.
 
 - [ ] **Step 5: Run the full gate**
 
