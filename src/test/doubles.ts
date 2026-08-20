@@ -75,17 +75,12 @@ export function createMatchMedia(options: { reduced?: boolean } = {}): MatchMedi
   return {
     matchMedia,
     install() {
-      // Plain assignment, not Object.defineProperty: setup.ts installs this
-      // property with `configurable` left unspecified, which defaults to
-      // false on a brand-new property. Restoring via defineProperty would
-      // need to promote configurable back to true, which V8 forbids once a
-      // property has been defined non-configurable — it throws
-      // "Cannot redefine property" before the restore closure is even
-      // returned. Assignment sidesteps the whole descriptor dance: it only
-      // needs `writable`, which setup.ts does set to true, and it doesn't
-      // care about `configurable` in either direction. Capture the previous
-      // *value* (and whether the property existed at all) and restore by
-      // assignment too, for symmetry.
+      // Plain assignment, not Object.defineProperty: vitest pre-seeds
+      // matchMedia as a configurable property before setup.ts runs, so
+      // setup.ts's defineProperty call redefines an already-configurable
+      // property (allowed). Assignment works in both directions without
+      // needing to check or promote configurable status. Capture the
+      // previous *value* and restore by assignment too.
       const hadOwn = Object.prototype.hasOwnProperty.call(window, 'matchMedia');
       const previous = window.matchMedia;
       window.matchMedia = matchMedia;
@@ -155,20 +150,18 @@ export function createIntersectionObserver(): IntersectionObserverDouble {
 
   return {
     install() {
-      // Plain assignment, not Object.defineProperty: setup.ts defines
-      // window.IntersectionObserver with `configurable` left unspecified,
-      // which defaults to false since jsdom has no native
-      // IntersectionObserver for this to be redefining. defineProperty here
-      // would need to promote configurable false -> true, which is
-      // forbidden and throws "Cannot redefine property: IntersectionObserver"
-      // — this is exactly the bug this double exists to fix. matchMedia's
-      // twin install() escapes this only because jsdom's Window.prototype
-      // already exposes matchMedia, so setup.ts's equally partial descriptor
-      // there inherits configurable: true from the prototype's own
-      // property. Assignment needs no configurable promotion in either
-      // case, so use it for both and keep the two installers symmetric.
-      // Capture the previous *value* (and whether the property existed at
-      // all) and restore by assignment too.
+      // Plain assignment, not Object.defineProperty: vitest does not
+      // pre-seed IntersectionObserver, so setup.ts's defineProperty call
+      // creates a brand-new property with default configurable: false.
+      // A later defineProperty trying to promote configurable to true throws
+      // TypeError — this is exactly the bug this double exists to fix.
+      // matchMedia works because vitest pre-seeds it as configurable, so
+      // setup.ts redefines an already-configurable property (allowed).
+      // Assignment works in both cases without needing to check or manage
+      // configurable status. Warning: any future double for a global not
+      // pre-seeded (e.g. ResizeObserver) will land in the IntersectionObserver
+      // case, not the matchMedia case. Assignment is used because it works for
+      // both. Capture the previous *value* and restore by assignment too.
       const hadOwnWindow = Object.prototype.hasOwnProperty.call(window, 'IntersectionObserver');
       const hadOwnGlobal = Object.prototype.hasOwnProperty.call(globalThis, 'IntersectionObserver');
       const previousWindow = window.IntersectionObserver;
