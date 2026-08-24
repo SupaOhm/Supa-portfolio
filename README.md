@@ -8,7 +8,7 @@ A modern, interactive developer portfolio built with **React 19**, **TypeScript*
 
 ## ✨ Features
 
-- **Single-page, section-based navigation** — Home, About, Skills, Projects, and Connect live on one page; the navbar tracks the section in view with an `IntersectionObserver` and scrolls smoothly to it.
+- **Single-page, section-based navigation** — Home, About, Skills, Projects, and Connect live on one page; the navbar tracks the section in view with a scroll listener that picks the section occupying most of the viewport (`useActiveSection`) and scrolls smoothly to it.
 - **3D project carousel** — Perspective-transformed cards where the center card is full-size and bright while neighbors rotate and dim for depth, with looping next/previous controls and dot navigation.
 - **Grid ↔ carousel toggle** — Switch between an immersive carousel and a scannable grid.
 - **Category filtering** — Filter projects across Web, Mobile, Backend, Database, Tools, Embedded, Security, Cloud, AI, Design, and Data, each with a live count badge.
@@ -62,7 +62,7 @@ npm run lint
 ```
 src/
 ├── components/
-│   ├── Navbar.tsx        # Section tracking (IntersectionObserver) + smooth scroll nav
+│   ├── Navbar.tsx        # Section tracking (useActiveSection) + smooth scroll nav
 │   ├── Hero.tsx          # Typing animation + cursor-following gradient
 │   ├── About.tsx         # Bio + compact live GitHub snapshot
 │   ├── Skills.tsx        # Skills grouped by category
@@ -95,7 +95,7 @@ Project images are static assets in `public/images/projects/`, referenced by abs
 
 - `/about`, `/projects`, and `/connect` don't render their own page content — each renders `RedirectToSection`, which immediately redirects to `/` carrying a target section ID, so a direct link to `/projects` lands you on the single page, scrolled to Projects.
 - Any other URL renders `NotFound`. This only works in production because `vercel.json` rewrites every unmatched path to `index.html` — without it, Vercel's static host would 404 before React Router ever sees the URL.
-- The **navbar** observes each section (threshold ~0.6) to highlight the active one and triggers `scrollIntoView` for smooth jumps.
+- The **navbar** highlights the active section by measuring viewport occupancy on scroll (`useActiveSection`, 10% floor), and triggers `scrollIntoView` for smooth jumps. `scroll-padding-top` on `html` keeps the target from landing behind the fixed bar.
 - When you arrive at `/` from elsewhere, `Home.tsx` reads `location.state.targetId` (or the URL hash) and scrolls to that section on mount.
 
 When extending navigation, treat `/about`, `/projects`, `/connect` as redirect-only entry points, not as pages — the primary path renders everything inside `Home`.
