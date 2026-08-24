@@ -5,6 +5,30 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+
+    /* Lands a scrolled-to section below the fixed navbar instead of behind it.
+       Without this, every scrollIntoView / #hash jump aligns the section flush
+       to the top of the scrollport, so the bar eats the top ~90px of it. Each
+       section's own top padding was all that kept its heading visible, which
+       held by accident until it didn't: measured in Chrome, #connect's heading
+       sat 10px *under* the bar at 1280px wide.
+
+       The value must clear the navbar's bottom edge, which is set in
+       Navbar.tsx: mobile is `top-0` + `h-14` (0 -> 56px, 57 with its border-b),
+       so 4rem leaves ~7px; from `sm` it is `sm:top-6` + `sm:h-16` (24 -> 88px,
+       90 with the 1px border on both edges), so 6rem leaves ~6px. Each section
+       then renders its own padding in full, below the bar rather than under it.
+
+       640px is Tailwind's `sm` breakpoint -- written literally rather than via
+       @screen, which Tailwind v4 removed. scripts/scroll-offset.test.ts reads
+       those class names back and fails if either side drifts. */
+    scroll-padding-top: 4rem;
+  }
+
+  @media (min-width: 640px) {
+    html {
+      scroll-padding-top: 6rem;
+    }
   }
   
   body {
