@@ -11,12 +11,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <article 
-      className="relative h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl overflow-hidden border border-gray-700/50 hover:border-blue-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20 group backdrop-blur-sm"
+      className="relative h-full bg-linear-to-br from-gray-800/50 to-gray-900/50 rounded-xl overflow-hidden border border-gray-700/50 hover:border-blue-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20 group backdrop-blur-xs"
       onMouseMove={handleMouseMove}
     >
       {/* Cursor-following gradient effects */}
-      <div className="cursor-glow w-[250px] h-[250px] bg-gradient-to-r from-blue-500/20 via-purple-500/15 to-transparent rounded-full blur-[60px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="cursor-glow w-[150px] h-[150px] bg-gradient-to-r from-blue-400/15 to-transparent rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="cursor-glow w-[250px] h-[250px] bg-linear-to-r from-blue-500/20 via-purple-500/15 to-transparent rounded-full blur-[60px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="cursor-glow w-[150px] h-[150px] bg-linear-to-r from-blue-400/15 to-transparent rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
       {/* Project Image */}
       {project.imageUrl ? (
@@ -45,7 +45,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           {project.tags.map((tag) => (
             <li
               key={tag}
-              className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-gray-300 rounded-md text-xs border border-blue-500/20 hover:border-blue-400/50 hover:text-blue-300 transition-all duration-200"
+              className="px-3 py-1 bg-linear-to-r from-blue-500/10 to-purple-500/10 text-gray-300 rounded-md text-xs border border-blue-500/20 hover:border-blue-400/50 hover:text-blue-300 transition-all duration-200"
             >
               {tag}
             </li>
@@ -60,7 +60,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110 p-1 hover:bg-blue-500/10 rounded"
+                className="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110 p-1 hover:bg-blue-500/10 rounded-sm"
                 aria-label="View source code"
               >
                 <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
@@ -73,7 +73,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 href={project.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110 p-3 hover:bg-blue-500/10 rounded"
+                className="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110 p-3 hover:bg-blue-500/10 rounded-sm"
                 aria-label="View live demo"
               >
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,10 +88,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap transition-all duration-300 ${
                 project.status === 'completed'
-                  ? 'bg-gradient-to-r from-green-500/25 to-emerald-500/25 text-green-300 border border-green-400/40'
+                  ? 'bg-linear-to-r from-green-500/25 to-emerald-500/25 text-green-300 border border-green-400/40'
                   : project.status === 'in-progress'
-                  ? 'bg-gradient-to-r from-yellow-500/25 to-orange-500/25 text-yellow-300 border border-yellow-400/40'
-                  : 'bg-gradient-to-r from-blue-500/25 to-cyan-500/25 text-blue-300 border border-blue-400/40'
+                  ? 'bg-linear-to-r from-yellow-500/25 to-orange-500/25 text-yellow-300 border border-yellow-400/40'
+                  : 'bg-linear-to-r from-blue-500/25 to-cyan-500/25 text-blue-300 border border-blue-400/40'
               }`}
             >
               {project.status === 'in-progress' ? 'In Progress' : project.status.charAt(0).toUpperCase() + project.status.slice(1)}

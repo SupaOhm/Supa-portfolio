@@ -57,10 +57,10 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav aria-label="Main" className={`fixed top-0 left-0 right-0 sm:top-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-full sm:w-[90%] max-w-4xl z-50 transition-all duration-300 sm:border-[1px] ${
+    <nav aria-label="Main" className={`fixed top-0 left-0 right-0 sm:top-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-full sm:w-[90%] max-w-4xl z-50 transition-all duration-300 sm:border ${
       isScrolled 
         ? 'bg-gray-950/95 backdrop-blur-md border-b sm:border-blue-500/40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' 
-        : 'bg-gray-950/70 backdrop-blur-sm border-b sm:border-gray-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
+        : 'bg-gray-950/70 backdrop-blur-xs border-b sm:border-gray-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
     }`}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
@@ -69,7 +69,7 @@ export default function Navbar() {
             {/* Logo with gradient */}
             <button
               onClick={() => handleSectionClick('home')}
-              className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all duration-300 hover:scale-105"
+              className="text-xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all duration-300 hover:scale-105"
             >
               Portfolio
             </button>
@@ -99,7 +99,7 @@ export default function Navbar() {
                 }`}
               >
                 {link.label}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-300 ${isLinkActive(link.id) ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-linear-to-r from-blue-400 to-purple-400 transition-all duration-300 ${isLinkActive(link.id) ? 'w-full' : 'w-0 group-hover:w-full'}`} />
               </button>
             ))}
           </div>
@@ -108,7 +108,7 @@ export default function Navbar() {
           <button
             ref={menuToggleRef}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 rounded p-2 transition-all duration-300 hover:bg-gray-800/50"
+            className="md:hidden text-gray-300 hover:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-400 rounded-sm p-2 transition-all duration-300 hover:bg-gray-800/50"
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"

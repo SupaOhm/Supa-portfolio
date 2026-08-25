@@ -65,7 +65,7 @@ type InfoCardProps = {
 
 function InfoCard({ title, icon, accentClass, children }: InfoCardProps) {
   return (
-    <div className={`group p-6 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
+    <div className={`group p-6 bg-linear-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl backdrop-blur-xs transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${accentClass}`}>
       <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
         {icon}
         {title}
@@ -83,13 +83,13 @@ export default function About() {
   return (
     <section ref={sectionRef} id="about" aria-labelledby="about-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
       
       <div className="max-w-4xl mx-auto relative z-10">
         <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-300/80 text-center mb-3">
           Professional Summary
         </p>
-        <h2 id="about-heading" className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8 text-center">
+        <h2 id="about-heading" className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8 text-center">
           About Me
         </h2>
         
@@ -128,7 +128,7 @@ export default function About() {
           </h3>
           
           {/* GitHub Profile Card */}
-          <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-4 sm:p-5 max-w-2xl mx-auto text-left">
+          <div className="bg-gray-800/30 backdrop-blur-xs border border-gray-700 rounded-xl p-4 sm:p-5 max-w-2xl mx-auto text-left">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
@@ -252,7 +252,7 @@ export default function About() {
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                       <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-1000 ease-out group-hover/lang:shadow-lg group-hover/lang:shadow-blue-500/50"
+                        className="bg-linear-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-1000 ease-out group-hover/lang:shadow-lg group-hover/lang:shadow-blue-500/50"
                         style={{ 
                           width: `${lang.percentage}%`,
                           animation: isVisible ? `slideIn 1s ease-out ${index * 200}ms forwards` : 'none',

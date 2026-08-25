@@ -131,11 +131,11 @@ export default function Projects() {
         {carouselStatusText}
       </p>
 
-      <div className="max-w-7xl mx-auto relative z-10 marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-4 sm:p-8 border-[1px] border-gray-800/60 bg-gray-950/40 backdrop-blur-sm">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b-[1px] border-gray-800/60 pb-8 relative">
+      <div className="max-w-7xl mx-auto relative z-10 marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-4 sm:p-8 border border-gray-800/60 bg-gray-950/40 backdrop-blur-xs">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-gray-800/60 pb-8 relative">
           {/* Decorative lines */}
-          <div className="absolute top-0 left-0 w-8 h-[1px] bg-blue-500/50" />
-          <div className="absolute bottom-0 right-0 w-8 h-[1px] bg-purple-500/50" />
+          <div className="absolute top-0 left-0 w-8 h-px bg-blue-500/50" />
+          <div className="absolute bottom-0 right-0 w-8 h-px bg-purple-500/50" />
           
           <div className="text-center md:text-left flex-1 w-full md:w-auto">
             <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-400 mb-2">
@@ -152,7 +152,7 @@ export default function Projects() {
           <div className="mt-6 md:mt-0 flex gap-4 w-full md:w-auto items-center justify-center">
           <button
             onClick={() => setIsCarouselView((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-700/50 text-gray-300 rounded-lg hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white transition-all duration-300 border border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
+            className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-gray-800/50 to-gray-700/50 text-gray-300 rounded-lg hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white transition-all duration-300 border border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
             aria-pressed={isCarouselView}
             aria-label="Carousel view"
           >
@@ -210,7 +210,7 @@ export default function Projects() {
                             type="checkbox"
                             checked={selectedCategories.has(cat)}
                             onChange={() => toggleCategory(cat)}
-                            className="w-3.5 h-3.5 accent-blue-500 flex-shrink-0"
+                            className="w-3.5 h-3.5 accent-blue-500 shrink-0"
                           />
                           <span className="text-sm text-gray-300 group-hover:text-white flex-1">{cat}</span>
                           <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
@@ -231,9 +231,9 @@ export default function Projects() {
                             type="checkbox"
                             checked={selectedStatuses.has(st)}
                             onChange={() => toggleStatus(st)}
-                            className="w-3.5 h-3.5 accent-blue-500 flex-shrink-0"
+                            className="w-3.5 h-3.5 accent-blue-500 shrink-0"
                           />
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_COLORS[st]}`} />
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLORS[st]}`} />
                           <span className="text-sm text-gray-300 group-hover:text-white flex-1">{STATUS_LABELS[st]}</span>
                           <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.status === st).length})</span>
                         </label>
@@ -323,12 +323,12 @@ export default function Projects() {
             {/* Arrow Navigation */}
             {filteredProjects.length > 1 && (
               <>
-                <button onClick={prev} className="absolute left-0 sm:left-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Previous project">
+                <button onClick={prev} className="absolute left-0 sm:left-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-xs transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Previous project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <button onClick={next} className="absolute right-0 sm:right-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Next project">
+                <button onClick={next} className="absolute right-0 sm:right-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-xs transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Next project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>

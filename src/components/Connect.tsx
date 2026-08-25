@@ -90,10 +90,10 @@ export default function Connect() {
   return (
     <section id="connect" aria-labelledby="connect-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
       
       <div className="max-w-4xl mx-auto text-center relative z-10">
-        <h2 id="connect-heading" className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
+        <h2 id="connect-heading" className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
           Get In Touch
         </h2>
         <p className="text-gray-400 mb-10 max-w-2xl mx-auto">
@@ -114,10 +114,10 @@ export default function Connect() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onMouseMove={handleMouseMove}
-                className={`group flex flex-col items-center justify-center gap-2 rounded-xl border backdrop-blur-sm overflow-hidden relative transition-all duration-700 ease-in-out ${
+                className={`group flex flex-col items-center justify-center gap-2 rounded-xl border backdrop-blur-xs overflow-hidden relative transition-all duration-700 ease-in-out ${
                   hoveredLink === link.name
-                    ? 'bg-gradient-to-br from-blue-500/60 via-purple-500/50 to-blue-600/60 shadow-2xl shadow-blue-500/60 border-blue-400/90 text-white'
-                    : 'bg-gradient-to-r from-gray-800/50 to-gray-700/50 text-gray-300 border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20'
+                    ? 'bg-linear-to-br from-blue-500/60 via-purple-500/50 to-blue-600/60 shadow-2xl shadow-blue-500/60 border-blue-400/90 text-white'
+                    : 'bg-linear-to-r from-gray-800/50 to-gray-700/50 text-gray-300 border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20'
                 }`}
                 style={{
                   animation: reducedMotion ? 'none' : `fadeIn 0.5s ease-out ${index * 100}ms both`,
@@ -129,8 +129,8 @@ export default function Connect() {
                 {/* Cursor-following gradient effects */}
                 {hoveredLink === link.name && (
                   <>
-                    <div className="cursor-glow w-[160px] h-[160px] bg-gradient-to-r from-blue-400/30 via-purple-400/25 to-transparent rounded-full blur-[50px] pointer-events-none opacity-100" />
-                    <div className="cursor-glow w-[100px] h-[100px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[30px] pointer-events-none opacity-100" />
+                    <div className="cursor-glow w-[160px] h-[160px] bg-linear-to-r from-blue-400/30 via-purple-400/25 to-transparent rounded-full blur-[50px] pointer-events-none opacity-100" />
+                    <div className="cursor-glow w-[100px] h-[100px] bg-linear-to-r from-blue-300/25 to-transparent rounded-full blur-[30px] pointer-events-none opacity-100" />
                   </>
                 )}
                 
@@ -156,7 +156,7 @@ export default function Connect() {
             onClick={() => setShowAllDetails((prev) => !prev)}
             aria-expanded={showAllDetails}
             aria-controls="contact-details-panel"
-            className="px-4 py-3 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-blue-500/30 border border-blue-400/40 hover:border-blue-400/70 text-xs font-semibold text-blue-100 transition-all duration-300 shadow-sm hover:shadow-blue-500/20"
+            className="px-4 py-3 rounded-full bg-linear-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-blue-500/30 border border-blue-400/40 hover:border-blue-400/70 text-xs font-semibold text-blue-100 transition-all duration-300 shadow-xs hover:shadow-blue-500/20"
           >
             {showAllDetails ? 'Hide All Contact Details' : 'Show All Contact Details'}
           </button>
@@ -182,16 +182,16 @@ export default function Connect() {
                 onMouseEnter={() => setFullHoverName(link.name)}
                 onMouseLeave={resetFullHover}
                 onMouseMove={handleMouseMove}
-                className="group relative overflow-hidden flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-gray-800/60 to-gray-700/60 border border-gray-700/60 hover:border-blue-400/60 hover:from-blue-900/20 hover:to-purple-900/20 transition-all duration-300"
+                className="group relative overflow-hidden flex items-center gap-3 p-4 rounded-xl bg-linear-to-r from-gray-800/60 to-gray-700/60 border border-gray-700/60 hover:border-blue-400/60 hover:from-blue-900/20 hover:to-purple-900/20 transition-all duration-300"
               >
                 {fullHoverName === link.name && (
                   <>
-                    <span className="cursor-glow pointer-events-none w-[140px] h-[140px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-transparent rounded-full blur-[40px] opacity-80" />
-                    <span className="cursor-glow pointer-events-none w-[80px] h-[80px] bg-gradient-to-r from-blue-300/25 to-transparent rounded-full blur-[24px] opacity-80" />
+                    <span className="cursor-glow pointer-events-none w-[140px] h-[140px] bg-linear-to-r from-blue-500/20 via-purple-500/20 to-transparent rounded-full blur-2xl opacity-80" />
+                    <span className="cursor-glow pointer-events-none w-[80px] h-[80px] bg-linear-to-r from-blue-300/25 to-transparent rounded-full blur-xl opacity-80" />
                   </>
                 )}
                 <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="absolute -inset-6 bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 blur-3xl" />
+                  <span className="absolute -inset-6 bg-linear-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 blur-3xl" />
                 </span>
                 <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10 text-blue-200">
                   {link.icon}
@@ -206,7 +206,7 @@ export default function Connect() {
         </div>
 
         {/* Detailed GitHub Profile */}
-        <div className="mb-10 bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-6 text-left">
+        <div className="mb-10 bg-gray-800/30 backdrop-blur-xs border border-gray-700 rounded-xl p-6 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <img
