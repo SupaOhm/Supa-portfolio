@@ -52,7 +52,7 @@ export default function Hero() {
               Hola World
             </p>
             <h1 id="hero-heading" className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-[-0.04em] leading-[0.92]">
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-500">
+              <span className="block text-transparent bg-clip-text bg-linear-to-r from-blue-300 via-cyan-200 to-blue-500">
                 Supakorn
               </span>
               <span className="block text-gray-100">Prayongyam</span>
@@ -90,7 +90,7 @@ export default function Hero() {
             <button
               type="button"
               onClick={() => handleSectionClick('connect')}
-              className="group px-8 py-3 bg-gray-900 text-gray-300 font-bold uppercase tracking-wider text-sm transition-all shadow-tactile-dark border-2 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="group px-8 py-3 bg-gray-900 text-gray-300 font-bold uppercase tracking-wider text-sm transition-all shadow-tactile-dark border-2 border-gray-600 focus:outline-hidden focus:ring-2 focus:ring-blue-400"
             >
               Get in Touch
             </button>
@@ -102,13 +102,13 @@ export default function Hero() {
            <div className="absolute inset-0 bg-dot-pattern opacity-30" />
            
            {/* Technical framing lines */}
-           <div className="absolute top-0 right-0 w-32 h-32 border-t-[1px] border-r-[1px] border-blue-500/40" />
-           <div className="absolute bottom-0 left-0 w-32 h-32 border-b-[1px] border-l-[1px] border-purple-500/40" />
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-gray-700/50 to-transparent" />
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-[1px] bg-gradient-to-b from-transparent via-gray-700/50 to-transparent" />
+           <div className="absolute top-0 right-0 w-32 h-32 border-t border-r border-blue-500/40" />
+           <div className="absolute bottom-0 left-0 w-32 h-32 border-b border-l border-purple-500/40" />
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-linear-to-r from-transparent via-gray-700/50 to-transparent" />
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-px bg-linear-to-b from-transparent via-gray-700/50 to-transparent" />
 
            {/* Floating Code Block */}
-           <div className="relative z-10 p-6 border-[1px] border-gray-700/80 bg-gray-900/80 backdrop-blur-md shadow-2xl transform rotate-2 hover:rotate-0 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] shadow-blue-900/20">
+           <div className="relative z-10 p-6 border border-gray-700/80 bg-gray-900/80 backdrop-blur-md shadow-2xl transform rotate-2 hover:rotate-0 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] shadow-blue-900/20">
              <div className="flex gap-2 mb-4 border-b border-gray-700/50 pb-2">
                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
@@ -149,7 +149,7 @@ developer.initialize();`}
 
         {/* Scroll indicator - redesigned as a rigid arrow */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
-          <div className="w-[1px] h-12 bg-gradient-to-b from-blue-500 to-transparent animate-pulse" />
+          <div className="w-px h-12 bg-linear-to-b from-blue-500 to-transparent animate-pulse" />
           <button type="button" onClick={() => handleSectionClick('about')} className="text-blue-500 font-mono text-xs mt-2 uppercase tracking-widest hover:text-white transition-colors">
             Scroll
           </button>

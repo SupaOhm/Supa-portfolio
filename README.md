@@ -132,7 +132,7 @@ Edit the `SKILL_CATEGORIES` object in `src/components/Skills.tsx`.
 `GITHUB_USERNAME` is set in both `src/components/About.tsx` and `src/components/Connect.tsx`. Requests are unauthenticated and subject to GitHub's public rate limit (60 req/hr/IP), so expect occasional throttling during heavy local reloading.
 
 ### Theme
-The dark theme uses `gray-900`/`gray-950` backgrounds with `blue-*` and `purple-*` accents via Tailwind utility classes (`tailwind.config.js` has no custom theme extensions).
+The dark theme uses `gray-900`/`gray-950` backgrounds with `blue-*` and `purple-*` accents via Tailwind utility classes. Tailwind v4 is configured from CSS rather than a JS config file, and this project adds no theme customisation, so `src/index.css` opens with a bare `@import 'tailwindcss'`.
 
 ---
 

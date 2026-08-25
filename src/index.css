@@ -1,6 +1,154 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@utility cursor-glow {
+  /* Cursor-following glow. Position comes from --glow-x / --glow-y, written by
+     the useCursorGlow hook on the hovered ancestor; custom properties inherit,
+     so any number of glows can share one writer.
+
+     translate(-50%, -50%) is relative to the element's OWN size, which centres
+     each glow on the cursor regardless of its dimensions — this replaces the
+     per-element `left: x - width/2` arithmetic the inline styles used.
+
+     The var() fallbacks are required: an unset custom property makes the
+     transform declaration invalid at computed-value time, so `transform`
+     computes to `none` and the glow renders un-shifted at `top: 0; left: 0`
+     until the first mousemove. */
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(var(--glow-x, 0px), var(--glow-y, 0px), 0)
+    translate(-50%, -50%);
+}
+
+@utility animate-fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+/* Engineer's Blueprint Theme Utilities */
+@utility bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+@utility bg-dot-pattern {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+/* Tactile / Offset Shadow for buttons */
+@utility shadow-tactile {
+  box-shadow: 4px 4px 0px 0px rgba(59, 130, 246, 0.8);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 6px 6px 0px 0px rgba(59, 130, 246, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  &:active {
+    box-shadow: 0px 0px 0px 0px rgba(59, 130, 246, 0.8);
+    transform: translate(4px, 4px);
+  }
+}
+
+@utility shadow-tactile-dark {
+  box-shadow: 4px 4px 0px 0px rgba(107, 114, 128, 0.8);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 6px 6px 0px 0px rgba(107, 114, 128, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  &:active {
+    box-shadow: 0px 0px 0px 0px rgba(107, 114, 128, 0.8);
+    transform: translate(4px, 4px);
+  }
+}
+
+/* Crosshair marker for sections */
+@utility marker-cross {
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    background-color: rgba(156, 163, 175, 0.4);
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    background-color: rgba(156, 163, 175, 0.4);
+  }
+}
+
+@utility marker-cross-tl {
+  &::before {
+    top: 10px;
+    left: 0;
+    width: 20px;
+    height: 1px;
+  }
+  &::after {
+    top: 0;
+    left: 10px;
+    width: 1px;
+    height: 20px;
+  }
+}
+
+@utility marker-cross-tr {
+  &::before {
+    top: 10px;
+    right: 0;
+    width: 20px;
+    height: 1px;
+  }
+  &::after {
+    top: 0;
+    right: 10px;
+    width: 1px;
+    height: 20px;
+  }
+}
+
+@utility marker-cross-bl {
+  &::before {
+    bottom: 10px;
+    left: 0;
+    width: 20px;
+    height: 1px;
+  }
+  &::after {
+    bottom: 0;
+    left: 10px;
+    width: 1px;
+    height: 20px;
+  }
+}
+
+@utility marker-cross-br {
+  &::before {
+    bottom: 10px;
+    right: 0;
+    width: 20px;
+    height: 1px;
+  }
+  &::after {
+    bottom: 0;
+    right: 10px;
+    width: 1px;
+    height: 20px;
+  }
+}
+
+@utility animate-blink {
+  animation: blink 1s step-end infinite;
+}
 
 @layer base {
   html {
@@ -36,31 +184,10 @@
   }
 }
 
+/* Keyframes referenced by the @utility rules above and by inline `animation`
+   styles in Hero and Connect. slideIn has no utility -- Skills applies it
+   through an inline style. */
 @layer utilities {
-  /* Cursor-following glow. Position comes from --glow-x / --glow-y, written by
-     the useCursorGlow hook on the hovered ancestor; custom properties inherit,
-     so any number of glows can share one writer.
-
-     translate(-50%, -50%) is relative to the element's OWN size, which centres
-     each glow on the cursor regardless of its dimensions — this replaces the
-     per-element `left: x - width/2` arithmetic the inline styles used.
-
-     The var() fallbacks are required: an unset custom property makes the
-     transform declaration invalid at computed-value time, so `transform`
-     computes to `none` and the glow renders un-shifted at `top: 0; left: 0`
-     until the first mousemove. */
-  .cursor-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate3d(var(--glow-x, 0px), var(--glow-y, 0px), 0)
-               translate(-50%, -50%);
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 1s ease-in;
-  }
-
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -72,74 +199,6 @@
     }
   }
 
-  /* Engineer's Blueprint Theme Utilities */
-  .bg-grid-pattern {
-    background-size: 40px 40px;
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  }
-
-  .bg-dot-pattern {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
-
-  /* Tactile / Offset Shadow for buttons */
-  .shadow-tactile {
-    box-shadow: 4px 4px 0px 0px rgba(59, 130, 246, 0.8);
-    transition: all 0.2s ease;
-  }
-  
-  .shadow-tactile:hover {
-    box-shadow: 6px 6px 0px 0px rgba(59, 130, 246, 1);
-    transform: translate(-2px, -2px);
-  }
-
-  .shadow-tactile:active {
-    box-shadow: 0px 0px 0px 0px rgba(59, 130, 246, 0.8);
-    transform: translate(4px, 4px);
-  }
-
-  .shadow-tactile-dark {
-    box-shadow: 4px 4px 0px 0px rgba(107, 114, 128, 0.8);
-    transition: all 0.2s ease;
-  }
-  
-  .shadow-tactile-dark:hover {
-    box-shadow: 6px 6px 0px 0px rgba(107, 114, 128, 1);
-    transform: translate(-2px, -2px);
-  }
-
-  .shadow-tactile-dark:active {
-    box-shadow: 0px 0px 0px 0px rgba(107, 114, 128, 0.8);
-    transform: translate(4px, 4px);
-  }
-
-  /* Crosshair marker for sections */
-  .marker-cross {
-    position: relative;
-  }
-  .marker-cross::before, .marker-cross::after {
-    content: '';
-    position: absolute;
-    background-color: rgba(156, 163, 175, 0.4);
-  }
-  .marker-cross-tl::before { top: 10px; left: 0; width: 20px; height: 1px; }
-  .marker-cross-tl::after { top: 0; left: 10px; width: 1px; height: 20px; }
-  
-  .marker-cross-tr::before { top: 10px; right: 0; width: 20px; height: 1px; }
-  .marker-cross-tr::after { top: 0; right: 10px; width: 1px; height: 20px; }
-  
-  .marker-cross-bl::before { bottom: 10px; left: 0; width: 20px; height: 1px; }
-  .marker-cross-bl::after { bottom: 0; left: 10px; width: 1px; height: 20px; }
-  
-  .marker-cross-br::before { bottom: 10px; right: 0; width: 20px; height: 1px; }
-  .marker-cross-br::after { bottom: 0; right: 10px; width: 1px; height: 20px; }
-
-  .animate-blink {
-    animation: blink 1s step-end infinite;
-  }
-
   @keyframes blink {
     0%, 100% {
       opacity: 1;
@@ -148,8 +207,6 @@
       opacity: 0;
     }
   }
-
-  /* Slide-in animation for language bars */
   @keyframes slideIn {
     from {
       width: 0;

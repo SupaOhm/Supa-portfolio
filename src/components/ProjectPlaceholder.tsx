@@ -51,7 +51,7 @@ export default function ProjectPlaceholder({ project }: ProjectPlaceholderProps)
             {category}
           </span>
         )}
-        <span className="mt-2.5 text-3xl font-bold tracking-tight text-white/95 [text-wrap:balance] leading-tight">
+        <span className="mt-2.5 text-3xl font-bold tracking-tight text-white/95 text-balance leading-tight">
           {name}
         </span>
         <span
