@@ -111,8 +111,20 @@ describe('contact identity is not duplicated into components', () => {
  * hardcoding 'Best Paper Award, IEEE IMC 2026' directly into Hero.tsx in place
  * of {AWARD}, {VENUE} left all six Hero.test.tsx tests green. That test file
  * imports the same constants it asserts against, so both sides move together
- * and neither catches the value being wrong. Only an independently-authored
- * copy of the literal, like this one, catches it.
+ * and neither catches the value being wrong.
+ *
+ * What actually catches it here is that this block reads Hero's source text
+ * and asserts the constant's *value* does not appear there as a literal — not
+ * an independently-authored copy of the literal, since it imports AWARD/VENUE/
+ * PAPER_TITLE from the same src/data/profile module, the same pattern the
+ * contact-identity block above uses. Reading source rather than rendered
+ * output is exactly what makes it catch a fresh hardcode.
+ *
+ * It cannot catch a stale one: if VENUE later becomes 'IEEE IMC 2027' while
+ * Hero still carries a literal 'IEEE IMC 2026', all three tests below stay
+ * green, because that literal no longer equals VENUE's new value and so isn't
+ * found — the mismatch would only show up in Hero.test.tsx's rendered-output
+ * assertion. The two guards are sound only in combination.
  */
 describe('the award identity is not hardcoded into Hero', () => {
   const heroSource = readFileSync(join(COMPONENTS_DIR, 'Hero.tsx'), 'utf8');

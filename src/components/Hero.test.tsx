@@ -8,6 +8,7 @@ import {
   ACADEMIC_YEAR,
   AWARD,
   EXPECTED_GRADUATION,
+  GPA,
   INSTITUTION,
   LOCATION,
   PAPER_TITLE,
@@ -62,10 +63,16 @@ describe('Hero', () => {
     expect(screen.getByText(`${AWARD}, ${VENUE}`)).toBeInTheDocument();
   });
 
-  it('exposes exactly one top-level heading', () => {
+  it('exposes one h1 and no other headings', () => {
     renderHero();
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    // The band labels are deliberately <p>, not <h2>. Nothing else in the repo
+    // asserts heading levels — the landmark tests only check that regions
+    // resolve by accessible name — so without this, converting the three
+    // labels to headings would put three h2s inside the hero ahead of every
+    // section heading on the assembled page, with a green suite.
+    expect(screen.queryAllByRole('heading', { level: 2 })).toHaveLength(0);
   });
 
   it('scrolls to the projects section from the footer link', async () => {
@@ -92,6 +99,18 @@ describe('Hero', () => {
     target.remove();
   });
 
+  it('scrolls to the projects section from the paper link', async () => {
+    const target = withSection('projects');
+    renderHero();
+    const scrollIntoView = target.scrollIntoView as unknown as ReturnType<typeof vi.fn>;
+
+    await userEvent.click(screen.getByRole('button', { name: new RegExp(PAPER_TITLE) }));
+
+    expect(scrollIntoView).toHaveBeenCalled();
+    expect(scrollIntoView.mock.contexts).toContain(target);
+    target.remove();
+  });
+
   it('no longer renders the typewriter or the fake code block', () => {
     // Guards the redesign against a revert-by-accident. Both were the loudest
     // generated-looking elements on the page.
@@ -100,5 +119,10 @@ describe('Hero', () => {
     expect(container.querySelector('pre')).toBeNull();
     expect(container.querySelector('.cursor-glow')).toBeNull();
     expect(container.textContent).not.toMatch(/const developer/);
+    // The GPA is deliberately off the landing screen — it has no room in the
+    // band and About states it. Nothing else asserts this: profile-drift only
+    // forbids a hardcoded literal, so re-adding {GPA} from the constant would
+    // otherwise pass every test.
+    expect(container.textContent).not.toContain(GPA);
   });
 });

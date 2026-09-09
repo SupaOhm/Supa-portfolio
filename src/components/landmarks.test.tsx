@@ -33,11 +33,12 @@ describe('section landmarks', () => {
         <Hero />
       </MemoryRouter>,
     );
-    // The nameplate is the two name words as separate spans. jsdom loads no
-    // CSS, so the block-level separators the accname algorithm would insert
-    // in a browser are absent here; the regex tolerates the whitespace either way.
+    // The nameplate is the two name words as separate spans, joined only by a
+    // single JSX {' '} expression — the only thing spacing them at md: and up.
+    // \s+ (not \s*) is deliberate: \s* would still match if that {' '} were
+    // ever dropped, silently accepting the accessible name "SupakornPrayongyam".
     expect(
-      screen.getByRole('region', { name: /Supakorn\s*Prayongyam/ }),
+      screen.getByRole('region', { name: /Supakorn\s+Prayongyam/ }),
     ).toBeInTheDocument();
   });
 

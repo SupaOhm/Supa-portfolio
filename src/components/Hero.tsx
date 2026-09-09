@@ -73,9 +73,10 @@ export default function Hero() {
 
         <hr className="mt-6 h-px border-0 bg-gray-800" />
 
-        {/* Labels are <p>, not headings: three new h2s inside the hero would
-            change the document outline that landmarks.test.tsx and
-            integration.a11y.test.tsx read. */}
+        {/* Labels are <p>, not headings: three h2s here would put headings
+            inside the hero ahead of every section heading on the assembled
+            page. The guard is the level-2 assertion in Hero.test.tsx — the
+            landmark tests only check that regions resolve by accessible name. */}
         <div
           className="font-band animate-rise mt-8 grid grid-cols-1 gap-8 text-[15px] leading-relaxed md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]"
           style={{ animationDelay: '80ms' }}
