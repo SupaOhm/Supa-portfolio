@@ -20,12 +20,18 @@ import {
 const [FIRST_NAME, LAST_NAME] = FULL_NAME.split(' ');
 
 /**
- * Inline links replace the old padded CTA buttons. `py-3 -my-3` grows the hit
- * area to ~44px without moving the text baseline, so the band's rhythm is
- * unchanged and the target still meets the minimum on touch.
+ * Inline links replace the old padded CTA buttons. `py-3 -my-3` keeps the
+ * band's rhythm unchanged (it adds padding without moving the text baseline),
+ * but padding alone does not guarantee 44px everywhere these links appear: in
+ * the footer the surrounding `band-label` class sets an 11px font with no
+ * line-height override, so the inherited 1.5 gives a ~16.5px line box and
+ * padding alone lands around ~40px, not 44. `min-h-11` (2.75rem = 44px) is
+ * what actually guarantees 44px at both call sites -- the padding-only band
+ * usage and the footer's smaller-type usage alike. No test enforces this;
+ * jsdom performs no layout, so nothing here is measurable from the suite.
  */
 const LINK_CLASS =
-  'inline-flex items-baseline gap-2 py-3 -my-3 text-blue-400 ' +
+  'inline-flex items-baseline gap-2 py-3 -my-3 min-h-11 text-blue-400 ' +
   'hover:underline underline-offset-4 ' +
   'focus:outline-hidden focus:ring-2 focus:ring-blue-400';
 

@@ -48,10 +48,6 @@
     translate(-50%, -50%);
 }
 
-@utility animate-fade-in {
-  animation: fadeIn 1s ease-in;
-}
-
 /* ---- Editorial masthead (Hero) -------------------------------------------
 
    Three named type roles plus the nameplate sizing.
@@ -181,9 +177,17 @@
   }
 }
 
-/* Keyframes referenced by the @utility rules above and by one inline
-   `animation` style in Connect (Connect.tsx:123). Hero no longer sets an inline
-   `animation` -- it sets only `animation-delay` on top of animate-rise.
+/* fadeIn has four consumers, not one: the @utility animate-rise rule above,
+   plus three inline `animation` styles -- Connect.tsx:123, Projects.tsx:359,
+   and src/lib/revealStyle.ts:33, the shared helper behind useReveal that About,
+   Skills, and Connect all render through. That last one is the biggest: delete
+   this keyframe and every reveal animation on the site goes dark along with the
+   Projects grid stagger. Hero no longer sets an inline `animation` -- it sets
+   only `animation-delay` on top of animate-rise.
+
+   Nothing automated catches that: revealStyle.test.ts asserts the animation
+   *string* contains 'fadeIn', not that the keyframe itself exists, so a green
+   suite is consistent with this keyframe being gone.
 
    slideIn has no utility: About applies it through an inline style
    (About.tsx:260). This comment previously credited Skills, which has never
@@ -213,7 +217,6 @@
     scroll-behavior: auto;
   }
 
-  .animate-fade-in,
   .animate-rise {
     animation: none;
   }
