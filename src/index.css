@@ -52,6 +52,92 @@
   animation: fadeIn 1s ease-in;
 }
 
+/* ---- Editorial masthead (Hero) -------------------------------------------
+
+   Three named type roles plus the nameplate sizing.
+
+   Tailwind v4.3 does have font-weight and font-stretch-[82%] utilities, so the
+   roles COULD be class soup at each use site. They live here instead because
+   each is a single design decision used in several places, and because the
+   nameplate's container-relative clamp() has no utility equivalent at all.
+
+   Declared with @utility, not @layer utilities: in v4 the latter no longer
+   produces variant-capable utilities, and the nameplate needs a md: variant.  */
+
+/* These use the high-level font-weight / font-stretch properties rather than
+   font-variation-settings, even though both drive the same wght and wdth axes.
+   The @font-face declares `font-weight: 200 800` and `font-stretch: 75% 100%`,
+   so the registered axes are reachable directly.
+
+   Two reasons this matters here. font-variation-settings is a single
+   all-or-nothing property: any descendant that restates it resets every axis it
+   does not repeat, so a nested rule setting only a weight would silently un-
+   condense the nameplate. And the high-level properties compose with Tailwind's
+   own font-medium / font-bold utilities, while the low-level one is simply
+   ignored by them. font-stretch: 82% maps to wdth 82. */
+
+@utility font-nameplate {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-stretch: 82%;
+  text-transform: uppercase;
+  line-height: 0.86;
+}
+
+/* The nameplate must be sized so its LONGEST line reaches both edges, and the
+   longest line changes when the line break does — hence two rules rather than
+   one clamp.
+
+   Sized in cqi against the max-w-7xl wrapper (which carries Tailwind's
+   @container), not vw: the wrapper caps at 80rem, so past ~1344px of viewport a
+   vw-based size keeps growing and overflows the box it is meant to fit.
+
+   The coefficients are MEASURED, not guessed — shaped with HarfBuzz against the
+   real font at wdth 82 / wght 700 (font-stretch: 82% / font-weight: 700 above),
+   kerning applied:
+
+     "SUPAKORN PRAYONGYAM"  9.500em, less 0.045em x 19 tracking -> 8.645em
+                            100 / 8.645 = 11.57cqi
+     "PRAYONGYAM"           5.000em, less 0.03em x 10 tracking  -> 4.700em
+                            100 / 4.700 = 21.28cqi
+
+   Re-measure if the name, the weight, the width axis or the tracking changes.
+   Nothing automated catches a wrong value; it shows as a gap at the right edge
+   or as overflow. */
+@utility nameplate-two-line {
+  font-size: clamp(3.25rem, 21.2cqi, 9rem);
+  letter-spacing: -0.03em;
+}
+
+@utility nameplate-one-line {
+  font-size: clamp(4.5rem, 11.5cqi, 9.25rem);
+  letter-spacing: -0.045em;
+}
+
+@utility band-label {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@utility font-band {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-stretch: 100%;
+}
+
+/* One staggered entrance, reusing the existing fadeIn keyframe at a shorter
+   duration. `backwards` fill-mode matters: without it a delayed element paints
+   at full opacity for one frame before the animation starts. Delays are set
+   inline per group in Hero.tsx. Disabled by the prefers-reduced-motion block at
+   the foot of this file. */
+@utility animate-rise {
+  animation: fadeIn 0.5s ease-out backwards;
+}
+
 /* Engineer's Blueprint Theme Utilities */
 @utility bg-grid-pattern {
   background-size: 40px 40px;
@@ -249,7 +335,8 @@
 
   .animate-blink,
   .animate-pulse,
-  .animate-fade-in {
+  .animate-fade-in,
+  .animate-rise {
     animation: none;
   }
 }
