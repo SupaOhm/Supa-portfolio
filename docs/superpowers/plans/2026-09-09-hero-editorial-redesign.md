@@ -4,7 +4,7 @@
 
 **Goal:** Replace the portfolio's AI-generated-looking hero — typewriter, fake code block, blueprint grid, cursor glow — with an editorial masthead set in a real typeface, putting the IEEE Best Paper award and the internship availability above the fold.
 
-**Architecture:** One rewritten component (`Hero.tsx`) reading every fact from `src/data/profile.ts`, styled with Tailwind v4 utilities plus four `@utility` rules in `index.css` for the things Tailwind has no utility for (`font-variation-settings`, container-relative nameplate sizing). A self-hosted variable `.woff2` follows the repo's existing `assets-src/` → script → `public/` convention. Deletions of now-dead CSS and hooks happen last, after every consumer has stopped referencing them.
+**Architecture:** One rewritten component (`Hero.tsx`) reading every fact from `src/data/profile.ts`, styled with Tailwind v4 utilities plus six `@utility` rules in `index.css` — the container-relative `clamp()` nameplate sizing has no utility equivalent, and the three type roles are named once there rather than repeated as class soup at each use site. A self-hosted variable `.woff2` follows the repo's existing `assets-src/` → script → `public/` convention. Deletions of now-dead CSS and hooks happen last, after every consumer has stopped referencing them.
 
 **Tech Stack:** React 19, TypeScript, Vite, Tailwind CSS v4 (`@utility`, container queries), Vitest + Testing Library (jsdom opt-in per file), Bricolage Grotesque variable from Fontsource 5.3.0.
 
@@ -34,6 +34,8 @@
 - Modify: `src/index.css` (add `@font-face` after the `@import`)
 - Modify: `index.html` (add preload in `<head>`)
 - Modify: `package.json` (add the `fonts` script)
+- Modify: `CLAUDE.md` (document `npm run fonts` and the third `assets-src/` pipeline)
+- Modify: `README.md:56` (list the third script)
 
 **Interfaces:**
 - Consumes: nothing.
@@ -43,12 +45,17 @@
 
 The `wdth` variant is the correct file: it carries `wght` + `wdth`. The `opsz` variant has no width axis, and `standard` (which has all three) costs 128.5 KB against this one's 76.3 KB. `wdth` is load-bearing for the condensed nameplate; `opsz` is not.
 
+Run from the repo root. No `cd` — shell state does not persist between steps,
+and `npm pack --pack-destination` plus `tar -C` do the job with absolute paths:
+
 ```bash
-mkdir -p assets-src/fonts public/fonts
-cd /tmp && npm pack @fontsource-variable/bricolage-grotesque@5.3.0 --silent
-tar xzf fontsource-variable-bricolage-grotesque-5.3.0.tgz
-cd - >/dev/null
-cp /tmp/package/files/bricolage-grotesque-latin-wdth-normal.woff2 assets-src/fonts/
+mkdir -p assets-src/fonts public/fonts /tmp/bricolage
+npm pack @fontsource-variable/bricolage-grotesque@5.3.0 \
+  --pack-destination /tmp/bricolage --silent
+tar xzf /tmp/bricolage/fontsource-variable-bricolage-grotesque-5.3.0.tgz \
+  -C /tmp/bricolage
+cp /tmp/bricolage/package/files/bricolage-grotesque-latin-wdth-normal.woff2 \
+  assets-src/fonts/
 ls -l assets-src/fonts/bricolage-grotesque-latin-wdth-normal.woff2
 ```
 
@@ -114,7 +121,41 @@ npm run fonts
 
 Expected: `public/fonts/bricolage-grotesque-wdth.woff2` exists, roughly 44,600 bytes (43.6 KB). If `pyftsubset` is not on PATH after the pip install, use `python3 -m fontTools.subset` with the same arguments.
 
-- [ ] **Step 5: Write the failing guard test**
+- [ ] **Step 5: Document the pipeline**
+
+`CLAUDE.md` documents every generated-asset script with its platform traps, and
+its `assets-src/` vs `public/` section explains the convention. This adds a third
+pipeline of exactly that shape, so both need updating or the repo's own
+documentation stops being true.
+
+In `CLAUDE.md`, after the `npm run og` bullet (line 12), add:
+
+```markdown
+- `npm run fonts` — re-subset the Bricolage Grotesque original in `assets-src/fonts/` into the `public/fonts/` `.woff2` the hero masthead loads (`scripts/subset-font.sh`). Manual/local only, never in CI. Requires `pyftsubset` (`pip install fonttools brotli`) — unlike `images` and `og` it is a shell script, not a bare `.ts` file, so it has no Node version floor. The shipped file is the `wdth`-axis Fontsource variant (wght + wdth, no `opsz`) subsetted from 76.3 KB to 43.6 KB.
+```
+
+In the `**`assets-src/` vs `public/`**` section (around line 41), add after the
+Open Graph sentences:
+
+```markdown
+The same pattern holds a third time for the typeface: `assets-src/fonts/` holds the unmodified Fontsource original, and `npm run fonts` subsets it into `public/fonts/`, which is what the `@font-face` in `src/index.css` and the preload in `index.html` both point at. `scripts/font-preload.test.ts` guards those two against each other — nothing in the browser links them, and both failure modes (a 404 preload, a silent system-stack fallback) are invisible to a component test.
+```
+
+In `README.md:56`, change:
+
+```markdown
+> Two additional scripts (`npm run images`, `npm run og`) re-encode source as
+```
+
+to:
+
+```markdown
+> Three additional scripts (`npm run images`, `npm run og`, `npm run fonts`) re-encode source as
+```
+
+Check the surrounding sentence still reads correctly after the count change.
+
+- [ ] **Step 6: Write the failing guard test**
 
 Create `scripts/font-preload.test.ts`. This follows the same pattern as `scroll-offset.test.ts` and `discoverability.test.ts`: a cross-file coupling that nothing in the browser enforces, so a test parses both sides.
 
@@ -172,13 +213,13 @@ describe('the font preload and the @font-face agree', () => {
 });
 ```
 
-- [ ] **Step 6: Run the test to verify it fails**
+- [ ] **Step 7: Run the test to verify it fails**
 
 Run: `npx vitest run scripts/font-preload.test.ts`
 
 Expected: FAIL — `index.html preloads a woff2` fails with `expected undefined to be defined`, because neither the preload nor the `@font-face` exists yet.
 
-- [ ] **Step 7: Add the `@font-face` to `src/index.css`**
+- [ ] **Step 8: Add the `@font-face` to `src/index.css`**
 
 Insert immediately after the `@import 'tailwindcss';` line at the top of the file, before the `cursor-glow` utility:
 
@@ -193,10 +234,18 @@ Insert immediately after the `@import 'tailwindcss';` line at the top of the fil
 
    font-display: swap so the masthead renders in the fallback stack rather than
    staying invisible on a cold load. scripts/font-preload.test.ts pins this URL
-   to the preload in index.html. */
+   to the preload in index.html.
+
+   format('woff2'), NOT format('woff2-variations'). A browser that does not
+   recognise a format string skips that src entirely, and with a single src the
+   font then never loads — the page silently renders in the system stack, which
+   is the exact defect this redesign exists to fix, and font-preload.test.ts
+   compares URLs so it would pass anyway. 'woff2-variations' is a legacy spelling
+   from an early CSS Fonts 4 draft; variable support is inferred from the file.
+   Both work in current browsers, but only one of them can fail silently. */
 @font-face {
   font-family: 'Bricolage Grotesque';
-  src: url('/fonts/bricolage-grotesque-wdth.woff2') format('woff2-variations');
+  src: url('/fonts/bricolage-grotesque-wdth.woff2') format('woff2');
   font-weight: 200 800;
   font-stretch: 75% 100%;
   font-style: normal;
@@ -204,7 +253,7 @@ Insert immediately after the `@import 'tailwindcss';` line at the top of the fil
 }
 ```
 
-- [ ] **Step 8: Add the preload to `index.html`**
+- [ ] **Step 9: Add the preload to `index.html`**
 
 Insert after the `<link rel="icon" ... />` line:
 
@@ -218,17 +267,17 @@ Insert after the `<link rel="icon" ... />` line:
     />
 ```
 
-- [ ] **Step 9: Run the test to verify it passes**
+- [ ] **Step 10: Run the test to verify it passes**
 
 Run: `npx vitest run scripts/font-preload.test.ts`
 
 Expected: PASS, 5 tests.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 11: Commit**
 
 ```bash
 git add assets-src/fonts scripts/subset-font.sh scripts/font-preload.test.ts \
-        public/fonts src/index.css index.html package.json
+        public/fonts src/index.css index.html package.json CLAUDE.md README.md
 git commit -m "feat: self-host Bricolage Grotesque for the hero masthead
 
 The site has no typeface at all — no @font-face anywhere, everything on the
@@ -378,15 +427,32 @@ Insert into `src/index.css` after the `animate-fade-in` utility and before the `
 ```css
 /* ---- Editorial masthead (Hero) -------------------------------------------
 
-   Tailwind has no utility for font-variation-settings, and the nameplate is
-   sized against its container rather than the viewport, so these live here.
+   Three named type roles plus the nameplate sizing.
+
+   Tailwind v4.3 does have font-weight and font-stretch-[82%] utilities, so the
+   roles COULD be class soup at each use site. They live here instead because
+   each is a single design decision used in several places, and because the
+   nameplate's container-relative clamp() has no utility equivalent at all.
 
    Declared with @utility, not @layer utilities: in v4 the latter no longer
    produces variant-capable utilities, and the nameplate needs a md: variant.  */
 
+/* These use the high-level font-weight / font-stretch properties rather than
+   font-variation-settings, even though both drive the same wght and wdth axes.
+   The @font-face declares `font-weight: 200 800` and `font-stretch: 75% 100%`,
+   so the registered axes are reachable directly.
+
+   Two reasons this matters here. font-variation-settings is a single
+   all-or-nothing property: any descendant that restates it resets every axis it
+   does not repeat, so a nested rule setting only a weight would silently un-
+   condense the nameplate. And the high-level properties compose with Tailwind's
+   own font-medium / font-bold utilities, while the low-level one is simply
+   ignored by them. font-stretch: 82% maps to wdth 82. */
+
 @utility font-nameplate {
   font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
-  font-variation-settings: 'wdth' 82, 'wght' 700;
+  font-weight: 700;
+  font-stretch: 82%;
   text-transform: uppercase;
   line-height: 0.86;
 }
@@ -400,7 +466,8 @@ Insert into `src/index.css` after the `animate-fade-in` utility and before the `
    vw-based size keeps growing and overflows the box it is meant to fit.
 
    The coefficients are MEASURED, not guessed — shaped with HarfBuzz against the
-   real font at wdth 82 / wght 700, kerning applied:
+   real font at wdth 82 / wght 700 (font-stretch: 82% / font-weight: 700 above),
+   kerning applied:
 
      "SUPAKORN PRAYONGYAM"  9.500em, less 0.045em x 19 tracking -> 8.645em
                             100 / 8.645 = 11.57cqi
@@ -422,7 +489,8 @@ Insert into `src/index.css` after the `animate-fade-in` utility and before the `
 
 @utility band-label {
   font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
-  font-variation-settings: 'wght' 500;
+  font-weight: 500;
+  font-stretch: 100%;
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -430,7 +498,8 @@ Insert into `src/index.css` after the `animate-fade-in` utility and before the `
 
 @utility font-band {
   font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
-  font-variation-settings: 'wght' 400;
+  font-weight: 400;
+  font-stretch: 100%;
 }
 
 /* One staggered entrance, reusing the existing fadeIn keyframe at a shorter
@@ -470,8 +539,14 @@ Expected: PASS. A malformed `@utility` fails the PostCSS step with a parse error
 git add src/index.css
 git commit -m "feat: add the masthead typographic utilities
 
-font-variation-settings has no Tailwind utility, and the nameplate is sized
-against its container rather than the viewport, so both live in CSS.
+Three named type roles plus the nameplate sizing. The roles could be class soup
+at each use site — v4.3 has font-weight and font-stretch utilities — but each is
+one design decision used in several places, and the nameplate's container-
+relative clamp() has no utility equivalent at all.
+
+Uses font-weight/font-stretch rather than font-variation-settings for the wght
+and wdth axes: the latter is a single all-or-nothing property, so any descendant
+restating it silently resets every axis it does not repeat.
 
 The two nameplate coefficients are measured with HarfBuzz against the real font
 at wdth 82 / wght 700 rather than guessed — an earlier estimate was ~5% low,
@@ -759,7 +834,12 @@ export default function Hero() {
             See the work
             <span aria-hidden="true">&darr;</span>
           </button>
-          <span className="py-3">{LOCATION}</span>
+          {/* inline-flex, not a bare span with py-3: vertical padding on a
+              non-replaced inline element does not affect line box height, so
+              py-3 alone would read as a touch-target fix that is not one. This
+              has no hit area to grow — it is not interactive — it just needs to
+              share the button's line box. */}
+          <span className="inline-flex items-center">{LOCATION}</span>
         </div>
       </div>
     </section>
@@ -935,7 +1015,12 @@ Remove these blocks entirely:
 
 Keep: `cursor-glow` (Connect and ProjectCard still use it), `animate-fade-in`, `@keyframes fadeIn`, `@keyframes slideIn` (Skills applies it inline), the whole `@layer base` block, and everything added in Tasks 1 and 3.
 
-- [ ] **Step 3: Drop `animate-blink` from the reduced-motion block**
+- [ ] **Step 3: Drop `animate-blink` AND `animate-pulse` from the reduced-motion block**
+
+`animate-pulse` is Tailwind's own utility, but its only consumer anywhere in the
+codebase was the hero's scroll indicator (`Hero.tsx:152` before the rewrite).
+Task 4 removed it, so this selector now targets nothing. Leaving it behind would
+half-finish the cleanup this task exists to do.
 
 Change:
 
@@ -951,12 +1036,19 @@ Change:
 to:
 
 ```css
-  .animate-pulse,
   .animate-fade-in,
   .animate-rise {
     animation: none;
   }
 ```
+
+Confirm first:
+
+```bash
+grep -rn "animate-pulse" src/ | grep -v index.css
+```
+
+Expected: no output. If anything prints, keep the selector.
 
 - [ ] **Step 4: Delete the dead hook**
 
@@ -1012,6 +1104,12 @@ At each of **320, 375, 640, 768, 1024, 1280 and 1920** px, confirm:
 - The band is one column below 768, two columns from 768 (with "What I do" spanning the full first row), three from 1024.
 - The page does not scroll horizontally.
 - The footer hairline sits at the bottom of the viewport, not floating mid-page.
+- **At 320px specifically**, where the footer row wraps: the "See the work"
+  button carries `-my-3` (−12px) inside a `flex-wrap` row whose `gap-y-2` is only
+  8px. The negative margin can eat the row gap and pull the location line into
+  the button. If they overlap, drop the negative margin on the footer button
+  only and let it sit taller than the location text — the 44px hit area matters
+  more than the two lines sharing a baseline.
 
 - [ ] **Step 3: Calibrate if needed**
 
@@ -1053,6 +1151,7 @@ Skip this step if Step 3 changed nothing.
 | --- | --- |
 | Self-hosted subset woff2, `@font-face`, preload, `assets-src/` convention | 1 |
 | `scripts/font-preload.test.ts` guard | 1 |
+| `CLAUDE.md` / `README.md` document the third `assets-src/` pipeline | 1 |
 | `PAPER_TITLE` / `AWARD` / `VENUE`, About adoption | 2 |
 | Nameplate / band-label / body `@utility` rules, measured coefficients | 3 |
 | Container query on the `max-w-7xl` wrapper | 3, 4 |

@@ -82,6 +82,9 @@ accepted cost of this pass.
 | `src/hooks/useTypewriter.ts` | Delete — Hero was the only consumer |
 | `src/hooks/useTypewriter.test.ts` | Delete with it |
 | `scripts/font-preload.test.ts` | New guard (see Testing) |
+| `assets-src/fonts/` | New — the unmodified Fontsource original |
+| `scripts/subset-font.sh` | New — regenerates the shipped subset (`npm run fonts`) |
+| `CLAUDE.md`, `README.md` | Document the third `assets-src/` → script → `public/` pipeline |
 
 ### What must NOT be deleted
 
@@ -135,9 +138,14 @@ it from 76.3 KB to a measured **43.6 KB**. Following the repo's existing
 committed to `assets-src/fonts/`, `scripts/subset-font.sh` regenerates the
 output, and only `public/fonts/` ships.
 
-Tailwind has no utility for `font-variation-settings`, so the three roles are
-declared as `@utility` rules in `index.css`, matching the v4 convention already
-used in that file:
+The three roles are declared as `@utility` rules in `index.css`, matching the v4
+convention already used in that file. Note Tailwind 4.3 *does* ship
+`font-weight` and `font-stretch-[82%]` utilities, so the roles are named here for
+reuse rather than out of necessity — but the nameplate's container-relative
+`clamp()` has no utility equivalent, and the axes are driven by the high-level
+`font-weight` / `font-stretch` properties rather than `font-variation-settings`,
+which is all-or-nothing and silently resets any axis a descendant fails to
+restate:
 
 - **Nameplate** — `wdth 82, wght 700`; uppercase. Size and tracking are both
   breakpoint-dependent and container-relative; see **Responsive behaviour**.
