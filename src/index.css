@@ -1,5 +1,33 @@
 @import 'tailwindcss';
 
+/* Bricolage Grotesque, variable, self-hosted. Regenerate with `npm run fonts`;
+   the Fontsource original lives in assets-src/fonts/.
+
+   This is the `wdth` axis variant: wght 200-800 and wdth 75-100. The `opsz`
+   axis is deliberately absent — the only Fontsource latin file carrying all
+   three axes is 128.5 KB against this one's 76.3 KB (43.6 KB subsetted), and
+   the design only depends on wdth (the condensed nameplate) and wght.
+
+   font-display: swap so the masthead renders in the fallback stack rather than
+   staying invisible on a cold load. scripts/font-preload.test.ts pins this URL
+   to the preload in index.html.
+
+   format('woff2'), NOT format('woff2-variations'). A browser that does not
+   recognise a format string skips that src entirely, and with a single src the
+   font then never loads — the page silently renders in the system stack, which
+   is the exact defect this redesign exists to fix, and font-preload.test.ts
+   compares URLs so it would pass anyway. 'woff2-variations' is a legacy spelling
+   from an early CSS Fonts 4 draft; variable support is inferred from the file.
+   Both work in current browsers, but only one of them can fail silently. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-grotesque-wdth.woff2') format('woff2');
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+
 @utility cursor-glow {
   /* Cursor-following glow. Position comes from --glow-x / --glow-y, written by
      the useCursorGlow hook on the hovered ancestor; custom properties inherit,

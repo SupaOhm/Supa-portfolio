@@ -53,7 +53,7 @@ npm run lint
 
 > Requires Node ^20.19 or >=22.12 (Vite 7). Run `npm test` for the unit test suite and `npm run typecheck` for a standalone type check.
 >
-> Two additional scripts (`npm run images`, `npm run og`) re-encode source assets in `assets-src/` into files under `public/`. Both are macOS-and-local only, never run in CI, and require Node 22.18+/23.6+ — see `CLAUDE.md` for details.
+> Three additional scripts (`npm run images`, `npm run og`, `npm run fonts`) re-encode source assets in `assets-src/` into files under `public/`. All three are local only, never run in CI; `images` and `og` are macOS-only and require Node 22.18+/23.6+, while `fonts` is a shell script with no Node version floor but needs `pyftsubset` on PATH — see `CLAUDE.md` for details.
 
 ---
 
