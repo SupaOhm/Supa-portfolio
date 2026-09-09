@@ -116,8 +116,9 @@ Tailwind has no utility for `font-variation-settings`, so the three roles are
 declared as `@utility` rules in `index.css`, matching the v4 convention already
 used in that file:
 
-- **Nameplate** — `wdth 82, wght 700, opsz 96`; `clamp(2.75rem, 9vw, 8.5rem)`;
-  tracking `-0.045em`; uppercase. One line at `lg`, wrapping to two below `md`.
+- **Nameplate** — `wdth 82, wght 700, opsz 96`; uppercase. Size and tracking are
+  both breakpoint-dependent and container-relative; see **Responsive
+  behaviour**.
 - **Band label** — same family at 11px, uppercase, tracking `0.1em`, weight 500.
 - **Body** — `opsz 14, wght 400`, 15–16px, max ~34ch per column.
 
@@ -149,7 +150,8 @@ them means one font file instead of two.
 └────────────────────────────────────────────────────────┘
 ```
 
-Below `md` the band stacks to a single column and the nameplate breaks in two.
+That is the `lg` layout. See **Responsive behaviour** below for the rest — the
+nameplate and the band each change shape twice on the way down.
 
 The two uppercase tactile buttons are gone. Navigation is inline text links with
 arrows, but they remain `<button>` elements calling `handleSectionClick` — the
@@ -190,6 +192,117 @@ than migrated — `About.test.tsx` and `profile-drift.test.ts` already cover it.
 mid-2025 and a content refresh is planned; a masthead that advertises a count
 points hard at content that is about to change.
 
+## Responsive behaviour
+
+A full-bleed nameplate is the one layout that cannot be made responsive by
+stacking alone. The type has to be sized so the *longest line* reaches both
+edges, and the longest line changes when the break point changes — so the
+sizing rule changes with it. Everything below follows from that.
+
+### Breakpoints
+
+| Width | Nameplate | Band | Section padding |
+| --- | --- | --- | --- |
+| base, `< 640` | Two lines | One column, stacked | `pt-16` (clears the `h-14` bar) |
+| `sm`, `640–767` | Two lines | One column, stacked | `pt-24` (clears `top-6` + `h-16`) |
+| `md`, `768–1023` | Two lines | Two columns — "What I do" spans row 1, Recognition and Availability share row 2 | `pt-24` |
+| `lg`, `≥ 1024` | One line | Three columns, `1.4fr 1fr 1fr` | `pt-24` |
+
+The band's `md` shape is not an arbitrary halfway house: "What I do" is the only
+column holding a paragraph, and at 768px three columns leave it roughly 210px —
+about 14 characters a line. Letting it span the full row keeps it at a readable
+measure while the two short fact columns, which are naturally narrow, sit
+beneath it.
+
+Stack order below `md` is What I do → Recognition → Availability, matching both
+the DOM order and the `lg` reading order, so nothing depends on CSS reordering.
+
+### Sizing the nameplate
+
+The nameplate is sized against the **content box, not the viewport**, using a
+container query (`@container` on the `max-w-7xl` wrapper, `cqi` units). This
+matters because the container caps at `80rem`: past ~1376px of viewport the
+content box stops growing, and a `vw`-based size would keep growing and overflow
+the container. `cqi` tracks the box that actually constrains the text.
+
+Two rules, switched at `lg`, because the longest line differs:
+
+- **Two-line setting** (below `lg`) — longest line is `PRAYONGYAM`, ~10 glyphs.
+  Starting value `font-size: clamp(2.75rem, 19cqi, 9rem)`.
+- **One-line setting** (`lg` and up) — `SUPAKORN PRAYONGYAM`, 19 glyphs plus a
+  space. Starting value `font-size: clamp(4rem, 9.9cqi, 8.5rem)`.
+
+**Both coefficients are starting values, not derived facts.** They assume an
+average uppercase advance of roughly `0.52em` at `wdth 82, wght 700`, which is
+an estimate — they must be calibrated by eye against the real font file, and
+re-calibrated if the `wdth` axis is ever changed. Getting this wrong is not
+subtle: it shows as an obvious gap at the right edge, or as overflow.
+
+Consequence worth accepting up front: in the two-line setting, `SUPAKORN` is
+eight glyphs against `PRAYONGYAM`'s ten, so the first line will always fall
+short of the right edge. That is a ragged setting, which is normal editorially —
+it is not a bug to be fixed by tracking the short line out.
+
+Tracking scales with size rather than staying fixed: `-0.045em` at the one-line
+`lg` setting, relaxing to `-0.03em` below `md`. Tight negative tracking that
+reads as confident at 120px reads as broken at 44px.
+
+### Vertical space
+
+The section is `min-h-dvh`, not `min-h-screen` and not `h-screen`:
+
+- `dvh` rather than `vh` because mobile browsers report `100vh` as the height
+  *without* the collapsing URL bar, which pushes the footer row off-screen on
+  first paint.
+- `min-h-` rather than `h-` because on a short viewport — a landscape phone at
+  ~375px tall, or a desktop window dragged short — the masthead plus a stacked
+  band plus the footer row simply does not fit. The section must grow and let
+  the page scroll rather than clip. `mt-auto` on the bottom hairline degrades
+  gracefully: it pins the footer to the bottom when there is slack and behaves
+  as a normal margin when there is not.
+
+The `pt-16` / `sm:pt-24` values in the table exist because `Navbar` is `fixed`
+and out of flow. They must clear its bottom edge: `top-0` + `h-14` = 57px with
+its border on mobile, and `sm:top-6` + `sm:h-16` = 90px from `sm`. These are the
+same numbers `scroll-padding-top` in `index.css` is built from, and
+`scripts/scroll-offset.test.ts` guards that stylesheet against `Navbar.tsx`
+drift — but it does **not** guard Hero's own padding, which is an independent
+copy of the same constraint. If the navbar height ever changes, this is a third
+place to update by hand.
+
+### Touch targets
+
+This is the one accessibility regression the redesign risks introducing. The
+current CTAs are `px-8 py-3` buttons — comfortably past the 44×44px minimum. The
+replacements are inline text links at 15px, which are roughly 20px tall.
+
+Every section-scroll button therefore carries vertical padding to reach a 44px
+hit area, cancelled by an equal negative margin so the text still sits on its
+editorial baseline and the band's rhythm is unchanged (`py-3 -my-3` or
+equivalent). The visible underline stays tight to the text; only the hit area
+grows.
+
+### Footer row
+
+The footer is a two-item `justify-between` flex. At 320px, "See the work ↓" and
+`LOCATION` ("Pathum Thani, Thailand") together exceed the line. It wraps with a
+gap rather than shrinking or truncating, so the location drops to its own line
+on the narrowest phones.
+
+### What is not covered by tests
+
+Effectively all of the above. jsdom performs no layout — every
+`getBoundingClientRect()` returns zeros and `innerHeight` is a fixed 768 — so a
+test asserting a breakpoint, a `cqi` size, or a 44px hit area would pass while
+asserting nothing. `src/test/doubles.ts` and its `stubRect` exist for
+geometry-dependent tests, but they cannot substitute for a layout engine
+evaluating a media query.
+
+Responsive behaviour is verified by hand, and the plan should name the widths
+rather than leaving "check it looks fine": **320, 375, 640, 768, 1024, 1280 and
+1920**, plus one short-landscape check at roughly 812×375 to confirm the section
+grows instead of clipping.
+
 ## Palette and motion
 
 Ground stays `#030712`. Text `gray-100`, body copy `gray-400`, band labels
@@ -228,8 +341,9 @@ browser links them. It asserts that the `href` of the font preload in
 the file exists under `public/fonts/`.
 
 Verification before the work is called done: `npm test`, `npm run typecheck`,
-`npm run lint`, `npm run build` all green, plus a look at the running page at
-mobile, `md` and `lg` widths.
+`npm run lint` and `npm run build` all green, plus the manual width sweep named
+under **Responsive behaviour** — 320, 375, 640, 768, 1024, 1280, 1920 and one
+short-landscape viewport. The automated suite cannot see any of it.
 
 ## Risks
 
@@ -242,6 +356,17 @@ mobile, `md` and `lg` widths.
 - **Silent style loss.** Tailwind v4 does not error on a class whose `@utility`
   has been deleted — it just renders unstyled. The deletion list above was
   verified by grep and must be re-verified against the final diff.
+- **The nameplate coefficients are estimates.** Both `cqi` values assume an
+  average glyph advance that has not been measured against the real font file.
+  They need calibrating by eye, and a wrong value is visible rather than subtle:
+  a gap at the right edge, or overflow. Nothing automated will catch it.
+- **Touch targets.** Replacing padded buttons with inline text links drops the
+  natural hit area to about 20px. The padding-plus-negative-margin fix is easy
+  to lose in a later tidy-up, and jsdom cannot assert it.
+- **A third copy of the navbar height.** Hero's top padding encodes the same
+  constraint as `scroll-padding-top`, which `scroll-offset.test.ts` guards
+  against `Navbar.tsx` — but that guard does not cover Hero. A navbar height
+  change now needs three hand edits.
 - **`node:` imports.** `scripts/font-preload.test.ts` uses `node:fs`, so it must
   live under `scripts/`, not `src/`. `tsconfig.app.json` sets
   `types: ["vite/client"]` with no Node types; a `node:` import under `src/`
