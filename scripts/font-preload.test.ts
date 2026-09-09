@@ -48,4 +48,22 @@ describe('the font preload and the @font-face agree', () => {
     const tag = html.match(/<link[^>]*rel="preload"[^>]*\.woff2[^>]*>/)?.[0] ?? '';
     expect(tag).toMatch(/crossorigin/);
   });
+
+  it('declares format("woff2"), not the legacy variations spelling', () => {
+    // A browser that does not recognise a format string skips that src
+    // entirely. There is only one src, so the font then never loads and the
+    // page silently renders in the system stack — the exact defect this
+    // typeface was added to fix, with no error and no failed request to
+    // notice. 'woff2-variations' is a legacy spelling from an early CSS
+    // Fonts 4 draft; variable support is inferred from the file itself.
+    //
+    // The URL assertions above cannot catch this: they compare paths, not
+    // formats. Verified by probe — swapping the format string left all of
+    // them green.
+    const format = css.match(
+      /@font-face\s*\{[^}]*format\(['"]([^'"]+)['"]\)/,
+    )?.[1];
+
+    expect(format).toBe('woff2');
+  });
 });
