@@ -5,6 +5,7 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
 import {
   ACADEMIC_YEAR,
+  AWARD,
   EMAIL,
   EXPECTED_GRADUATION,
   FULL_NAME,
@@ -12,6 +13,7 @@ import {
   GITHUB_PROFILE_URL,
   GITHUB_USERNAME,
   GPA,
+  VENUE,
 } from '../data/profile';
 
 const RELEVANT_COURSES = [
@@ -40,7 +42,7 @@ const PERSONAL_INFO = [
   { label: 'Education', value: 'Computer Engineering | SIIT, Thammasat U.' },
   { label: 'Year', value: `${ACADEMIC_YEAR} | GPA ${GPA} | Expected ${EXPECTED_GRADUATION}` },
   { label: 'Focus', value: 'Cybersecurity | AI & RAG Systems' },
-  { label: 'Recognition', value: 'IEEE IMC 2026 Best Paper Award' },
+  { label: 'Recognition', value: `${VENUE} ${AWARD}` },
   { label: 'Availability', value: 'Looking for Internships', highlight: true },
 ];
 
