@@ -58,7 +58,16 @@ export default function Hero() {
       // sm:top-6 + sm:h-16 = 90px). Those are the same numbers scroll-padding-top
       // in index.css is built from, but this is an independent third copy —
       // scroll-offset.test.ts does not cover it.
-      className="relative flex min-h-dvh flex-col bg-[#030712] px-4 pt-16 pb-8 sm:px-6 sm:pt-24 lg:px-8"
+      // overflow-x-clip, not overflow-hidden: it stops the nameplate widening
+      // the page without creating a scroll container.
+      //
+      // This is not defensive padding, it is a measured failure. The nameplate
+      // is sized from the real advance width of the name at font-stretch: 82%,
+      // but font-stretch does nothing to the system-ui fallback, which shapes
+      // materially wider. With the webfont blocked, 375px scrolled
+      // horizontally. The old hero carried overflow-hidden and never hit this,
+      // because it had no webfont to fail.
+      className="relative flex min-h-dvh flex-col overflow-x-clip bg-[#030712] px-4 pt-16 pb-8 sm:px-6 sm:pt-24 lg:px-8"
     >
       {/* @container is what makes the nameplate's cqi units resolve against this
           box rather than the viewport. The box caps at 80rem. */}

@@ -92,25 +92,34 @@
    @container), not vw: the wrapper caps at 80rem, so past ~1344px of viewport a
    vw-based size keeps growing and overflows the box it is meant to fit.
 
-   The coefficients are MEASURED, not guessed — shaped with HarfBuzz against the
-   real font at wdth 82 / wght 700 (font-stretch: 82% / font-weight: 700 above),
-   kerning applied:
+   The coefficients are MEASURED IN THE BROWSER, against the real font, with the
+   real tracking, at the real weight and width. Not derived, not estimated:
 
-     "SUPAKORN PRAYONGYAM"  9.500em, less 0.045em x 19 tracking -> 8.645em
-                            100 / 8.645 = 11.57cqi
-     "PRAYONGYAM"           5.000em, less 0.03em x 10 tracking  -> 4.700em
-                            100 / 4.700 = 21.28cqi
+     "SUPAKORN PRAYONGYAM"  9.5891em  ->  100 / 9.5891 = 10.43cqi
+     "PRAYONGYAM"           5.4445em  ->  100 / 5.4445 = 18.37cqi
 
-   Re-measure if the name, the weight, the width axis or the tracking changes.
-   Nothing automated catches a wrong value; it shows as a gap at the right edge
-   or as overflow. */
+   Both are rounded DOWN to 10.4 / 18.3 on purpose. Undersizing leaves a hairline
+   gap at the right edge; oversizing overflows the container and wraps the line,
+   which is far worse and is exactly what an earlier pass shipped.
+
+   HOW THE EARLIER PASS GOT IT WRONG, so nobody repeats it: the first numbers
+   (11.5 / 21.2) came from shaping the strings with HarfBuzz offline. That probe
+   reported 9.500em for the one-line string, but the browser renders it at
+   10.444em before tracking — the offline shaping was landing near wdth 75 rather
+   than the wdth 82 it was asked for. The result overflowed at every width from
+   md up: the nameplate wrapped to two lines and stopped ~445px short of the
+   right edge at 1280. Offline shaping is a useful sanity check; it is NOT a
+   substitute for measuring the thing the browser actually draws.
+
+   Re-measure in the browser if the name, the weight, the width axis or the
+   tracking changes. Nothing automated catches a wrong value here. */
 @utility nameplate-two-line {
-  font-size: clamp(3.25rem, 21.2cqi, 9rem);
+  font-size: clamp(3.25rem, 18.3cqi, 9rem);
   letter-spacing: -0.03em;
 }
 
 @utility nameplate-one-line {
-  font-size: clamp(4.5rem, 11.5cqi, 9.25rem);
+  font-size: clamp(4.5rem, 10.4cqi, 9.25rem);
   letter-spacing: -0.045em;
 }
 
@@ -172,9 +181,14 @@
   }
 }
 
-/* Keyframes referenced by the @utility rules above and by inline `animation`
-   styles in Hero and Connect. slideIn has no utility -- Skills applies it
-   through an inline style. */
+/* Keyframes referenced by the @utility rules above and by one inline
+   `animation` style in Connect (Connect.tsx:123). Hero no longer sets an inline
+   `animation` -- it sets only `animation-delay` on top of animate-rise.
+
+   slideIn has no utility: About applies it through an inline style
+   (About.tsx:260). This comment previously credited Skills, which has never
+   used it -- so grepping for a class name will not find slideIn's consumer, and
+   it looks dead when it is not. */
 @layer utilities {
   @keyframes fadeIn {
     from {
