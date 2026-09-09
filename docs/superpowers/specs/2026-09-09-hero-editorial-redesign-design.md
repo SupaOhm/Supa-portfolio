@@ -107,20 +107,42 @@ longer exists.
 
 ## Typography
 
-One typeface: **Bricolage Grotesque**, variable, self-hosted as a latin-subset
+One typeface: **Bricolage Grotesque**, variable, self-hosted as a subset
 `.woff2` under `public/fonts/`. Self-hosted rather than the Google CDN so there
 is no third-party request and no flash of unstyled text on a cold load.
 `font-display: swap`, preloaded from `index.html`.
+
+Source is Fontsource `@fontsource-variable/bricolage-grotesque@5.3.0`. That
+package ships the latin subset split by axis group, and **no single file carries
+every axis this design wanted**, confirmed by reading `fvar`:
+
+| File | Axes | Size |
+| --- | --- | --- |
+| `…-latin-wght-normal.woff2` | `wght` | — |
+| `…-latin-opsz-normal.woff2` | `opsz`, `wght` | 75.1 KB |
+| `…-latin-wdth-normal.woff2` | `wght`, `wdth` | 76.3 KB |
+| `…-latin-standard-normal.woff2` | `opsz`, `wght`, `wdth` | 128.5 KB |
+
+**The `opsz` axis is dropped and `…-latin-wdth-normal.woff2` is used.** The
+`wdth` axis is load-bearing — the condensed nameplate is the entire look — while
+`opsz` only refines contrast and spacing across 12–96. Keeping both means the
+128.5 KB file, and 52 KB is a lot to spend on a refinement nobody will name.
+
+Re-subset to the characters the page can actually use (`U+0020-007E` plus
+`U+00A0 U+00B7 U+2013-2014 U+2018-2019 U+201C-201D U+2192 U+2193`), which takes
+it from 76.3 KB to a measured **43.6 KB**. Following the repo's existing
+`assets-src/` → script → `public/` convention: the Fontsource original is
+committed to `assets-src/fonts/`, `scripts/subset-font.sh` regenerates the
+output, and only `public/fonts/` ships.
 
 Tailwind has no utility for `font-variation-settings`, so the three roles are
 declared as `@utility` rules in `index.css`, matching the v4 convention already
 used in that file:
 
-- **Nameplate** — `wdth 82, wght 700, opsz 96`; uppercase. Size and tracking are
-  both breakpoint-dependent and container-relative; see **Responsive
-  behaviour**.
-- **Band label** — same family at 11px, uppercase, tracking `0.1em`, weight 500.
-- **Body** — `opsz 14, wght 400`, 15–16px, max ~34ch per column.
+- **Nameplate** — `wdth 82, wght 700`; uppercase. Size and tracking are both
+  breakpoint-dependent and container-relative; see **Responsive behaviour**.
+- **Band label** — same family at 11px, uppercase, tracking `0.1em`, `wght 500`.
+- **Body** — `wght 400`, 15px, max ~34ch per column.
 
 JetBrains Mono, which the mockups used for the band labels, is **not** adopted.
 Mono micro-labels are the last surviving piece of terminal costume, and dropping
@@ -205,7 +227,7 @@ sizing rule changes with it. Everything below follows from that.
 | --- | --- | --- | --- |
 | base, `< 640` | Two lines | One column, stacked | `pt-16` (clears the `h-14` bar) |
 | `sm`, `640–767` | Two lines | One column, stacked | `pt-24` (clears `top-6` + `h-16`) |
-| `md`, `768–1023` | Two lines | Two columns — "What I do" spans row 1, Recognition and Availability share row 2 | `pt-24` |
+| `md`, `768–1023` | **One line** | Two columns — "What I do" spans row 1, Recognition and Availability share row 2 | `pt-24` |
 | `lg`, `≥ 1024` | One line | Three columns, `1.4fr 1fr 1fr` | `pt-24` |
 
 The band's `md` shape is not an arbitrary halfway house: "What I do" is the only
@@ -225,18 +247,33 @@ matters because the container caps at `80rem`: past ~1376px of viewport the
 content box stops growing, and a `vw`-based size would keep growing and overflow
 the container. `cqi` tracks the box that actually constrains the text.
 
-Two rules, switched at `lg`, because the longest line differs:
+Two rules, switched at **`md`**, because the longest line differs:
 
-- **Two-line setting** (below `lg`) — longest line is `PRAYONGYAM`, ~10 glyphs.
-  Starting value `font-size: clamp(2.75rem, 19cqi, 9rem)`.
-- **One-line setting** (`lg` and up) — `SUPAKORN PRAYONGYAM`, 19 glyphs plus a
-  space. Starting value `font-size: clamp(4rem, 9.9cqi, 8.5rem)`.
+- **Two-line setting** (below `md`) — longest line is `PRAYONGYAM`.
+  `font-size: clamp(3.25rem, 21.2cqi, 9rem)`.
+- **One-line setting** (`md` and up) — `SUPAKORN PRAYONGYAM`.
+  `font-size: clamp(4.5rem, 11.5cqi, 9.25rem)`.
 
-**Both coefficients are starting values, not derived facts.** They assume an
-average uppercase advance of roughly `0.52em` at `wdth 82, wght 700`, which is
-an estimate — they must be calibrated by eye against the real font file, and
-re-calibrated if the `wdth` axis is ever changed. Getting this wrong is not
-subtle: it shows as an obvious gap at the right edge, or as overflow.
+These coefficients are **measured, not estimated**. Shaped with HarfBuzz against
+the real font file at `wdth 82, wght 700`, with kerning applied:
+
+| Line | Advance | Plus tracking | Coefficient |
+| --- | --- | --- | --- |
+| `SUPAKORN PRAYONGYAM` (19 ch) | 9.500 em | −0.045em × 19 → 8.645 em | `100 / 8.645` = **11.57cqi** |
+| `PRAYONGYAM` (10 ch) | 5.000 em | −0.03em × 10 → 4.700 em | `100 / 4.700` = **21.28cqi** |
+
+The earlier draft of this spec guessed 9.9 and 19 from an assumed 0.52em average
+advance. Both were about 5% low, which would have shipped as a visible gap at
+the right edge — the failure mode this section warns about.
+
+The break moved from `lg` to `md` as a consequence of those numbers. Two lines
+held until `lg` would reach ~207px per line at a 1023px viewport — roughly 356px
+of nameplate before the band even starts, which overflows a 768px-tall window.
+One line from `md` gives a 83–113px nameplate across that range instead.
+
+Re-measure if the `wdth` axis, the weight, the tracking, or the name itself ever
+changes. `scripts/subset-font.sh` and the measurement are the only two places
+these numbers come from.
 
 Consequence worth accepting up front: in the two-line setting, `SUPAKORN` is
 eight glyphs against `PRAYONGYAM`'s ten, so the first line will always fall
@@ -244,7 +281,7 @@ short of the right edge. That is a ragged setting, which is normal editorially �
 it is not a bug to be fixed by tracking the short line out.
 
 Tracking scales with size rather than staying fixed: `-0.045em` at the one-line
-`lg` setting, relaxing to `-0.03em` below `md`. Tight negative tracking that
+`md`-and-up setting, relaxing to `-0.03em` below `md`. Tight negative tracking that
 reads as confident at 120px reads as broken at 44px.
 
 ### Vertical space
@@ -350,16 +387,19 @@ short-landscape viewport. The automated suite cannot see any of it.
 - **The seam.** About, Skills and Connect keep the old look. Accepted; the
   demoted-blue palette was chosen specifically to keep that seam as quiet as
   possible.
-- **Font weight on the wire.** A latin-subset variable `.woff2` is roughly
-  35–45KB. Preloading keeps it off the critical render path for a repeat
-  visitor; a first paint may briefly swap.
+- **Font weight on the wire.** The subset variable `.woff2` is 43.6 KB measured.
+  Preloading keeps it off the critical render path for a repeat visitor; a first
+  paint may briefly swap.
 - **Silent style loss.** Tailwind v4 does not error on a class whose `@utility`
   has been deleted — it just renders unstyled. The deletion list above was
   verified by grep and must be re-verified against the final diff.
-- **The nameplate coefficients are estimates.** Both `cqi` values assume an
-  average glyph advance that has not been measured against the real font file.
-  They need calibrating by eye, and a wrong value is visible rather than subtle:
-  a gap at the right edge, or overflow. Nothing automated will catch it.
+- **The nameplate coefficients are measured but not guarded.** They are correct
+  for this name, this weight, this width and this tracking, and silently wrong
+  if any of the four changes. Nothing automated catches it. One known wrinkle:
+  CSS applies `letter-spacing` after the final character too, so the real line
+  is ~0.045em narrower than the coefficient assumes — under half a percent, but
+  it is why the setting still wants a visual check rather than trust in the
+  arithmetic.
 - **Touch targets.** Replacing padded buttons with inline text links drops the
   natural hit area to about 20px. The padding-plus-negative-margin fix is easy
   to lose in a later tidy-up, and jsdom cannot assert it.
