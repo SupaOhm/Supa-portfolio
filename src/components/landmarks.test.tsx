@@ -33,10 +33,11 @@ describe('section landmarks', () => {
         <Hero />
       </MemoryRouter>,
     );
-    // jsdom loads no CSS, so the block-level separators the accname algorithm
-    // would insert in a browser are absent. Match by regex to tolerate both forms.
+    // The nameplate is the two name words as separate spans. jsdom loads no
+    // CSS, so the block-level separators the accname algorithm would insert
+    // in a browser are absent here; the regex tolerates the whitespace either way.
     expect(
-      screen.getByRole('region', { name: /Supakorn\s*Prayongyam\s*SIIT, Thammasat University/ }),
+      screen.getByRole('region', { name: /Supakorn\s*Prayongyam/ }),
     ).toBeInTheDocument();
   });
 

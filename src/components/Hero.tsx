@@ -69,12 +69,6 @@ export default function Hero() {
         >
           <span className="block md:inline">{FIRST_NAME}</span>{' '}
           <span className="block md:inline">{LAST_NAME}</span>
-          {/* sr-only: landmarks.test.tsx names the hero region off this h1's
-              accessible name (aria-labelledby resolves only to this element's
-              subtree), and pre-dates this redesign by expecting the full
-              institution name in it. The nameplate itself must stay just the
-              two visual words, so the extra context is here but not painted. */}
-          <span className="sr-only"> SIIT, Thammasat University</span>
         </h1>
 
         <hr className="mt-6 h-px border-0 bg-gray-800" />
