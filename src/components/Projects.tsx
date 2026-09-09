@@ -144,7 +144,7 @@ export default function Projects() {
             </h2>
           </div>
 
-          {/* View Toggle wrapper with blueprint styling */}
+          {/* View Toggle wrapper */}
           <div className="mt-6 md:mt-0 flex gap-4 w-full md:w-auto items-center justify-center">
           <button
             onClick={() => setIsCarouselView((v) => !v)}
