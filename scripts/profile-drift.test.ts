@@ -3,10 +3,13 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   ACADEMIC_YEAR,
+  AWARD,
   EMAIL,
   GITHUB_USERNAME,
   GPA,
   LINKEDIN_HANDLE,
+  PAPER_TITLE,
+  VENUE,
 } from '../src/data/profile';
 
 /**
@@ -93,5 +96,48 @@ describe('contact identity is not duplicated into components', () => {
     expect(EMAIL).toMatch(/^[^@\s]+@[^@\s]+\.[^@\s]+$/);
     expect(GITHUB_USERNAME).not.toContain('/');
     expect(LINKEDIN_HANDLE.startsWith('/')).toBe(true);
+  });
+});
+
+/**
+ * The same drift shape, one fact further out, but scoped to Hero.tsx only
+ * rather than every component. About's prose and the long description in
+ * src/data/projects.ts both legitimately spell the award out in their own
+ * wording, so a repo-wide guard on these literals could never pass — Hero is
+ * the one place the identity must come from src/data/profile.ts, because the
+ * redesigned hero makes it the loudest claim on the landing screen.
+ *
+ * This guard exists because a probe proved the opposite assumption false:
+ * hardcoding 'Best Paper Award, IEEE IMC 2026' directly into Hero.tsx in place
+ * of {AWARD}, {VENUE} left all six Hero.test.tsx tests green. That test file
+ * imports the same constants it asserts against, so both sides move together
+ * and neither catches the value being wrong.
+ *
+ * What actually catches it here is that this block reads Hero's source text
+ * and asserts the constant's *value* does not appear there as a literal — not
+ * an independently-authored copy of the literal, since it imports AWARD/VENUE/
+ * PAPER_TITLE from the same src/data/profile module, the same pattern the
+ * contact-identity block above uses. Reading source rather than rendered
+ * output is exactly what makes it catch a fresh hardcode.
+ *
+ * It cannot catch a stale one: if VENUE later becomes 'IEEE IMC 2027' while
+ * Hero still carries a literal 'IEEE IMC 2026', all three tests below stay
+ * green, because that literal no longer equals VENUE's new value and so isn't
+ * found — the mismatch would only show up in Hero.test.tsx's rendered-output
+ * assertion. The two guards are sound only in combination.
+ */
+describe('the award identity is not hardcoded into Hero', () => {
+  const heroSource = readFileSync(join(COMPONENTS_DIR, 'Hero.tsx'), 'utf8');
+
+  it('does not hardcode the award name', () => {
+    expect(heroSource).not.toContain(AWARD);
+  });
+
+  it('does not hardcode the award venue', () => {
+    expect(heroSource).not.toContain(VENUE);
+  });
+
+  it('does not hardcode the paper title', () => {
+    expect(heroSource).not.toContain(PAPER_TITLE);
   });
 });

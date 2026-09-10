@@ -1,5 +1,33 @@
 @import 'tailwindcss';
 
+/* Bricolage Grotesque, variable, self-hosted. Regenerate with `npm run fonts`;
+   the Fontsource original lives in assets-src/fonts/.
+
+   This is the `wdth` axis variant: wght 200-800 and wdth 75-100. The `opsz`
+   axis is deliberately absent — the only Fontsource latin file carrying all
+   three axes is 128.5 KB against this one's 76.3 KB (43.6 KB subsetted), and
+   the design only depends on wdth (the condensed nameplate) and wght.
+
+   font-display: swap so the masthead renders in the fallback stack rather than
+   staying invisible on a cold load. scripts/font-preload.test.ts pins this URL
+   to the preload in index.html.
+
+   format('woff2'), NOT format('woff2-variations'). A browser that does not
+   recognise a format string skips that src entirely, and with a single src the
+   font then never loads — the page silently renders in the system stack, which
+   is the exact defect this redesign exists to fix, and font-preload.test.ts
+   compares URLs so it would pass anyway. 'woff2-variations' is a legacy spelling
+   from an early CSS Fonts 4 draft; variable support is inferred from the file.
+   Both work in current browsers, but only one of them can fail silently. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-grotesque-wdth.woff2') format('woff2');
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+
 @utility cursor-glow {
   /* Cursor-following glow. Position comes from --glow-x / --glow-y, written by
      the useCursorGlow hook on the hovered ancestor; custom properties inherit,
@@ -20,134 +48,99 @@
     translate(-50%, -50%);
 }
 
-@utility animate-fade-in {
-  animation: fadeIn 1s ease-in;
+/* ---- Editorial masthead (Hero) -------------------------------------------
+
+   Three named type roles plus the nameplate sizing.
+
+   Tailwind v4.3 does have font-weight and font-stretch-[82%] utilities, so the
+   roles COULD be class soup at each use site. They live here instead because
+   each is a single design decision used in several places, and because the
+   nameplate's container-relative clamp() has no utility equivalent at all.
+
+   Declared with @utility, not @layer utilities: in v4 the latter no longer
+   produces variant-capable utilities, and the nameplate needs a md: variant.  */
+
+/* These use the high-level font-weight / font-stretch properties rather than
+   font-variation-settings, even though both drive the same wght and wdth axes.
+   The @font-face declares `font-weight: 200 800` and `font-stretch: 75% 100%`,
+   so the registered axes are reachable directly.
+
+   Two reasons this matters here. font-variation-settings is a single
+   all-or-nothing property: any descendant that restates it resets every axis it
+   does not repeat, so a nested rule setting only a weight would silently un-
+   condense the nameplate. And the high-level properties compose with Tailwind's
+   own font-medium / font-bold utilities, while the low-level one is simply
+   ignored by them. font-stretch: 82% maps to wdth 82. */
+
+@utility font-nameplate {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-stretch: 82%;
+  text-transform: uppercase;
+  line-height: 0.86;
 }
 
-/* Engineer's Blueprint Theme Utilities */
-@utility bg-grid-pattern {
-  background-size: 40px 40px;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+/* The nameplate must be sized so its LONGEST line reaches both edges, and the
+   longest line changes when the line break does — hence two rules rather than
+   one clamp.
+
+   Sized in cqi against the max-w-7xl wrapper (which carries Tailwind's
+   @container), not vw: the wrapper caps at 80rem, so past ~1344px of viewport a
+   vw-based size keeps growing and overflows the box it is meant to fit.
+
+   The coefficients are MEASURED IN THE BROWSER, against the real font, with the
+   real tracking, at the real weight and width. Not derived, not estimated:
+
+     "SUPAKORN PRAYONGYAM"  9.5891em  ->  100 / 9.5891 = 10.43cqi
+     "PRAYONGYAM"           5.4445em  ->  100 / 5.4445 = 18.37cqi
+
+   Both are rounded DOWN to 10.4 / 18.3 on purpose. Undersizing leaves a hairline
+   gap at the right edge; oversizing overflows the container and wraps the line,
+   which is far worse and is exactly what an earlier pass shipped.
+
+   HOW THE EARLIER PASS GOT IT WRONG, so nobody repeats it: the first numbers
+   (11.5 / 21.2) came from shaping the strings with HarfBuzz offline. That probe
+   reported 9.500em for the one-line string, but the browser renders it at
+   10.444em before tracking — the offline shaping was landing near wdth 75 rather
+   than the wdth 82 it was asked for. The result overflowed at every width from
+   md up: the nameplate wrapped to two lines and stopped ~445px short of the
+   right edge at 1280. Offline shaping is a useful sanity check; it is NOT a
+   substitute for measuring the thing the browser actually draws.
+
+   Re-measure in the browser if the name, the weight, the width axis or the
+   tracking changes. Nothing automated catches a wrong value here. */
+@utility nameplate-two-line {
+  font-size: clamp(3.25rem, 18.3cqi, 9rem);
+  letter-spacing: -0.03em;
 }
 
-@utility bg-dot-pattern {
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.1) 1px,
-    transparent 1px
-  );
-  background-size: 20px 20px;
+@utility nameplate-one-line {
+  font-size: clamp(4.5rem, 10.4cqi, 9.25rem);
+  letter-spacing: -0.045em;
 }
 
-/* Tactile / Offset Shadow for buttons */
-@utility shadow-tactile {
-  box-shadow: 4px 4px 0px 0px rgba(59, 130, 246, 0.8);
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 6px 6px 0px 0px rgba(59, 130, 246, 1);
-    transform: translate(-2px, -2px);
-  }
-
-  &:active {
-    box-shadow: 0px 0px 0px 0px rgba(59, 130, 246, 0.8);
-    transform: translate(4px, 4px);
-  }
+@utility band-label {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-@utility shadow-tactile-dark {
-  box-shadow: 4px 4px 0px 0px rgba(107, 114, 128, 0.8);
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 6px 6px 0px 0px rgba(107, 114, 128, 1);
-    transform: translate(-2px, -2px);
-  }
-
-  &:active {
-    box-shadow: 0px 0px 0px 0px rgba(107, 114, 128, 0.8);
-    transform: translate(4px, 4px);
-  }
+@utility font-band {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-stretch: 100%;
 }
 
-/* Crosshair marker for sections */
-@utility marker-cross {
-  position: relative;
-  &::before {
-    content: '';
-    position: absolute;
-    background-color: rgba(156, 163, 175, 0.4);
-  }
-  &::after {
-    content: '';
-    position: absolute;
-    background-color: rgba(156, 163, 175, 0.4);
-  }
-}
-
-@utility marker-cross-tl {
-  &::before {
-    top: 10px;
-    left: 0;
-    width: 20px;
-    height: 1px;
-  }
-  &::after {
-    top: 0;
-    left: 10px;
-    width: 1px;
-    height: 20px;
-  }
-}
-
-@utility marker-cross-tr {
-  &::before {
-    top: 10px;
-    right: 0;
-    width: 20px;
-    height: 1px;
-  }
-  &::after {
-    top: 0;
-    right: 10px;
-    width: 1px;
-    height: 20px;
-  }
-}
-
-@utility marker-cross-bl {
-  &::before {
-    bottom: 10px;
-    left: 0;
-    width: 20px;
-    height: 1px;
-  }
-  &::after {
-    bottom: 0;
-    left: 10px;
-    width: 1px;
-    height: 20px;
-  }
-}
-
-@utility marker-cross-br {
-  &::before {
-    bottom: 10px;
-    right: 0;
-    width: 20px;
-    height: 1px;
-  }
-  &::after {
-    bottom: 0;
-    right: 10px;
-    width: 1px;
-    height: 20px;
-  }
-}
-
-@utility animate-blink {
-  animation: blink 1s step-end infinite;
+/* One staggered entrance, reusing the existing fadeIn keyframe at a shorter
+   duration. `backwards` fill-mode matters: without it a delayed element paints
+   at full opacity for one frame before the animation starts. Delays are set
+   inline per group in Hero.tsx. Disabled by the prefers-reduced-motion block at
+   the foot of this file. */
+@utility animate-rise {
+  animation: fadeIn 0.5s ease-out backwards;
 }
 
 @layer base {
@@ -184,9 +177,22 @@
   }
 }
 
-/* Keyframes referenced by the @utility rules above and by inline `animation`
-   styles in Hero and Connect. slideIn has no utility -- Skills applies it
-   through an inline style. */
+/* fadeIn has four consumers, not one: the @utility animate-rise rule above,
+   plus three inline `animation` styles -- Connect.tsx:123, Projects.tsx:359,
+   and src/lib/revealStyle.ts:33, the shared helper behind useReveal that About,
+   Skills, and Connect all render through. That last one is the biggest: delete
+   this keyframe and every reveal animation on the site goes dark along with the
+   Projects grid stagger. Hero no longer sets an inline `animation` -- it sets
+   only `animation-delay` on top of animate-rise.
+
+   Nothing automated catches that: revealStyle.test.ts asserts the animation
+   *string* contains 'fadeIn', not that the keyframe itself exists, so a green
+   suite is consistent with this keyframe being gone.
+
+   slideIn has no utility: About applies it through an inline style
+   (About.tsx:260). This comment previously credited Skills, which has never
+   used it -- so grepping for a class name will not find slideIn's consumer, and
+   it looks dead when it is not. */
 @layer utilities {
   @keyframes fadeIn {
     from {
@@ -199,14 +205,6 @@
     }
   }
 
-  @keyframes blink {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
-  }
   @keyframes slideIn {
     from {
       width: 0;
@@ -219,9 +217,7 @@
     scroll-behavior: auto;
   }
 
-  .animate-blink,
-  .animate-pulse,
-  .animate-fade-in {
+  .animate-rise {
     animation: none;
   }
 }

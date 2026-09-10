@@ -13,7 +13,7 @@ A modern, interactive developer portfolio built with **React 19**, **TypeScript*
 - **Grid ↔ carousel toggle** — Switch between an immersive carousel and a scannable grid.
 - **Category filtering** — Filter projects across Web, Mobile, Backend, Database, Tools, Embedded, Security, Cloud, AI, Design, and Data, each with a live count badge.
 - **Live GitHub data** — Profile and repo stats (avatar, total stars, top language, most-starred repo, and more) fetched at runtime from the public GitHub API.
-- **Animated hero** — A typing animation cycling through roles, with a cursor-following gradient that eases toward the pointer.
+- **Editorial masthead hero** — The full name set edge to edge in a self-hosted variable typeface (Bricolage Grotesque), container-query sized so the longest line fills the container, over a three-column band covering what he does, the IEEE Best Paper award, and internship availability.
 - **Reveal-on-scroll** — Sections fade and animate in as they enter the viewport.
 - **Fully responsive dark theme** — Blue/purple accents on gray-950, tuned for mobile, tablet, and desktop.
 
@@ -53,7 +53,7 @@ npm run lint
 
 > Requires Node ^20.19 or >=22.12 (Vite 7). Run `npm test` for the unit test suite and `npm run typecheck` for a standalone type check.
 >
-> Two additional scripts (`npm run images`, `npm run og`) re-encode source assets in `assets-src/` into files under `public/`. Both are macOS-and-local only, never run in CI, and require Node 22.18+/23.6+ — see `CLAUDE.md` for details.
+> Three additional scripts (`npm run images`, `npm run og`, `npm run fonts`) re-encode source assets in `assets-src/` into files under `public/`. All three are local only, never run in CI; `images` and `og` are macOS-only and require Node 22.18+/23.6+, while `fonts` is a shell script with no Node version floor but needs `pyftsubset` on PATH — see `CLAUDE.md` for details.
 
 ---
 
@@ -63,7 +63,7 @@ npm run lint
 src/
 ├── components/
 │   ├── Navbar.tsx        # Section tracking (useActiveSection) + smooth scroll nav
-│   ├── Hero.tsx          # Typing animation + cursor-following gradient
+│   ├── Hero.tsx          # Editorial masthead: nameplate + three-column info band
 │   ├── About.tsx         # Bio + compact live GitHub snapshot
 │   ├── Skills.tsx        # Skills grouped by category
 │   ├── Projects.tsx      # 3D carousel, grid view, and category filtering
@@ -82,6 +82,8 @@ src/
 ├── main.tsx              # React entry (StrictMode + BrowserRouter)
 └── index.css             # Global styles, keyframes, and animations
 ```
+
+Two directories outside `src/` feed the build rather than living in it. `assets-src/` holds source material that must stay in-repo for reproducible re-encoding but must never ship as-is — project image originals, the Open Graph template, and the unmodified Bricolage Grotesque font from Fontsource. `public/` holds the generated output that does ship: `public/images/projects/` (via `npm run images`), `public/og.png` (via `npm run og`), and `public/fonts/` (via `npm run fonts`, which subsets the typeface the hero masthead loads).
 
 `vercel.json`, at the repo root, is the production deploy config: it rewrites every unmatched path to `index.html` so client-side routes like `/about` resolve instead of 404ing, while still letting Vercel serve static files (like `public/images/...`) directly.
 

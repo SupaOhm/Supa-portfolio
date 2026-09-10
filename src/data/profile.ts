@@ -39,3 +39,20 @@ export const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
 export const GITHUB_AVATAR_URL = `${GITHUB_PROFILE_URL}.png`;
 export const LINKEDIN_HANDLE = '/in/supakornpra';
 export const LINKEDIN_URL = `https://linkedin.com${LINKEDIN_HANDLE}`;
+
+/**
+ * Award identity rendered in more than one place.
+ *
+ * "Best Paper Award at IEEE IMC 2026" was typed out in Hero, About, projects.ts
+ * and index.html — the same four-copy shape the year/GPA and contact blocks
+ * above exist to prevent. The redesigned hero makes it the loudest claim on the
+ * landing screen, so it gets a single source here.
+ *
+ * Kept as three parts rather than one sentence because the hero sets the paper
+ * title on its own line as a link, and About composes venue + award into one
+ * label. The prose in About and the long description in projects.ts keep their
+ * own wording deliberately; these constants are not a uniqueness guarantee.
+ */
+export const PAPER_TITLE = 'ESNIDSaaS';
+export const AWARD = 'Best Paper Award';
+export const VENUE = 'IEEE IMC 2026';

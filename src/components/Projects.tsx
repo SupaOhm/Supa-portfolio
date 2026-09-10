@@ -119,7 +119,6 @@ export default function Projects() {
 
   return (
     <section id="projects" aria-labelledby="projects-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
-      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
       {/* Live regions. Permanently mounted and rendered outside every conditional
           branch: a region inserted into the DOM at the same moment its text
@@ -131,16 +130,13 @@ export default function Projects() {
         {carouselStatusText}
       </p>
 
-      <div className="max-w-7xl mx-auto relative z-10 marker-cross marker-cross-tl marker-cross-tr marker-cross-bl marker-cross-br p-4 sm:p-8 border border-gray-800/60 bg-gray-950/40 backdrop-blur-xs">
+      <div className="max-w-7xl mx-auto relative z-10 p-4 sm:p-8 border border-gray-800/60 bg-gray-950/40 backdrop-blur-xs">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-gray-800/60 pb-8 relative">
           {/* Decorative lines */}
           <div className="absolute top-0 left-0 w-8 h-px bg-blue-500/50" />
           <div className="absolute bottom-0 right-0 w-8 h-px bg-purple-500/50" />
           
           <div className="text-center md:text-left flex-1 w-full md:w-auto">
-            <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-400 mb-2">
-              // sys.logs.fetch("projects")
-            </p>
             <h2 id="projects-heading" className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
               <span aria-hidden="true" className="text-gray-700 font-light text-2xl">[</span>
               Featured Projects
@@ -148,7 +144,7 @@ export default function Projects() {
             </h2>
           </div>
 
-          {/* View Toggle wrapper with blueprint styling */}
+          {/* View Toggle wrapper */}
           <div className="mt-6 md:mt-0 flex gap-4 w-full md:w-auto items-center justify-center">
           <button
             onClick={() => setIsCarouselView((v) => !v)}
@@ -169,8 +165,8 @@ export default function Projects() {
           </div>
         </div>
 
-        <p className="font-mono text-gray-400/80 text-sm text-center mb-8 max-w-2xl mx-auto pt-6">
-          &gt; Select filters or switch views to explore technical implementations.
+        <p className="text-gray-400/80 text-sm text-center mb-8 max-w-2xl mx-auto pt-6">
+          Select filters or switch views to explore technical implementations.
         </p>
 
         {/* Filter Dropdown */}
