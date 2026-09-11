@@ -114,38 +114,92 @@ export default function Connect() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onMouseMove={handleMouseMove}
-                className={`group flex flex-col items-center justify-center gap-2 rounded-xl border backdrop-blur-xs overflow-hidden relative transition-all duration-700 ease-in-out ${
+                /* The card grows with `transform: scale`, not width/height.
+                   Animating width and height re-runs layout on every frame and
+                   reflows the neighbouring cards with it, which is why the old
+                   version read as a jump rather than a grow -- the browser was
+                   snapping through intermediate layouts instead of easing.
+                   Transform is composited, so this eases smoothly and leaves
+                   the siblings where they are.
+
+                   The transition names `scale`, not `transform`: Tailwind v4
+                   emits scale-110 as the standalone `scale` property, so
+                   transition-transform does not cover it and the card snaps to
+                   full size on the first frame -- measured, not assumed.
+
+                   The curve is cubic-bezier(0.4,0,0.2,1), not an easeOutQuint.
+                   Measured frame by frame, the quint put half the growth in
+                   the first 68ms of 500 -- technically a transition, but it
+                   still reads as a snap that then settles. This one spends its
+                   time in the middle, which is what makes the card look like
+                   it is growing rather than arriving.
+
+                   The size is therefore fixed and the detail line is always in
+                   the DOM, revealed by opacity and height. It used to be a
+                   conditional render, so the label was REPLACED on hover: the
+                   box eased while its contents popped. */
+                className={`group relative flex w-[188px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3 backdrop-blur-xs ${
+                  reducedMotion
+                    ? ''
+                    : 'transition-[scale,background-color,border-color,box-shadow] duration-[420ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[scale]'
+                } ${
                   hoveredLink === link.name
-                    ? 'bg-linear-to-br from-blue-500/60 via-purple-500/50 to-blue-600/60 shadow-2xl shadow-blue-500/60 border-blue-400/90 text-white'
-                    : 'bg-linear-to-r from-gray-800/50 to-gray-700/50 text-gray-300 border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20'
+                    ? 'z-10 scale-110 border-blue-400/90 bg-linear-to-br from-blue-500/60 via-purple-500/50 to-blue-600/60 text-white shadow-2xl shadow-blue-500/40'
+                    : 'scale-100 border-gray-700/50 bg-linear-to-r from-gray-800/50 to-gray-700/50 text-gray-300'
                 }`}
                 style={{
                   animation: reducedMotion ? 'none' : `fadeIn 0.5s ease-out ${index * 100}ms both`,
-                  width: hoveredLink === link.name ? '224px' : '120px',
-                  height: hoveredLink === link.name ? '128px' : '96px',
-                  padding: hoveredLink === link.name ? '24px' : '12px 16px',
                 }}
               >
-                {/* Cursor-following gradient effects */}
-                {hoveredLink === link.name && (
-                  <>
-                    <div className="cursor-glow w-[160px] h-[160px] bg-linear-to-r from-blue-400/30 via-purple-400/25 to-transparent rounded-full blur-[50px] pointer-events-none opacity-100" />
-                    <div className="cursor-glow w-[100px] h-[100px] bg-linear-to-r from-blue-300/25 to-transparent rounded-full blur-[30px] pointer-events-none opacity-100" />
-                  </>
-                )}
-                
-                <span className={`relative z-10 transition-transform duration-300 ${hoveredLink === link.name ? 'scale-125' : 'scale-100'}`}>
+                {/* Always mounted, faded rather than conditionally rendered, so
+                    the glow arrives with the scale instead of appearing at full
+                    strength on the first hovered frame. */}
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+                    hoveredLink === link.name ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <span className="cursor-glow h-[160px] w-[160px] rounded-full bg-linear-to-r from-blue-400/30 via-purple-400/25 to-transparent blur-[50px]" />
+                </span>
+
+                <span
+                  className={`relative z-10 ${
+                    reducedMotion
+                      ? ''
+                      : 'transition-[scale] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]'
+                  } ${hoveredLink === link.name ? 'scale-110' : 'scale-100'}`}
+                >
                   {link.icon}
                 </span>
-                
-                {hoveredLink === link.name ? (
-                  <div className="flex flex-col items-center gap-1 relative z-10">
-                    <span className="font-bold text-sm">{link.name}</span>
-                    <span className="text-xs font-semibold text-blue-100">{link.detail}</span>
-                  </div>
-                ) : (
-                  <span className="font-medium relative z-10 transition-opacity duration-500 ease-in-out">{link.name}</span>
-                )}
+
+                <span className="relative z-10 text-sm font-medium">{link.name}</span>
+
+                {/* grid-template-rows 0fr -> 1fr is the one way to transition to
+                    an element's natural height without hardcoding it. */}
+                <span
+                  className={`relative z-10 grid w-full ${
+                    reducedMotion ? '' : 'transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]'
+                  } ${
+                    hoveredLink === link.name
+                      ? 'grid-rows-[1fr] opacity-100'
+                      : 'grid-rows-[0fr] opacity-0'
+                  }`}
+                >
+                  {/* break-words, not truncate: the email is 24 characters and
+                      the phone number carries non-breaking spaces so it cannot
+                      split mid-digit-group. Clipping it was the bug -- a
+                      contact card whose contact detail is cut off has failed
+                      at its one job.
+
+                      The card is 188px wide because that is what the longest
+                      detail needs: the email is 24 characters and at 168px it
+                      broke mid-word as "...@gma / il.com". Sized to the
+                      content rather than leaving the content to cope. */}
+                  <span className="overflow-hidden px-1 pt-0.5 text-center text-[11px] leading-snug font-semibold break-words text-blue-100">
+                    {link.detail}
+                  </span>
+                </span>
               </a>
             </div>
           ))}
