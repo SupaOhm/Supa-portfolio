@@ -30,8 +30,22 @@ import { buildCalendar, type CommitActivityWeek, type ContributionDay } from './
  */
 export const MAX_REPOS = 6;
 
-/** Matches the profile cache, so both expire together and a reload costs one round of requests. */
-export const CONTRIB_CACHE_TTL_MS = 600_000;
+/**
+ * Twelve hours, in localStorage — deliberately NOT the profile cache's ten
+ * minutes in sessionStorage.
+ *
+ * The two caches hold different kinds of thing. Follower and star counts move
+ * during a browsing session, so a short session-scoped TTL is right for them. A
+ * year-long commit calendar moves at most once a day, and costs six of the
+ * hourly sixty requests to rebuild.
+ *
+ * Matching the profile's TTL made every visitor re-spend those six requests
+ * every ten minutes, which is how a handful of reloads — or several people
+ * behind one NAT — exhausts the budget and leaves the graph missing for
+ * everyone with no way to tell that from a bug. Persisting across sessions
+ * means one successful load keeps the graph up for the rest of the day.
+ */
+export const CONTRIB_CACHE_TTL_MS = 43_200_000;
 
 /** Attempts per repository before giving up on a 202. */
 export const MAX_STATS_ATTEMPTS = 3;
@@ -55,9 +69,11 @@ const noopStorage: CacheStorage = {
 
 function defaultStorage(): CacheStorage {
   try {
-    return globalThis.sessionStorage ?? noopStorage;
+    // localStorage, not sessionStorage: the whole point is surviving a tab
+    // close, so a returning visitor never waits on six requests again today.
+    return globalThis.localStorage ?? noopStorage;
   } catch {
-    // Accessing sessionStorage itself throws when cookies are fully blocked.
+    // Accessing localStorage itself throws when cookies are fully blocked.
     return noopStorage;
   }
 }

@@ -40,10 +40,15 @@ export function useContributions(
   const repoKey = (repoNames ?? []).join(',');
 
   useEffect(() => {
-    if (!repoKey) {
-      return;
-    }
-
+    // Deliberately NOT guarded on repoKey being non-empty.
+    //
+    // getCachedContributions reads its cache before it looks at the repository
+    // list, so running with an empty list costs zero requests (Promise.all of
+    // nothing) and still serves a previously cached calendar. Guarding here
+    // instead coupled the graph to the PROFILE fetch: when that was
+    // rate-limited, repoNames never arrived, the effect never ran, and a
+    // perfectly good cached graph went unread. The graph disappeared for a
+    // reason that had nothing to do with the graph.
     const controller = new AbortController();
     let active = true;
 
