@@ -16,25 +16,34 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 const LIFT: Record<ContributionLevel, number> = { 0: 0, 1: 5, 2: 11, 3: 19, 4: 30 };
 
 /**
- * A blue ramp rather than GitHub's green: this sits inside a hero that already
- * uses #2997ff as its one accent, and a second unrelated hue is what makes a
- * page look assembled out of widgets.
+ * GitHub's own dark-theme contribution ramp, used verbatim.
+ *
+ * An earlier version used blue, on the reasoning that the hero already has one
+ * accent and a second hue would make the page look assembled out of widgets.
+ * That reasoning loses to recognition: this shape IS the GitHub contribution
+ * graph, and green is the thing that says so at a glance, before anyone reads
+ * the number underneath it. Borrowing the exact values rather than
+ * approximating them is what keeps it from looking like a near-miss.
  */
 const FACE: Record<ContributionLevel, string> = {
-  0: 'rgba(255,255,255,0.05)',
-  1: '#0d3f73',
-  2: '#1268c4',
-  3: '#2997ff',
-  4: '#7fd5ff',
+  0: 'rgba(255,255,255,0.085)',
+  1: '#0e4429',
+  2: '#006d32',
+  3: '#26a641',
+  4: '#39d353',
 };
 
-/** The lit top of a column reads as a separate face from its side. */
+/**
+ * The lit top of a column reads as a separate face from its side. Each side is
+ * roughly a third of the way from its face colour to black -- enough contrast
+ * to read as a solid volume, not so much that the columns look outlined.
+ */
 const SIDE: Record<ContributionLevel, string> = {
   0: 'transparent',
-  1: '#082a4d',
-  2: '#0b478a',
-  3: '#1b6dc0',
-  4: '#3f9ad4',
+  1: '#072a19',
+  2: '#00461f',
+  3: '#166b29',
+  4: '#228a37',
 };
 
 const CELL = 9;
@@ -150,15 +159,21 @@ export default function ContributionGraph({
             // screen. The offsets here are the correction, set by eye against
             // the centred headline rather than derived -- there is no formula
             // for where a rotated plate's visual weight lands.
-            transform: 'translate(-44%, -46%) scale(2.6)',
+            //
+            // The Y offset is well short of centred on purpose. At -46% the
+            // plate's upper edge rose behind the fixed navbar on a short
+            // viewport, which read as the background leaking out of its
+            // section. Sitting it lower keeps the terrain under the headline
+            // and the panels, where it belongs.
+            transform: 'translate(-44%, -24%) scale(2.6)',
             transformOrigin: 'center',
             // Faded on both axes, because the plate runs diagonally. Without
             // this its hard edges cut across the headline sitting on top.
             maskImage:
-              'radial-gradient(ellipse 70% 62% at 50% 50%, rgba(0,0,0,0.95), transparent 82%)',
+              'radial-gradient(ellipse 96% 90% at 50% 50%, rgba(0,0,0,1), transparent 99%)',
             WebkitMaskImage:
-              'radial-gradient(ellipse 70% 62% at 50% 50%, rgba(0,0,0,0.95), transparent 82%)',
-            opacity: 0.62,
+              'radial-gradient(ellipse 96% 90% at 50% 50%, rgba(0,0,0,1), transparent 99%)',
+            opacity: 1,
           }}
         >
           <div style={{ transformStyle: 'preserve-3d', transform: BACKDROP_TRANSFORM }}>
