@@ -21,6 +21,9 @@ type GitHubRepoResponse = {
   html_url: string;
   stargazers_count: number;
   language: string | null;
+  /** ISO timestamp. Drives `recentRepoNames`, which the contribution graph fetches against. */
+  pushed_at: string;
+  fork: boolean;
 };
 
 export type GitHubProfile = {
@@ -37,6 +40,16 @@ export type GitHubProfile = {
   sinceYear: number;
   updatedAt: string;
   topLanguage: string;
+  /**
+   * Own repositories, most recently pushed first.
+   *
+   * This list exists so the contribution graph does not have to re-request
+   * /users/:user/repos. That call is already made here, and the GitHub API
+   * allows 60 unauthenticated requests an hour per IP -- the graph then spends
+   * one request per repository on top, so every request saved here is a
+   * repository the graph can afford to include.
+   */
+  recentRepoNames: string[];
   mostStarredRepo: {
     name: string;
     stars: number;
@@ -74,6 +87,15 @@ export async function fetchGitHubProfile(
 
   const repos: GitHubRepoResponse[] = await reposResponse.json();
   const totalStars = repos.reduce((total, repo) => total + repo.stargazers_count, 0);
+
+  // Forks are excluded: their commit_activity is dominated by the upstream
+  // project's history, which would swamp the calendar with commits that are
+  // not his.
+  const recentRepoNames = repos
+    .filter((repo) => !repo.fork)
+    .slice()
+    .sort((a, b) => Date.parse(b.pushed_at) - Date.parse(a.pushed_at))
+    .map((repo) => repo.name);
   const createdYear = new Date(data.created_at).getFullYear();
 
   const mostStarredRepo = repos.reduce<GitHubProfile['mostStarredRepo']>((best, repo) => {
@@ -114,6 +136,7 @@ export async function fetchGitHubProfile(
     sinceYear: createdYear,
     updatedAt: data.updated_at,
     topLanguage,
+    recentRepoNames,
     mostStarredRepo,
   };
 }

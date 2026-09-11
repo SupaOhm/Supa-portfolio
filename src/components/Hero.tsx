@@ -1,5 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCursorGlow } from '../hooks/useCursorGlow';
+import { useGitHubProfile } from '../hooks/useGitHubProfile';
+import { useContributions } from '../hooks/useContributions';
+import ContributionGraph from './ContributionGraph';
+import { summarise } from '../lib/contributions';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
 import {
   ACADEMIC_YEAR,
@@ -9,6 +13,7 @@ import {
   INSTITUTION,
   LOCATION,
   PAPER_TITLE,
+  GITHUB_USERNAME,
   PROGRAM,
   VENUE,
 } from '../data/profile';
@@ -64,6 +69,15 @@ export default function Hero() {
 
   const handleMouseMove = useCursorGlow();
 
+  /**
+   * The profile fetch is shared with About and Connect through githubCache, so
+   * mounting it here costs no additional request -- and it is what supplies the
+   * repository list the contribution graph reads.
+   */
+  const { profile } = useGitHubProfile(GITHUB_USERNAME);
+  const { days } = useContributions(GITHUB_USERNAME, profile?.recentRepoNames);
+  const contributionStats = days.length > 0 ? summarise(days) : null;
+
   return (
     <section
       id="home"
@@ -77,6 +91,12 @@ export default function Hero() {
       // own content without escaping behind the page background.
       className="font-system relative isolate flex min-h-dvh flex-col justify-center overflow-hidden bg-black px-6 pt-24 pb-16"
     >
+      {/* The contribution plate, as the deepest layer on the page. Real commit
+          data rendered as terrain rather than as an embedded widget image, then
+          pushed behind the gradient wash so it reads as depth instead of as a
+          chart someone put in the background. */}
+      <ContributionGraph variant="background" days={days} className="-z-20" />
+
       {/* Ambient wash: two large, low-opacity radial blobs. Desaturated and
           under 0.2 alpha on purpose -- a saturated blue-to-purple wash is the
           single most recognisable generated-portfolio background, and the
@@ -216,7 +236,23 @@ export default function Hero() {
           </div>
         </div>
 
-        <p className="animate-rise mt-10 text-[13px] text-[#6e6e73]" style={{ animationDelay: '300ms' }}>
+        {/* The plate itself is wallpaper, so the numbers it encodes live here,
+            in the foreground, where they can actually be read. */}
+        {contributionStats && (
+          <p
+            className="animate-rise mt-12 text-[13px] text-[#86868b]"
+            style={{ animationDelay: '300ms' }}
+          >
+            <span className="font-semibold text-[#f5f5f7]">
+              {contributionStats.total.toLocaleString()}
+            </span>{' '}
+            commits across{' '}
+            <span className="font-semibold text-[#f5f5f7]">{contributionStats.activeDays}</span>{' '}
+            active days in the last year
+          </p>
+        )}
+
+        <p className="animate-rise mt-10 text-[13px] text-[#6e6e73]" style={{ animationDelay: '360ms' }}>
           {LOCATION}
         </p>
       </div>
