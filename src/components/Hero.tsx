@@ -11,29 +11,31 @@ import {
   PROGRAM,
   VENUE,
 } from '../data/profile';
+import { PROJECTS } from '../data/projects';
 
 /**
- * The nameplate sets each word as its own block below `md` and inline from `md`
- * up, so the same markup gives a two-line and a one-line masthead without a
- * <br>. Split from FULL_NAME rather than typed out, so the name has one source.
+ * Apple's dark palette rather than Tailwind's grays: #000 ground, #f5f5f7 for
+ * primary text, #86868b for secondary, #1d1d1f for raised panels, #2997ff for
+ * links. Tailwind's gray-900/950 are blue-tinted and read as "generic dark
+ * theme"; these are the actual values the look depends on, so they are written
+ * literally rather than approximated with the nearest utility.
  */
-const [FIRST_NAME, LAST_NAME] = FULL_NAME.split(' ');
+const PANEL = 'rounded-[18px] bg-[#1d1d1f] p-7 text-left';
+const PANEL_LABEL = 'text-[13px] font-semibold tracking-[-0.01em] text-[#86868b]';
 
 /**
- * Inline links replace the old padded CTA buttons. `py-3 -my-3` keeps the
- * band's rhythm unchanged (it adds padding without moving the text baseline),
- * but padding alone does not guarantee 44px everywhere these links appear: in
- * the footer the surrounding `band-label` class sets an 11px font with no
- * line-height override, so the inherited 1.5 gives a ~16.5px line box and
- * padding alone lands around ~40px, not 44. `min-h-11` (2.75rem = 44px) is
- * what actually guarantees 44px at both call sites -- the padding-only band
- * usage and the footer's smaller-type usage alike. No test enforces this;
- * jsdom performs no layout, so nothing here is measurable from the suite.
+ * Apple's inline call to action: a blue text link with a chevron that nudges on
+ * hover. Not a filled button -- those are reserved for the one primary action
+ * on an Apple page, and this hero has two equal ones.
+ *
+ * py-3 -my-3 plus min-h-11 gives a 44px target without moving the baseline.
  */
-const LINK_CLASS =
-  'inline-flex items-baseline gap-2 py-3 -my-3 min-h-11 text-blue-400 ' +
-  'hover:underline underline-offset-4 ' +
-  'focus:outline-hidden focus:ring-2 focus:ring-blue-400';
+const LINK =
+  'group inline-flex items-center gap-1 py-3 -my-3 min-h-11 text-[17px] ' +
+  'text-[#2997ff] hover:underline underline-offset-4 ' +
+  'focus:outline-hidden focus:ring-2 focus:ring-[#2997ff] focus:ring-offset-2 focus:ring-offset-black';
+
+const FEATURED = PROJECTS.slice(0, 3);
 
 export default function Hero() {
   const location = useLocation();
@@ -55,115 +57,121 @@ export default function Hero() {
     <section
       id="home"
       aria-labelledby="hero-heading"
-      // min-h-dvh, not min-h-screen: mobile browsers report 100vh without the
-      // collapsing URL bar, which pushes the footer row off-screen on first
-      // paint. min-h- rather than h- so a short landscape viewport scrolls
-      // instead of clipping.
-      //
-      // pt-16 / sm:pt-24 clear the fixed Navbar (top-0 + h-14 = 57px, then
-      // sm:top-6 + sm:h-16 = 90px). Those are the same numbers scroll-padding-top
-      // in index.css is built from, but this is an independent third copy —
-      // scroll-offset.test.ts does not cover it.
-      // overflow-x-clip, not overflow-hidden: it stops the nameplate widening
-      // the page without creating a scroll container.
-      //
-      // This is not defensive padding, it is a measured failure. The nameplate
-      // is sized from the real advance width of the name at font-stretch: 82%,
-      // but font-stretch does nothing to the system-ui fallback, which shapes
-      // materially wider. With the webfont blocked, 375px scrolled
-      // horizontally. The old hero carried overflow-hidden and never hit this,
-      // because it had no webfont to fail.
-      className="relative flex min-h-dvh flex-col overflow-x-clip bg-[#030712] px-4 pt-16 pb-8 sm:px-6 sm:pt-24 lg:px-8"
+      // Centred rather than left-aligned: Apple anchors a hero on the vertical
+      // axis and lets the margins do the work. min-h-dvh, not min-h-screen --
+      // mobile reports 100vh without the collapsing URL bar.
+      className="font-system relative flex min-h-dvh flex-col justify-center overflow-x-clip bg-black px-6 pt-24 pb-16"
     >
-      {/* @container is what makes the nameplate's cqi units resolve against this
-          box rather than the viewport. The box caps at 80rem. */}
-      <div className="@container mx-auto flex w-full max-w-7xl flex-1 flex-col">
+      <div className="mx-auto w-full max-w-[980px] text-center">
+        {/* Apple's eyebrow: small, semibold, coloured, sitting tight above the
+            headline rather than floating as a separate band. */}
+        <p className="animate-rise text-[17px] font-semibold tracking-[-0.01em] text-[#2997ff]">
+          {PROGRAM}
+        </p>
+
+        {/* The headline is the name, set at Apple's display proportions:
+            semibold rather than black, tight negative tracking, line-height
+            barely above 1. The weight is what keeps it from shouting -- an
+            800-weight name at this size reads as a poster, not a product. */}
         <h1
           id="hero-heading"
-          className="font-nameplate nameplate-two-line md:nameplate-one-line animate-rise text-gray-100"
+          className="animate-rise mt-2 text-[clamp(2.75rem,7vw,5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#f5f5f7]"
+          style={{ animationDelay: '60ms' }}
         >
-          <span className="block md:inline">{FIRST_NAME}</span>{' '}
-          <span className="block md:inline">{LAST_NAME}</span>
+          {FULL_NAME}
         </h1>
 
-        <hr className="mt-6 h-px border-0 bg-gray-800" />
-
-        {/* Labels are <p>, not headings: three h2s here would put headings
-            inside the hero ahead of every section heading on the assembled
-            page. The guard is the level-2 assertion in Hero.test.tsx — the
-            landmark tests only check that regions resolve by accessible name. */}
-        <div
-          className="font-band animate-rise mt-8 grid grid-cols-1 gap-8 text-[15px] leading-relaxed md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]"
-          style={{ animationDelay: '80ms' }}
+        <p
+          // text-balance so the subhead splits into even lines instead of
+          // leaving a one-word orphan on the last one, which is the detail that
+          // separates an Apple subhead from a paragraph that happens to be
+          // centred.
+          className="animate-rise mx-auto mt-5 max-w-[40rem] text-[19px] leading-[1.42] text-balance text-[#86868b] sm:text-[21px]"
+          style={{ animationDelay: '120ms' }}
         >
-          {/* At md the paragraph column spans the full first row: three columns
-              at 768px leave it ~14 characters a line. */}
-          <div className="md:col-span-2 lg:col-span-1">
-            <p className="band-label text-gray-500">What I do</p>
-            <p className="mt-3 max-w-[34ch] text-gray-400">
-              Security and retrieval systems &mdash; intrusion detection, RAG
-              pipelines &mdash; and the measurements that show whether they work.
-            </p>
-          </div>
+          Security and retrieval systems &mdash; intrusion detection, RAG
+          pipelines &mdash; and the measurements that show whether they work.
+        </p>
 
-          <div>
-            <p className="band-label text-gray-500">Recognition</p>
-            <p className="mt-3 text-gray-400">
-              <button
-                type="button"
-                onClick={() => handleSectionClick('projects')}
-                className={LINK_CLASS}
-              >
-                <span aria-hidden="true">&rarr;</span>
-                {PAPER_TITLE}
-              </button>
-              <span className="block">
-                {AWARD}, {VENUE}
-              </span>
-            </p>
-          </div>
+        <div
+          className="animate-rise mt-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2"
+          style={{ animationDelay: '180ms' }}
+        >
+          <button type="button" onClick={() => handleSectionClick('projects')} className={LINK}>
+            See the work
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+              &rsaquo;
+            </span>
+          </button>
+          <button type="button" onClick={() => handleSectionClick('connect')} className={LINK}>
+            Get in touch
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+              &rsaquo;
+            </span>
+          </button>
+        </div>
 
-          <div>
-            <p className="band-label text-gray-500">Availability</p>
-            <p className="mt-3 text-gray-400">Open to SWE internships.</p>
+        {/* Three raised panels, Apple's feature-tile grid. Labels are <p>, not
+            headings: three h2s inside the hero would sit ahead of every section
+            heading on the assembled page. Hero.test.tsx asserts that. */}
+        <div
+          className="animate-rise mt-14 grid grid-cols-1 gap-3 sm:grid-cols-3"
+          style={{ animationDelay: '240ms' }}
+        >
+          <div className={PANEL}>
+            <p className={PANEL_LABEL}>Recognition</p>
+            <p className="mt-2 text-[21px] leading-tight font-semibold tracking-[-0.02em] text-[#f5f5f7]">
+              {AWARD}
+            </p>
+            <p className="mt-1 text-[15px] text-[#86868b]">{VENUE}</p>
             <button
               type="button"
-              onClick={() => handleSectionClick('connect')}
-              className={`${LINK_CLASS} mt-3`}
+              onClick={() => handleSectionClick('projects')}
+              className={`${LINK} mt-2 text-[15px]`}
             >
-              <span aria-hidden="true">&rarr;</span>
-              Get in touch
+              {PAPER_TITLE}
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+                &rsaquo;
+              </span>
             </button>
-            {/* Stacked rather than run into a sentence: INSTITUTION is itself
-                'SIIT, Thammasat', and inlining it produces a comma pileup. */}
-            <p className="mt-4 text-gray-400">
-              <span className="block">{PROGRAM}</span>
-              <span className="block">{ACADEMIC_YEAR}</span>
-              <span className="block">{INSTITUTION}</span>
-              <span className="block">Graduating {EXPECTED_GRADUATION}</span>
+          </div>
+
+          <div className={PANEL}>
+            <p className={PANEL_LABEL}>Selected work</p>
+            <p className="mt-2 text-[21px] leading-tight font-semibold tracking-[-0.02em] text-[#f5f5f7]">
+              {PROJECTS.length} projects
             </p>
+            <ul className="mt-2 space-y-1">
+              {FEATURED.map((project) => (
+                <li
+                  key={project.id}
+                  className="truncate text-[15px] text-[#86868b]"
+                  title={project.title}
+                >
+                  {project.title.split(' - ')[0]}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className={PANEL}>
+            <p className={PANEL_LABEL}>Availability</p>
+            <p className="mt-2 text-[21px] leading-tight font-semibold tracking-[-0.02em] text-[#f5f5f7]">
+              Open to SWE internships
+            </p>
+            {/* Each fact in its own element: they come from profile.ts and
+                Hero.test.tsx looks each one up by exact text. */}
+            <div className="mt-2 text-[15px] text-[#86868b]">
+              <p>{ACADEMIC_YEAR}</p>
+              <p>{INSTITUTION}</p>
+              <p>Graduating {EXPECTED_GRADUATION}</p>
+            </div>
           </div>
         </div>
 
-        {/* mt-auto pins the footer to the bottom when there is slack and behaves
-            as a plain margin when the content is taller than the viewport. */}
-        <hr className="mt-auto h-px border-0 bg-gray-800" />
-        <div className="band-label flex flex-wrap justify-between gap-x-6 gap-y-2 pt-4 text-gray-500">
-          <button
-            type="button"
-            onClick={() => handleSectionClick('projects')}
-            className={LINK_CLASS}
-          >
-            See the work
-            <span aria-hidden="true">&darr;</span>
-          </button>
-          {/* inline-flex, not a bare span with py-3: vertical padding on a
-              non-replaced inline element does not affect line box height, so
-              py-3 alone would read as a touch-target fix that is not one. This
-              has no hit area to grow — it is not interactive — it just needs to
-              share the button's line box. */}
-          <span className="inline-flex items-center">{LOCATION}</span>
-        </div>
+        <p className="animate-rise mt-10 text-[13px] text-[#6e6e73]" style={{ animationDelay: '300ms' }}>
+          {LOCATION}
+        </p>
       </div>
     </section>
   );

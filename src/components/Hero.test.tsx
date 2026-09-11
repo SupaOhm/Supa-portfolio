@@ -53,14 +53,24 @@ describe('Hero', () => {
   });
 
   it('states the award from the profile constants', () => {
+    // Exact accessible name, not a regex: the Selected work index below the
+    // band renders the SAME project under its full title, so /ESNIDSaaS/ now
+    // matches two buttons and getByRole throws. The Recognition link's name is
+    // exactly the paper title; the index row's is the full title plus its
+    // number and categories.
     renderHero();
 
-    expect(screen.getByRole('button', { name: new RegExp(PAPER_TITLE) })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PAPER_TITLE })).toBeInTheDocument();
     // Exact string, not a regex: a regex also matches every ancestor whose
     // textContent contains it, and getByText throws on multiple matches. The
     // component gives this its own <span> so exactly one element's full text
     // equals it.
-    expect(screen.getByText(`${AWARD}, ${VENUE}`)).toBeInTheDocument();
+    // The award and the venue sit on separate lines in the Recognition panel,
+    // so they are asserted separately. Exact strings, not regexes: each is its
+    // own element's entire text, which keeps the query unambiguous against the
+    // panel and against any ancestor.
+    expect(screen.getByText(AWARD)).toBeInTheDocument();
+    expect(screen.getByText(VENUE)).toBeInTheDocument();
   });
 
   it('exposes one h1 and no other headings', () => {
@@ -104,7 +114,7 @@ describe('Hero', () => {
     renderHero();
     const scrollIntoView = target.scrollIntoView as unknown as ReturnType<typeof vi.fn>;
 
-    await userEvent.click(screen.getByRole('button', { name: new RegExp(PAPER_TITLE) }));
+    await userEvent.click(screen.getByRole('button', { name: PAPER_TITLE }));
 
     expect(scrollIntoView).toHaveBeenCalled();
     expect(scrollIntoView.mock.contexts).toContain(target);

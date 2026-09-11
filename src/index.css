@@ -72,6 +72,17 @@
    own font-medium / font-bold utilities, while the low-level one is simply
    ignored by them. font-stretch: 82% maps to wdth 82. */
 
+/* Apple-inspired hero: the system stack resolves to SF Pro on macOS and iOS,
+   which is the actual typeface the look is borrowed from -- no webfont needed
+   and nothing to download. Everything else falls through to a sane local sans. */
+@utility font-system {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-feature-settings: 'kern' 1;
+  -webkit-font-smoothing: antialiased;
+}
+
 @utility font-nameplate {
   font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
   font-weight: 700;
