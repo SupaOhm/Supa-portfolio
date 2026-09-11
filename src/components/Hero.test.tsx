@@ -127,8 +127,22 @@ describe('Hero', () => {
     const { container } = renderHero();
 
     expect(container.querySelector('pre')).toBeNull();
-    expect(container.querySelector('.cursor-glow')).toBeNull();
     expect(container.textContent).not.toMatch(/const developer/);
+
+    // This deliberately no longer asserts `.cursor-glow` is absent. It did, as
+    // part of the same revert-guard, because the cursor-following glow was one
+    // of the generated-looking tells being removed. The Apple-inspired
+    // direction reinstated it ON PURPOSE as a soft spotlight over the ambient
+    // gradient, so the premise of that assertion is gone -- keeping it would
+    // have meant the test failing for the design being right.
+    //
+    // What still holds is that it must stay decorative: the glow is
+    // aria-hidden and pointer-events-none, so it can neither be reached by
+    // assistive tech nor swallow a click meant for a link beneath it.
+    const glow = container.querySelector('.cursor-glow');
+    expect(glow).not.toBeNull();
+    expect(glow).toHaveAttribute('aria-hidden', 'true');
+    expect(glow?.className).toContain('pointer-events-none');
     // The GPA is deliberately off the landing screen — it has no room in the
     // band and About states it. Nothing else asserts this: profile-drift only
     // forbids a hardcoded literal, so re-adding {GPA} from the constant would

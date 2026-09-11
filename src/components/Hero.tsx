@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useCursorGlow } from '../hooks/useCursorGlow';
 import { currentScrollBehavior } from '../lib/scrollBehavior';
 import {
   ACADEMIC_YEAR,
@@ -20,7 +21,15 @@ import { PROJECTS } from '../data/projects';
  * theme"; these are the actual values the look depends on, so they are written
  * literally rather than approximated with the nearest utility.
  */
-const PANEL = 'rounded-[18px] bg-[#1d1d1f] p-7 text-left';
+/* Panels are a vertical gradient rather than a flat fill, with a hairline ring
+   that brightens on hover and a gradient highlight along the top edge -- the
+   detail Apple uses to make a dark card read as lit from above rather than as
+   a grey rectangle. */
+const PANEL =
+  'group/panel relative overflow-hidden rounded-[18px] p-7 text-left ' +
+  'bg-linear-to-b from-[#1d1d1f] to-[#161618] ' +
+  'ring-1 ring-white/[0.06] transition-[box-shadow,--tw-ring-color] duration-300 ' +
+  'hover:ring-white/[0.14]';
 const PANEL_LABEL = 'text-[13px] font-semibold tracking-[-0.01em] text-[#86868b]';
 
 /**
@@ -53,16 +62,42 @@ export default function Hero() {
     }
   };
 
+  const handleMouseMove = useCursorGlow();
+
   return (
     <section
       id="home"
       aria-labelledby="hero-heading"
+      onMouseMove={handleMouseMove}
       // Centred rather than left-aligned: Apple anchors a hero on the vertical
       // axis and lets the margins do the work. min-h-dvh, not min-h-screen --
       // mobile reports 100vh without the collapsing URL bar.
-      className="font-system relative flex min-h-dvh flex-col justify-center overflow-x-clip bg-black px-6 pt-24 pb-16"
+      //
+      // isolate so the -z-10 gradient layers below stay behind this section's
+      // own content without escaping behind the page background.
+      className="font-system relative isolate flex min-h-dvh flex-col justify-center overflow-hidden bg-black px-6 pt-24 pb-16"
     >
-      <div className="mx-auto w-full max-w-[980px] text-center">
+      {/* Ambient wash: two large, low-opacity radial blobs. Desaturated and
+          under 0.2 alpha on purpose -- a saturated blue-to-purple wash is the
+          single most recognisable generated-portfolio background, and the
+          difference between atmosphere and that is entirely opacity. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-[15%] left-1/2 h-[620px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(41,151,255,0.17),transparent)] blur-3xl" />
+        <div className="absolute -bottom-[20%] right-[2%] h-[560px] w-[780px] rounded-full bg-[radial-gradient(closest-side,rgba(148,109,255,0.14),transparent)] blur-3xl" />
+        <div className="absolute -bottom-[10%] left-[4%] h-[420px] w-[620px] rounded-full bg-[radial-gradient(closest-side,rgba(0,209,255,0.08),transparent)] blur-3xl" />
+      </div>
+
+      {/* Cursor spotlight. useCursorGlow eases toward the pointer rather than
+          tracking it exactly, and returns a no-op under prefers-reduced-motion,
+          so this costs nothing for a user who has asked for stillness.
+          mix-blend-screen lets it brighten the wash beneath instead of
+          stacking another opaque layer on top of it. */}
+      <div
+        aria-hidden="true"
+        className="cursor-glow pointer-events-none -z-10 h-[680px] w-[680px] rounded-full bg-[radial-gradient(closest-side,rgba(41,151,255,0.20),rgba(148,109,255,0.10),transparent)] blur-2xl mix-blend-screen"
+      />
+
+      <div className="relative z-10 mx-auto w-full max-w-[980px] text-center">
         {/* Apple's eyebrow: small, semibold, coloured, sitting tight above the
             headline rather than floating as a separate band. */}
         <p className="animate-rise text-[17px] font-semibold tracking-[-0.01em] text-[#2997ff]">
@@ -119,6 +154,10 @@ export default function Hero() {
           style={{ animationDelay: '240ms' }}
         >
           <div className={PANEL}>
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/25 to-transparent"
+            />
             <p className={PANEL_LABEL}>Recognition</p>
             <p className="mt-2 text-[21px] leading-tight font-semibold tracking-[-0.02em] text-[#f5f5f7]">
               {AWARD}
@@ -137,6 +176,10 @@ export default function Hero() {
           </div>
 
           <div className={PANEL}>
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/25 to-transparent"
+            />
             <p className={PANEL_LABEL}>Selected work</p>
             <p className="mt-2 text-[21px] leading-tight font-semibold tracking-[-0.02em] text-[#f5f5f7]">
               {PROJECTS.length} projects
@@ -155,6 +198,10 @@ export default function Hero() {
           </div>
 
           <div className={PANEL}>
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/25 to-transparent"
+            />
             <p className={PANEL_LABEL}>Availability</p>
             <p className="mt-2 text-[21px] leading-tight font-semibold tracking-[-0.02em] text-[#f5f5f7]">
               Open to SWE internships
