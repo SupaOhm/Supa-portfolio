@@ -37,6 +37,26 @@ export type ContributionDay = {
 
 const DAY_SECONDS = 86_400;
 
+/**
+ * GitHub's `week` is midnight Sunday in the repository's own timezone context,
+ * not in UTC, so the value is offset by that zone and the offset CHANGES across
+ * a daylight-saving boundary. This account's real response carries two distinct
+ * within-day offsets: 00:00 UTC for some weeks and 23:00 UTC the previous
+ * Saturday for the rest.
+ *
+ * Read literally, that puts half the year's day-0 on a Sunday date and the
+ * other half on a Saturday date -- the same weekday lands in different rows of
+ * the grid depending only on the season, and the calendar as a whole anchors to
+ * whichever side the earliest week fell on. Nothing throws; the rows just stop
+ * meaning the weekday they claim.
+ *
+ * Rounding to the nearest UTC midnight removes the zone offset for anywhere
+ * within twelve hours of UTC, which is every offset GitHub can produce here.
+ */
+function weekStart(unixSeconds: number): number {
+  return Math.round(unixSeconds / DAY_SECONDS) * DAY_SECONDS;
+}
+
 /** UTC date key. Deliberately not locale-formatted: this is an identity, not display text. */
 function isoDate(unixSeconds: number): string {
   return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
@@ -58,7 +78,7 @@ export function mergeCommitActivity(repos: CommitActivityWeek[][]): Map<string, 
         if (count <= 0) {
           return;
         }
-        const key = isoDate(week.week + dayIndex * DAY_SECONDS);
+        const key = isoDate(weekStart(week.week) + dayIndex * DAY_SECONDS);
         byDate.set(key, (byDate.get(key) ?? 0) + count);
       });
     }
@@ -112,7 +132,7 @@ export function levelFor(count: number, thresholds: [number, number, number]): C
  * and must never have to reason about a missing date.
  */
 export function buildCalendar(repos: CommitActivityWeek[][]): ContributionDay[] {
-  const weekStarts = repos.flat().map((w) => w.week);
+  const weekStarts = repos.flat().map((w) => weekStart(w.week));
   if (weekStarts.length === 0) {
     return [];
   }
@@ -165,4 +185,38 @@ export function summarise(days: ContributionDay[]): {
   }
 
   return { total, activeDays, busiestDay, currentStreak };
+}
+
+/**
+ * Thirteen weeks — the "recent three months" window the hero renders.
+ *
+ * A multiple of 7 is not cosmetic. `buildCalendar` returns a run that starts on
+ * a Sunday and ends on a Saturday, and the renderer groups it into columns with
+ * a plain `slice(i, i + 7)` from index 0. Taking a number of days that is not a
+ * whole number of weeks would shift every column off the weekday it claims to
+ * be, silently: the grid still renders, it just stops meaning anything.
+ */
+export const RECENT_WEEKS = 13;
+
+/**
+ * The tail of a calendar, re-banded against itself.
+ *
+ * Re-running the thresholds over the window — rather than keeping the levels
+ * `buildCalendar` assigned across the full year — is the point of this
+ * function. The bands are quartiles of the ACTIVE days in whatever range they
+ * describe, so a year's quartiles applied to three months render that window in
+ * whichever part of the ramp those months happened to sit: a quiet quarter of a
+ * busy year comes out uniformly dark, a busy quarter uniformly bright. Banding
+ * the window against itself is what gives the visible range its full contrast.
+ */
+export function takeRecentWeeks(
+  days: ContributionDay[],
+  weeks: number = RECENT_WEEKS,
+): ContributionDay[] {
+  // slice(-n) already yields the whole array when it is shorter than n, which
+  // is the right answer for an account younger than the window.
+  const recent = days.slice(-weeks * 7);
+  const thresholds = computeThresholds(recent.map((d) => d.count));
+
+  return recent.map((day) => ({ ...day, level: levelFor(day.count, thresholds) }));
 }

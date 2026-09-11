@@ -1,4 +1,9 @@
-import { buildCalendar, type CommitActivityWeek, type ContributionDay } from './contributions';
+import {
+  buildCalendar,
+  takeRecentWeeks,
+  type CommitActivityWeek,
+  type ContributionDay,
+} from './contributions';
 
 /**
  * Fetching, retrying and caching for the contribution graph. The shaping lives
@@ -208,7 +213,11 @@ export async function getCachedContributions(
     const activity = await Promise.all(
       repos.map((repo) => fetchRepoCommitActivity(owner, repo, deps, signal)),
     );
-    const days = buildCalendar(activity);
+    // Trimmed to the recent window here rather than at the render, so the
+    // cache, the graph and the summary line above it can never disagree about
+    // which range they describe. GitHub gives us 52 weeks per repo either
+    // way -- the request cost is the same, only what we keep changes.
+    const days = takeRecentWeeks(buildCalendar(activity));
     if (days.length > 0) {
       writeCache(owner, days, deps);
     }

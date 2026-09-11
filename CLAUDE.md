@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run og` — render `assets-src/og/og.html` to the 1200×630 `public/og.png` Open Graph card (`scripts/render-og.ts`) via headless Chrome, with the Chrome binary path hardcoded for macOS. Manual/local only, never run in CI — same trap as `npm run images`: it executes a bare `.ts` file, which needs Node 22.18+/23.6+ for unflagged native type stripping and fails on the project's Node 20 `engines` floor with a parse error rather than a friendly message.
 - `npm run fonts` — re-subset the Bricolage Grotesque original in `assets-src/fonts/` into the `public/fonts/` `.woff2` the hero masthead loads (`scripts/subset-font.sh`). Manual/local only, never in CI. Requires `pyftsubset` (`pip install fonttools brotli`) — unlike `images` and `og` it is a shell script, not a bare `.ts` file, so it has no Node version floor. The shipped file is the `wdth`-axis Fontsource variant (wght + wdth, no `opsz`) subsetted from 76.3 KB to 43.6 KB.
 
-`npm test` runs the Vitest suite (312 tests across 38 files); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
+`npm test` runs the Vitest suite (357 tests across 40 files); `npm run typecheck` runs a standalone `tsc -b --noEmit`.
 
 The suite's default `environment` is `'node'`. Files that need a DOM opt in individually with `// @vitest-environment jsdom` as their **first line** — there is no global jsdom. `src/test/setup.ts` runs for every file regardless, and guards its whole body behind `typeof window !== 'undefined'` for exactly that reason.
 

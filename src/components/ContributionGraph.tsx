@@ -143,7 +143,20 @@ export default function ContributionGraph({
     return (
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
+        // The scale is a breakpoint decision, not one number. The window is
+        // thirteen weeks, so the plate is a quarter of the width it had at a
+        // full year and the 2.6 that once filled the frame now strands a 438px
+        // patch in the middle of it. But a scale large enough to fill a desktop
+        // makes each day roughly 95px, and at 390px wide that is a single green
+        // tile sitting behind the headline, competing with it rather than
+        // backing it. Each step keeps the tiles at a similar fraction of the
+        // screen instead.
+        className={
+          'pointer-events-none absolute inset-0 overflow-hidden ' +
+          '[--contribution-scale:5.5] [--contribution-y:0%] ' +
+          'sm:[--contribution-scale:8] sm:[--contribution-y:60%] ' +
+          `lg:[--contribution-scale:10.5] lg:[--contribution-y:324%] ${className}`
+        }
       >
         <div
           className="absolute top-1/2 left-1/2"
@@ -153,19 +166,27 @@ export default function ContributionGraph({
             perspective: 1400,
             // Deliberately overflows the viewport: a backdrop that ends inside
             // the frame reads as a picture of a graph rather than as depth.
-            // translate(-50%,-50%) centres the LAYOUT box, and a rotated
-            // element's visual mass is not centred on its layout box -- at
-            // rotateZ(-42deg) the plate's weight fell into the left half of the
-            // screen. The offsets here are the correction, set by eye against
-            // the centred headline rather than derived -- there is no formula
-            // for where a rotated plate's visual weight lands.
             //
-            // The Y offset is well short of centred on purpose. At -46% the
-            // plate's upper edge rose behind the fixed navbar on a short
-            // viewport, which read as the background leaking out of its
-            // section. Sitting it lower keeps the terrain under the headline
-            // and the panels, where it belongs.
-            transform: 'translate(-44%, -24%) scale(2.6)',
+            // translate(-50%,-50%) would centre the LAYOUT box, and a rotated
+            // plate's visual mass is nowhere near its layout box. These two
+            // expressions are the correction, and they are measured rather than
+            // guessed: the plate was rendered at scales 6, 9 and 12 and its
+            // painted bounds read off the real client rects each time. The
+            // horizontal offset that recentres it turned out to be linear in
+            // the scale -- -18.4px per unit, which over the 149.5px-wide layout
+            // box is the -12.3% below -- so X is a formula and holds at every
+            // width measured.
+            //
+            // Y is not, and that is the whole reason it is a per-breakpoint
+            // variable rather than a second coefficient. This layer is
+            // `inset-0` on the hero, so `top-1/2` tracks the SECTION's height,
+            // and the section is roughly 900px on a desktop but 1200 on a phone
+            // where the panels stack. The same offset therefore parks the plate
+            // under the fold on a phone -- measured, it left one green sliver
+            // at the bottom edge and nothing else.
+            transform:
+              'translate(calc(-44% - 12.3% * var(--contribution-scale)),' +
+              ' var(--contribution-y)) scale(var(--contribution-scale))',
             transformOrigin: 'center',
             // Faded on both axes, because the plate runs diagonally. Without
             // this its hard edges cut across the headline sitting on top.
@@ -199,7 +220,7 @@ export default function ContributionGraph({
       <div className="mb-4 flex flex-wrap items-baseline justify-center gap-x-6 gap-y-1 text-[13px] text-[#86868b]">
         <span>
           <span className="font-semibold text-[#f5f5f7]">{stats.total.toLocaleString()}</span>{' '}
-          commits in the last year
+          commits in the last 3 months
         </span>
         <span>
           <span className="font-semibold text-[#f5f5f7]">{stats.activeDays}</span> active days
@@ -230,7 +251,7 @@ export default function ContributionGraph({
         >
           <div
             role="img"
-            aria-label={`Contribution graph: ${stats.total} commits across ${stats.activeDays} active days in the last year`}
+            aria-label={`Contribution graph: ${stats.total} commits across ${stats.activeDays} active days in the last 3 months`}
             style={{
               transformStyle: 'preserve-3d',
               transform: PLATE_TRANSFORM,

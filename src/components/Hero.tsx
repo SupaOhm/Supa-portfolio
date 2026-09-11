@@ -266,7 +266,7 @@ export default function Hero() {
             </span>{' '}
             commits across{' '}
             <span className="font-semibold text-[#f5f5f7]">{contributionStats.activeDays}</span>{' '}
-            active days in the last year
+            active days in the last 3 months
           </p>
         )}
 

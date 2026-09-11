@@ -9,6 +9,7 @@ import {
   type CacheStorage,
   type ContributionDeps,
 } from './githubContributions';
+import { RECENT_WEEKS } from './contributions';
 
 afterEach(() => {
   __resetContributionsInFlight();
@@ -172,5 +173,21 @@ describe('getCachedContributions', () => {
 
     expect(days.length).toBeGreaterThan(0);
     expect(days.some((d) => d.count > 0)).toBe(true);
+  });
+
+  it('returns only the recent window, not the full year GitHub sends', async () => {
+    // GitHub answers with 52 weeks per repository whatever we do; the window is
+    // applied here rather than at the render so the cache, the graph and the
+    // summary line above it cannot disagree about which range they describe.
+    const year = Array.from({ length: 52 }, (_, i) => ({
+      week: 1_767_484_800 + i * 604_800,
+      days: [1, 0, 0, 0, 0, 0, 0],
+      total: 1,
+    }));
+    const f = vi.fn(async () => ok(year)) as unknown as typeof fetch;
+
+    const days = await getCachedContributions('SupaOhm', ['a'], deps(f));
+
+    expect(days).toHaveLength(RECENT_WEEKS * 7);
   });
 });
