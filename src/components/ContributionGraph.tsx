@@ -143,19 +143,21 @@ export default function ContributionGraph({
     return (
       <div
         aria-hidden="true"
-        // The scale is a breakpoint decision, not one number. The window is
-        // thirteen weeks, so the plate is a quarter of the width it had at a
-        // full year and the 2.6 that once filled the frame now strands a 438px
-        // patch in the middle of it. But a scale large enough to fill a desktop
-        // makes each day roughly 95px, and at 390px wide that is a single green
-        // tile sitting behind the headline, competing with it rather than
-        // backing it. Each step keeps the tiles at a similar fraction of the
-        // screen instead.
+        // The scale is a breakpoint decision, not one number, and thirteen
+        // weeks cannot have it both ways: the plate is a quarter of the width
+        // it had at a full year, so a scale that bleeds the terrain off all
+        // four edges is also a scale that makes each day 95px. That was tried,
+        // and 95px days read as abstract slabs rather than a calendar -- on a
+        // 390px screen a single green one sat behind the headline arguing with
+        // it. These values keep the day cells near their original size and let
+        // the plate be a contained motif behind the copy instead, which is the
+        // side of the trade worth taking. Each step holds the cells at roughly
+        // the same fraction of the screen.
         className={
           'pointer-events-none absolute inset-0 overflow-hidden ' +
-          '[--contribution-scale:5.5] [--contribution-y:0%] ' +
-          'sm:[--contribution-scale:8] sm:[--contribution-y:60%] ' +
-          `lg:[--contribution-scale:10.5] lg:[--contribution-y:324%] ${className}`
+          '[--contribution-scale:3] [--contribution-y:-55%] ' +
+          'sm:[--contribution-scale:4.25] sm:[--contribution-y:64%] ' +
+          `lg:[--contribution-scale:5.5] lg:[--contribution-y:157%] ${className}`
         }
       >
         <div
