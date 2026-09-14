@@ -87,9 +87,17 @@ export default function Hero() {
       // axis and lets the margins do the work. min-h-dvh, not min-h-screen --
       // mobile reports 100vh without the collapsing URL bar.
       //
-      // isolate so the -z-10 gradient layers below stay behind this section's
-      // own content without escaping behind the page background.
-      className="font-system relative isolate flex min-h-dvh flex-col justify-center overflow-hidden bg-black px-6 pt-24 pb-16"
+      // isolate so this section's own negative-z layers -- the contribution
+      // plate and the legibility scrim -- stay behind its content instead of
+      // escaping behind the page background.
+      //
+      // No bg here, deliberately. PageAtmosphere is a fixed layer behind the
+      // whole document, and an opaque background on this section would cover it
+      // for the height of the hero: the mesh would start abruptly at the fold
+      // rather than running from the top of the page. What remains opaque
+      // underneath is body's own colour, which paints as the canvas and so sits
+      // below everything including the mesh.
+      className="font-system relative isolate flex min-h-dvh flex-col justify-center overflow-hidden px-6 pt-24 pb-16"
     >
       {/* The contribution plate, as the deepest layer on the page. Real commit
           data rendered as terrain rather than as an embedded widget image, then
@@ -107,23 +115,30 @@ export default function Hero() {
           every time the commit data does, so a snapshot that clears AA by a
           rounding error is not a result you can rely on next month.
 
-          Deliberately tight and centred on the copy rather than a full-section
+          Deliberately shaped around the copy rather than a full-section
           overlay, so the terrain stays at full strength everywhere it is not
-          sitting under text. */}
+          sitting under text.
+
+          Widened from 44%x30% to 64%x50% when the page-wide mesh replaced this
+          section's own ambient wash. The mesh is brighter than what it
+          replaced and it reaches the whole section rather than fading at the
+          edges, and the old ellipse only ever covered the headline: measured
+          afterwards, the panel labels fell to 3.36:1 and the location line to
+          2.19:1, both under AA. Widening the scrim fixes that while keeping the
+          hero's two-level grey hierarchy intact -- the alternative was lifting
+          both greys onto one token and losing the distinction between secondary
+          and tertiary text to solve a background problem. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-[15] bg-[radial-gradient(ellipse_44%_30%_at_50%_38%,rgba(0,0,0,0.88),rgba(0,0,0,0.55)_55%,transparent_78%)]"
+        className="pointer-events-none absolute inset-0 -z-[15] bg-[radial-gradient(ellipse_64%_50%_at_50%_46%,rgba(0,0,0,0.90),rgba(0,0,0,0.62)_58%,transparent_84%)]"
       />
 
-      {/* Ambient wash: two large, low-opacity radial blobs. Desaturated and
-          under 0.2 alpha on purpose -- a saturated blue-to-purple wash is the
-          single most recognisable generated-portfolio background, and the
-          difference between atmosphere and that is entirely opacity. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-[15%] left-1/2 h-[620px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(41,151,255,0.17),transparent)] blur-3xl" />
-        <div className="absolute -bottom-[20%] right-[2%] h-[560px] w-[780px] rounded-full bg-[radial-gradient(closest-side,rgba(148,109,255,0.14),transparent)] blur-3xl" />
-        <div className="absolute -bottom-[10%] left-[4%] h-[420px] w-[620px] rounded-full bg-[radial-gradient(closest-side,rgba(0,209,255,0.08),transparent)] blur-3xl" />
-      </div>
+      {/* The hero's own ambient wash is gone. It was three blurred radials
+          scoped to this section, which is exactly the shape of the seam this
+          page just removed everywhere else -- an atmosphere that begins and
+          ends at a section boundary. PageAtmosphere now supplies it for the
+          whole document, so the colour behind the headline is the same colour,
+          continuously interpolated, as the colour behind the footer. */}
 
       {/* Cursor spotlight. useCursorGlow eases toward the pointer rather than
           tracking it exactly, and returns a no-op under prefers-reduced-motion,
@@ -270,7 +285,14 @@ export default function Hero() {
           </p>
         )}
 
-        <p className="animate-rise mt-10 text-[13px] text-[#6e6e73]" style={{ animationDelay: '360ms' }}>
+        {/* text-muted, not #6e6e73. That grey was tuned against the hero's old
+            solid black ground. Over the page-wide mesh it measured 2.44:1,
+            and this line sits at the very bottom of the section, below where
+            the legibility scrim reaches, so widening the scrim cannot rescue
+            it. text-muted was tried next and measured 4.32:1 -- still under
+            the 4.5 floor, because at 13px this line has less stroke to carry it
+            than body copy does. text-neutral is one step up the same ramp. */}
+        <p className="animate-rise mt-10 text-[13px] text-neutral" style={{ animationDelay: '360ms' }}>
           {LOCATION}
         </p>
       </div>
