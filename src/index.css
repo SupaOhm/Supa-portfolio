@@ -1,5 +1,5 @@
 /* Hallmark · verb: redesign (visual layer only) · genre: modern-minimal
- * theme: custom · vibe: "near-black, one hue per section"
+ * theme: custom · vibe: "one continuous scroll-driven mesh, hue per section in the UI"
  * paper: oklch(14% 0.008 250), tinted 5% toward each section's hue
  * accents: azure 250 (About) · teal 185 (Skills) · amber 75 (Projects)
  *          violet 295 (Connect) -- one per section, never two in one
@@ -10,7 +10,9 @@
  *   section IDs are all as they were; only the visual layer was replaced
  * nav + footer: out of scope, untouched -- both still carry the previous
  *   blue-to-purple vocabulary, which is a known and deliberate seam
- * enrichment: none (typography only)
+ * enrichment: PageAtmosphere -- one fixed mesh behind the whole page,
+ *   hue driven continuously by scroll through --page-hue, cursor-reactive,
+ *   grain-dithered. Mounted once in Home.tsx, never per section.
  *
  * pre-emit critique: P5 H4 E5 S4 R5 V4
  *   V rose from 3 after the first pass shipped monochrome and read as dull.
@@ -51,7 +53,13 @@
   --color-paper-2: oklch(18% 0.009 250);
   --color-paper-3: oklch(22% 0.01 250);
   --color-rule: oklch(30% 0.008 250);
-  --color-muted: oklch(62% 0.008 250);
+  /* 68%, not the 62% this started at. Measured against the live animated mesh
+     at its brightest, 62% put secondary body copy at 4.28:1 -- under the 4.5
+     AA floor, and only at the worst pixels, which is exactly the kind of
+     failure that never shows up in a static screenshot. Raising the text was
+     the right side to fix: the backdrop is meant to be vivid, and dimming it to
+     rescue contrast would have been solving the wrong problem. */
+  --color-muted: oklch(68% 0.008 250);
   --color-neutral: oklch(76% 0.006 250);
   --color-ink: oklch(95% 0.005 250);
 
@@ -120,6 +128,32 @@
   font-stretch: 75% 100%;
   font-style: normal;
   font-display: swap;
+}
+
+/* Atmosphere drift.
+ *
+ * Three blobs on three different periods (29s / 37s / 43s) that share no common
+ * factor, so the composition never returns to the same arrangement twice within
+ * any watchable stretch -- a loop you can catch is a loop that reads as a GIF.
+ *
+ * transform and opacity only. Both are composited, so the whole thing runs off
+ * the main thread; animating the gradient's colour stops or the blobs' width
+ * would repaint and re-rasterize a blurred layer every frame, which is how
+ * "ambient background" turns into a dropped-frame scroll.
+ */
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(8%, -6%, 0) scale(1.12); }
+  66% { transform: translate3d(-5%, 7%, 0) scale(0.94); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  40% { transform: translate3d(-9%, 5%, 0) scale(0.92); }
+  70% { transform: translate3d(6%, 8%, 0) scale(1.15); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.96); }
+  50% { transform: translate3d(7%, 9%, 0) scale(1.18); }
 }
 
 @utility cursor-glow {

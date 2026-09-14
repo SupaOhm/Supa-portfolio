@@ -5,7 +5,6 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
 import {
   ACCENT_BUTTON,
-  SECTION_GROUND,
   CHIP,
   LINK,
   PANEL,
@@ -119,7 +118,7 @@ export default function About() {
       ref={sectionRef}
       id="about"
       aria-labelledby="about-heading"
-      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.azure}`}
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_HUES.azure}`}
     >
       <div className="relative z-10 mx-auto max-w-[980px]">
         <h2

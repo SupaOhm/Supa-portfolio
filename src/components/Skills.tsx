@@ -1,7 +1,7 @@
 import { useReveal } from '../hooks/useReveal';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
-import { CHIP, SECTION_GROUND, SECTION_HUES, SECTION_RULE } from '../lib/surfaces';
+import { CHIP, SECTION_HUES, SECTION_RULE } from '../lib/surfaces';
 
 const SKILL_CATEGORIES = {
   Languages: ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
@@ -19,7 +19,7 @@ export default function Skills() {
       ref={sectionRef}
       id="skills"
       aria-labelledby="skills-heading"
-      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.teal}`}
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_HUES.teal}`}
     >
       <div className="relative z-10 mx-auto max-w-[980px]">
         {/* Left-aligned, not centred. Four sections of centred column was the

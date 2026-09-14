@@ -7,7 +7,13 @@ import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    /* No background on this wrapper. `body` already paints the same colour in
+       index.css, and a body background propagates to the canvas -- which is
+       painted before everything, including negative-z layers. A background on
+       THIS element is painted as an ordinary in-flow box instead, so it covers
+       the fixed -z-10 atmosphere completely. Removing it changes nothing
+       visually and is the difference between the backdrop existing and not. */
+    <div className="min-h-screen text-white">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

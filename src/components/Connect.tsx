@@ -3,7 +3,6 @@ import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import {
   ACCENT_BUTTON,
-  SECTION_GROUND,
   LINK,
   PANEL,
   QUIET_BUTTON,
@@ -95,7 +94,7 @@ export default function Connect() {
     <section
       id="connect"
       aria-labelledby="connect-heading"
-      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.violet}`}
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_HUES.violet}`}
     >
       {/* The blue-to-purple wash that sat behind this section is gone. It was
           the same three-stop gradient on About, Skills and Connect -- a

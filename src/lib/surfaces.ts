@@ -33,12 +33,28 @@
  * the inheritance actually happen.
  */
 
-/** Applied by each section to choose its hue. Pair them; never set one alone. */
+/**
+ * Applied by each section to choose its hue. Set all three together.
+ *
+ * `--section-next` is the hue of the section BELOW this one, and it is what
+ * SectionAtmosphere blends toward. That makes the four backgrounds a chain
+ * rather than four separate washes: azure hands off to teal, teal to amber,
+ * amber to violet, violet back round to azure. Scrolling the page reads as one
+ * continuous move through the ramp, and the background is telling you where you
+ * are instead of merely being present.
+ *
+ * The UI rule is unchanged and unaffected: --section-next is used ONLY by the
+ * decorative atmosphere. No chip, link, border or active state ever touches it,
+ * so no piece of interface mixes two hues.
+ */
 export const SECTION_HUES = {
-  azure: '[--section-accent:var(--color-azure)] [--section-tint:var(--color-azure-soft)]',
-  teal: '[--section-accent:var(--color-teal)] [--section-tint:var(--color-teal-soft)]',
-  amber: '[--section-accent:var(--color-amber)] [--section-tint:var(--color-amber-soft)]',
-  violet: '[--section-accent:var(--color-violet)] [--section-tint:var(--color-violet-soft)]',
+  azure:
+    '[--section-accent:var(--color-azure)] [--section-tint:var(--color-azure-soft)] [--section-next:var(--color-teal)]',
+  teal: '[--section-accent:var(--color-teal)] [--section-tint:var(--color-teal-soft)] [--section-next:var(--color-amber)]',
+  amber:
+    '[--section-accent:var(--color-amber)] [--section-tint:var(--color-amber-soft)] [--section-next:var(--color-violet)]',
+  violet:
+    '[--section-accent:var(--color-violet)] [--section-tint:var(--color-violet-soft)] [--section-next:var(--color-azure)]',
 } as const;
 
 /**
@@ -87,22 +103,6 @@ export const CHIP =
 export const PANEL =
   'rounded-xl border border-[var(--section-accent)]/15 p-6 ' +
   'bg-[color-mix(in_oklab,var(--section-accent)_5%,var(--color-paper-2))]';
-
-/**
- * The section's ground, tinted toward its hue.
- *
- * 5% of the accent mixed into paper -- small enough that it never competes with
- * text and never reads as a coloured block, large enough that the four sections
- * are distinguishable at a glance while scrolling rather than only on close
- * inspection of their details.
- *
- * `color-mix(in oklab, ...)` rather than a stack of alpha layers, so the tint
- * is computed in a perceptual space and the result stays at the lightness the
- * palette intends. Mixing in sRGB darkens as it saturates, which is exactly the
- * muddiness that makes hand-tinted dark themes look grimy.
- */
-export const SECTION_GROUND =
-  'bg-[color-mix(in_oklab,var(--section-accent)_5%,var(--color-paper))]';
 
 /**
  * One number in a row of numbers.

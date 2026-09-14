@@ -11,7 +11,7 @@ import useCarousel from '../hooks/useCarousel';
 import { filterProjects } from '../lib/filterProjects';
 import { POSITION_STYLES, REDUCED_POSITION_STYLES } from '../lib/carouselPositionStyles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { QUIET_BUTTON, SECTION_GROUND, SECTION_HUES, SECTION_RULE } from '../lib/surfaces';
+import { QUIET_BUTTON, SECTION_HUES, SECTION_RULE } from '../lib/surfaces';
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   completed: 'Completed',
@@ -125,7 +125,7 @@ export default function Projects() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.amber}`}
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_HUES.amber}`}
     >
 
       {/* Live regions. Permanently mounted and rendered outside every conditional

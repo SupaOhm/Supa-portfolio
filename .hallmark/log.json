@@ -8,11 +8,11 @@
     "theme": "custom",
     "theme_axes": "dark / system-sans / four-hue ramp",
     "vibe": "near-black, one hue per section",
-    "enrichment": "none",
+    "enrichment": "PageAtmosphere (scroll-driven OKLCH mesh + grain + cursor glow)",
     "scope": "About, Skills, Projects, ProjectCard, Connect",
     "out_of_scope": "Hero, ContributionGraph, Navbar, Footer",
     "brief": "Supa portfolio - reset the four content sections to the hero's Apple-inspired direction",
     "accents": "azure 250 About, teal 185 Skills, amber 75 Projects, violet 295 Connect",
-    "note": "first pass was monochrome (single accent) and was rejected as boring; hue-per-section was the fix"
+    "note": "monochrome was rejected as boring -> hue per section; that read as four separate backdrops with seams -> one page-level fixed mesh whose hue interpolates with scroll"
   }
 ]

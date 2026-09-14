@@ -183,7 +183,12 @@ describe('earlier slices still hold', () => {
       const blockOf = (chipLabel: string) => {
         const chip = screen.getByText(chipLabel);
         expect(chip.tagName).toBe('LI');
-        const block = chip.closest('section')?.querySelector<HTMLElement>('[style*="opacity"]');
+        // Walk up from the chip rather than searching down from the section.
+        // A section-wide query for an inline opacity was fine until the
+        // decorative atmosphere layer arrived, whose blobs also carry one --
+        // and being merely the FIRST match is not a property worth depending
+        // on. The category block is the list's parent, which is structural.
+        const block = chip.closest('ul')?.parentElement ?? null;
         expect(block).not.toBeNull();
         return block as HTMLElement;
       };
