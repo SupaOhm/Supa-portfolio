@@ -51,7 +51,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       )}
 
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="text-[17px] font-semibold tracking-[-0.01em] text-ink transition-colors duration-200 group-hover:text-accent">
+        <h3 className="text-[17px] font-semibold tracking-[-0.01em] text-ink transition-colors duration-200 group-hover:text-[var(--section-accent)]">
           {project.title}
         </h3>
         <p className="mt-2 text-[14px] leading-relaxed text-muted">{project.description}</p>
@@ -78,7 +78,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md p-2 text-muted transition-colors duration-200 hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="rounded-md p-2 text-muted transition-colors duration-200 hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)]"
                 aria-label="View source code"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 href={project.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md p-2 text-muted transition-colors duration-200 hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="rounded-md p-2 text-muted transition-colors duration-200 hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)]"
                 aria-label="View live demo"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

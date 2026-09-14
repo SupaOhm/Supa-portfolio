@@ -1,7 +1,17 @@
 import { useState, type ReactElement } from 'react';
 import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { LINK, PANEL, STAT_LABEL, STAT_VALUE } from '../lib/surfaces';
+import {
+  ACCENT_BUTTON,
+  SECTION_GROUND,
+  LINK,
+  PANEL,
+  QUIET_BUTTON,
+  SECTION_HUES,
+  SECTION_RULE,
+  STAT_LABEL,
+  STAT_VALUE,
+} from '../lib/surfaces';
 import {
   EMAIL,
   EMAIL_HREF,
@@ -85,7 +95,7 @@ export default function Connect() {
     <section
       id="connect"
       aria-labelledby="connect-heading"
-      className="font-system relative px-6 py-24 sm:px-8 lg:px-12"
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.violet}`}
     >
       {/* The blue-to-purple wash that sat behind this section is gone. It was
           the same three-stop gradient on About, Skills and Connect -- a
@@ -98,6 +108,7 @@ export default function Connect() {
         >
           Get In Touch
         </h2>
+        <div aria-hidden="true" className={SECTION_RULE} />
         <p className="mt-4 max-w-[58ch] text-[15px] leading-relaxed text-muted">
           I'm currently looking for internship opportunities. Whether you have a question or just want to say hi, feel
           free to reach out!
@@ -151,9 +162,9 @@ export default function Connect() {
                   reducedMotion
                     ? ''
                     : 'transition-[scale,background-color,border-color] duration-[420ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[scale]'
-                } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)] ${
                   hoveredLink === link.name
-                    ? 'z-10 scale-110 border-accent/60 bg-paper-3 text-ink'
+                    ? 'z-10 scale-110 border-[var(--section-accent)]/60 bg-[var(--section-tint)] text-ink'
                     : 'scale-100 border-rule/60 bg-paper-2 text-neutral'
                 }`}
                 style={{
@@ -162,7 +173,7 @@ export default function Connect() {
               >
                 <span
                   className={`relative z-10 ${
-                    hoveredLink === link.name ? 'text-accent' : 'text-muted'
+                    hoveredLink === link.name ? 'text-[var(--section-accent)]' : 'text-muted'
                   } ${reducedMotion ? '' : 'transition-colors duration-300'}`}
                 >
                   {link.icon}
@@ -207,7 +218,7 @@ export default function Connect() {
             onClick={() => setShowAllDetails((prev) => !prev)}
             aria-expanded={showAllDetails}
             aria-controls="contact-details-panel"
-            className="rounded-lg border border-rule/60 bg-paper-2 px-4 py-2.5 text-[13px] font-medium text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className={QUIET_BUTTON}
           >
             {showAllDetails ? 'Hide All Contact Details' : 'Show All Contact Details'}
           </button>
@@ -238,9 +249,9 @@ export default function Connect() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-3.5 rounded-xl border border-rule/60 bg-paper-2 p-4 transition-colors duration-200 hover:border-rule hover:bg-paper-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="group flex items-center gap-3.5 rounded-xl border border-rule/60 bg-paper-2 p-4 transition-colors duration-200 hover:border-[var(--section-accent)]/50 hover:bg-[var(--section-tint)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)]"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-paper-3 text-muted transition-colors duration-200 group-hover:text-accent">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-paper-3 text-muted transition-colors duration-200 group-hover:text-[var(--section-accent)]">
                   {link.icon}
                 </span>
                 <span className="flex min-w-0 flex-col">
@@ -274,7 +285,7 @@ export default function Connect() {
               href={githubStats?.profileUrl ?? GITHUB_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 rounded-lg border border-accent/50 px-4 py-2 text-center text-[13px] font-semibold text-accent transition-colors duration-200 hover:border-accent hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className={`shrink-0 ${ACCENT_BUTTON}`}
             >
               Open GitHub <span aria-hidden="true">&rarr;</span>
             </a>

@@ -3,7 +3,17 @@ import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { useReveal } from '../hooks/useReveal';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
-import { CHIP, LINK, PANEL, STAT_LABEL, STAT_VALUE } from '../lib/surfaces';
+import {
+  ACCENT_BUTTON,
+  SECTION_GROUND,
+  CHIP,
+  LINK,
+  PANEL,
+  SECTION_HUES,
+  SECTION_RULE,
+  STAT_LABEL,
+  STAT_VALUE,
+} from '../lib/surfaces';
 import {
   ACADEMIC_YEAR,
   AWARD,
@@ -109,7 +119,7 @@ export default function About() {
       ref={sectionRef}
       id="about"
       aria-labelledby="about-heading"
-      className="font-system relative px-6 py-24 sm:px-8 lg:px-12"
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.azure}`}
     >
       <div className="relative z-10 mx-auto max-w-[980px]">
         <h2
@@ -118,6 +128,7 @@ export default function About() {
         >
           About Me
         </h2>
+        <div aria-hidden="true" className={SECTION_RULE} />
 
         {/* The prose is the section's real content, so it gets the section's
             widest measure and its brightest body colour. Emphasis is carried by
@@ -188,15 +199,12 @@ export default function About() {
                 </div>
               </div>
 
-              {/* A bordered control, not a filled blue block. The accent is a
-                  highlighter -- it marks the edge and the label, and leaves the
-                  surface to the neutrals. Filling a button with the accent is
-                  how a one-accent palette quietly becomes a blue page. */}
+              {/* A bordered control, not a filled block -- see ACCENT_BUTTON. */}
               <a
                 href={githubStats?.profileUrl ?? GITHUB_PROFILE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 rounded-lg border border-accent/50 px-4 py-2 text-center text-[13px] font-semibold text-accent transition-colors duration-200 hover:border-accent hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                  className={`shrink-0 ${ACCENT_BUTTON}`}
               >
                 Open GitHub <span aria-hidden="true">→</span>
               </a>
@@ -235,7 +243,9 @@ export default function About() {
                     <dt className="text-[13px] text-muted">{info.label}</dt>
                     <dd
                       className={
-                        info.highlight ? 'font-semibold text-accent' : 'font-medium text-neutral'
+                        info.highlight
+                          ? 'font-semibold text-[var(--section-accent)]'
+                          : 'font-medium text-neutral'
                       }
                     >
                       {info.value}
@@ -288,7 +298,7 @@ export default function About() {
                         which it does not. */}
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-paper-3">
                       <div
-                        className="h-full rounded-full bg-accent"
+                        className="h-full rounded-full bg-[var(--section-accent)]"
                         style={{
                           width: `${lang.percentage}%`,
                           animation:

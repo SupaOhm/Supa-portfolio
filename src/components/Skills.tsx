@@ -1,7 +1,7 @@
 import { useReveal } from '../hooks/useReveal';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
-import { CHIP } from '../lib/surfaces';
+import { CHIP, SECTION_GROUND, SECTION_HUES, SECTION_RULE } from '../lib/surfaces';
 
 const SKILL_CATEGORIES = {
   Languages: ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
@@ -19,7 +19,7 @@ export default function Skills() {
       ref={sectionRef}
       id="skills"
       aria-labelledby="skills-heading"
-      className="font-system relative px-6 py-24 sm:px-8 lg:px-12"
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.teal}`}
     >
       <div className="relative z-10 mx-auto max-w-[980px]">
         {/* Left-aligned, not centred. Four sections of centred column was the
@@ -31,6 +31,7 @@ export default function Skills() {
         >
           Skills &amp; Technologies
         </h2>
+        <div aria-hidden="true" className={SECTION_RULE} />
         <p className="mt-4 max-w-[58ch] text-[15px] leading-relaxed text-muted">
           A practical snapshot of the tools and concepts I have worked with across academic, personal, and
           collaborative projects.
@@ -51,7 +52,10 @@ export default function Skills() {
                  and "everything fades up on scroll" is the motion tell itself. */
               style={revealStyle(isVisible, categoryIndex * 90, reducedMotion)}
             >
-              <h3 className="text-[13px] font-semibold tracking-[0.02em] text-ink">{category}</h3>
+              <h3 className="flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.02em] text-ink">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--section-accent)]" />
+                {category}
+              </h3>
               <ul className="mt-4 flex flex-wrap gap-2">
                 {skills.map((skill) => (
                   <li key={skill} className={CHIP}>

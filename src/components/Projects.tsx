@@ -11,6 +11,7 @@ import useCarousel from '../hooks/useCarousel';
 import { filterProjects } from '../lib/filterProjects';
 import { POSITION_STYLES, REDUCED_POSITION_STYLES } from '../lib/carouselPositionStyles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { QUIET_BUTTON, SECTION_GROUND, SECTION_HUES, SECTION_RULE } from '../lib/surfaces';
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   completed: 'Completed',
@@ -124,7 +125,7 @@ export default function Projects() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="font-system relative bg-paper px-6 py-24 sm:px-8 lg:px-12"
+      className={`font-system relative px-6 py-24 sm:px-8 lg:px-12 ${SECTION_GROUND} ${SECTION_HUES.amber}`}
     >
 
       {/* Live regions. Permanently mounted and rendered outside every conditional
@@ -156,6 +157,7 @@ export default function Projects() {
             >
               Featured Projects
             </h2>
+            <div aria-hidden="true" className={SECTION_RULE} />
             <p className="mt-3 max-w-[52ch] text-[15px] text-muted">
               Select filters or switch views to explore technical implementations.
             </p>
@@ -164,7 +166,7 @@ export default function Projects() {
           <div className="flex shrink-0 items-center gap-3">
           <button
             onClick={() => setIsCarouselView((v) => !v)}
-            className="flex items-center gap-2 rounded-lg border border-rule/60 bg-paper-2 px-3.5 py-2 text-muted transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className={`flex items-center gap-2 ${QUIET_BUTTON}`}
             aria-pressed={isCarouselView}
             aria-label="Carousel view"
           >
@@ -189,14 +191,14 @@ export default function Projects() {
               onClick={() => setIsFilterOpen((v) => !v)}
               aria-expanded={isFilterOpen}
               aria-controls="project-filter-panel"
-              className="flex items-center gap-2 rounded-lg border border-rule/60 bg-paper-2 px-3.5 py-2 text-muted transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className={`flex items-center gap-2 ${QUIET_BUTTON}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
               </svg>
               <span className="text-sm font-medium">Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-accent/50 text-[11px] font-semibold text-accent">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--section-accent)]/50 text-[11px] font-semibold text-[var(--section-accent)]">
                   {activeFilterCount}
                 </span>
               )}
@@ -218,7 +220,7 @@ export default function Projects() {
                             type="checkbox"
                             checked={selectedCategories.has(cat)}
                             onChange={() => toggleCategory(cat)}
-                            className="h-3.5 w-3.5 shrink-0 accent-accent"
+                            className="h-3.5 w-3.5 shrink-0 accent-[var(--section-accent)]"
                           />
                           <span className="flex-1 text-[13px] text-neutral group-hover:text-ink">{cat}</span>
                           <span className="text-[11px] tabular-nums text-muted">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
@@ -239,7 +241,7 @@ export default function Projects() {
                             type="checkbox"
                             checked={selectedStatuses.has(st)}
                             onChange={() => toggleStatus(st)}
-                            className="h-3.5 w-3.5 shrink-0 accent-accent"
+                            className="h-3.5 w-3.5 shrink-0 accent-[var(--section-accent)]"
                           />
                           <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLORS[st]}`} />
                           <span className="flex-1 text-[13px] text-neutral group-hover:text-ink">{STATUS_LABELS[st]}</span>
@@ -271,7 +273,7 @@ export default function Projects() {
                   type="button"
                   onClick={() => toggleCategory(cat)}
                   aria-label={`Remove ${cat} filter`}
-                  className="flex cursor-pointer items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] text-accent transition-colors duration-150 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                  className="flex cursor-pointer items-center gap-1 rounded-full border border-[var(--section-accent)]/40 bg-[var(--section-tint)] px-2.5 py-0.5 text-[11px] text-[var(--section-accent)] transition-colors duration-150 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)]"
                 >
                   {cat}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +287,7 @@ export default function Projects() {
                   type="button"
                   onClick={() => toggleStatus(st)}
                   aria-label={`Remove ${STATUS_LABELS[st]} filter`}
-                  className="flex cursor-pointer items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] text-accent transition-colors duration-150 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                  className="flex cursor-pointer items-center gap-1 rounded-full border border-[var(--section-accent)]/40 bg-[var(--section-tint)] px-2.5 py-0.5 text-[11px] text-[var(--section-accent)] transition-colors duration-150 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)]"
                 >
                   {STATUS_LABELS[st]}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,7 +331,7 @@ export default function Projects() {
                             centred card is already distinguished by scale and
                             position; the glow was saying the same thing a third
                             time, in the loudest available voice. */}
-                        <div className={`overflow-hidden rounded-xl ${isCenter ? 'ring-1 ring-accent/60' : ''}`}>
+                        <div className={`overflow-hidden rounded-xl ${isCenter ? 'ring-1 ring-[var(--section-accent)]/70' : ''}`}>
                           <ProjectCard project={project} />
                         </div>
                       </div>
@@ -344,12 +346,12 @@ export default function Projects() {
             {/* Arrow Navigation */}
             {filteredProjects.length > 1 && (
               <>
-                <button onClick={prev} className="absolute top-64 z-40 rounded-full border border-rule/60 bg-paper-2 px-1.5 py-8 text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:p-4 left-0 sm:left-4" aria-label="Previous project">
+                <button onClick={prev} className="absolute top-64 z-40 rounded-full border border-rule/60 bg-paper-2 px-1.5 py-8 text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)] sm:p-4 left-0 sm:left-4" aria-label="Previous project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <button onClick={next} className="absolute top-64 z-40 rounded-full border border-rule/60 bg-paper-2 px-1.5 py-8 text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:p-4 right-0 sm:right-4" aria-label="Next project">
+                <button onClick={next} className="absolute top-64 z-40 rounded-full border border-rule/60 bg-paper-2 px-1.5 py-8 text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-accent)] sm:p-4 right-0 sm:right-4" aria-label="Next project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>
@@ -368,7 +370,7 @@ export default function Projects() {
                     aria-label={`Go to project ${i + 1}`}
                   >
                     <span
-                      className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${currentIndex === i ? 'w-7 bg-accent' : 'w-2 bg-rule group-hover:bg-muted'}`}
+                      className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${currentIndex === i ? 'w-7 bg-[var(--section-accent)]' : 'w-2 bg-rule group-hover:bg-muted'}`}
                     />
                   </button>
                 ))}

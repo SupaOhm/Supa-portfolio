@@ -1,6 +1,8 @@
 /* Hallmark · verb: redesign (visual layer only) · genre: modern-minimal
- * theme: custom · vibe: "austere near-black, one blue signal"
- * paper: oklch(14% 0.008 250) · accent: oklch(70% 0.155 250)
+ * theme: custom · vibe: "near-black, one hue per section"
+ * paper: oklch(14% 0.008 250), tinted 5% toward each section's hue
+ * accents: azure 250 (About) · teal 185 (Skills) · amber 75 (Projects)
+ *          violet 295 (Connect) -- one per section, never two in one
  * type: SF Pro system stack via @utility font-system
  * axes: dark paper / system-sans display / cool accent
  * scope: About, Skills, Projects, ProjectCard, Connect
@@ -10,13 +12,15 @@
  *   blue-to-purple vocabulary, which is a known and deliberate seam
  * enrichment: none (typography only)
  *
- * pre-emit critique: P5 H4 E5 S4 R5 V3
- *   V3 is the honest one. The four sections now share a single vocabulary --
- *   head, lede, grid of hairline-ruled blocks -- which is the POINT here, since
- *   the brief was to stop two halves of one page speaking different languages.
- *   But coherence bought with one repeated shape is still one repeated shape.
- *   Varying it means varying the macrostructures, which this pass was
- *   explicitly scoped out of.
+ * pre-emit critique: P5 H4 E5 S4 R5 V4
+ *   V rose from 3 after the first pass shipped monochrome and read as dull.
+ *   One accent for the whole page was correct discipline taken past the point
+ *   where it bought anything: four sections, one hue, one repeated block shape,
+ *   nothing to tell them apart while scrolling. Four hues -- one per section,
+ *   never two in one -- is the opposite of the gradient this redesign removed,
+ *   which used two hues to mean nothing. Still V4 not V5: the sections share a
+ *   shape, and varying that means varying macrostructures, which this pass was
+ *   scoped out of.
  */
 @import 'tailwindcss';
 
@@ -51,11 +55,36 @@
   --color-neutral: oklch(76% 0.006 250);
   --color-ink: oklch(95% 0.005 250);
 
-  /* One accent. It is a highlighter -- links, focus rings, the single active
-     state -- never a background fill or a gradient. The hero's #2997ff with its
-     chroma pulled back slightly, which is what the dark-mode recipe asks for. */
+  /* The accent ramp: one hue per section, four in total.
+   *
+   * A single accent across the whole page was correct discipline and it read as
+   * monochrome and dull -- restraint applied past the point where it was buying
+   * anything. Four hues brings the colour back without bringing back what was
+   * wrong before, because the rule is not "less colour", it is "colour that
+   * means something": each section owns exactly ONE hue, and no element ever
+   * mixes two. That is the opposite of a blue-to-purple gradient, which uses
+   * two hues to mean nothing at all.
+   *
+   * All four sit at the same lightness band (70-78%) and a similar chroma, so
+   * they read as four members of one family rather than four unrelated brand
+   * colours. Every one of them is measured against paper and paper-2 -- the
+   * amber needed the extra lightness to clear 4.5:1, which is why it is not
+   * flat with the others.
+   *
+   * The `-soft` variants are the same colour at low alpha, for tints and
+   * borders. Alpha is a modifier here, never a palette entry of its own.
+   */
   --color-accent: oklch(70% 0.155 250);
   --color-focus: oklch(74% 0.17 250);
+
+  --color-azure: oklch(70% 0.16 250);
+  --color-azure-soft: oklch(70% 0.16 250 / 0.14);
+  --color-teal: oklch(74% 0.13 185);
+  --color-teal-soft: oklch(74% 0.13 185 / 0.14);
+  --color-amber: oklch(80% 0.13 75);
+  --color-amber-soft: oklch(80% 0.13 75 / 0.14);
+  --color-violet: oklch(72% 0.15 295);
+  --color-violet-soft: oklch(72% 0.15 295 / 0.14);
 
   /* Semantic, not decorative. These three encode project status, and each one
      ships beside a written label, so the colour is never the only signal. They
