@@ -1,7 +1,7 @@
 import { useState, type ReactElement } from 'react';
 import { useGitHubProfile } from '../hooks/useGitHubProfile';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { useCursorGlow } from '../hooks/useCursorGlow';
+import { LINK, PANEL, STAT_LABEL, STAT_VALUE } from '../lib/surfaces';
 import {
   EMAIL,
   EMAIL_HREF,
@@ -74,34 +74,36 @@ const CONTACT_LINKS: ContactLink[] = [
 export default function Connect() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [showAllDetails, setShowAllDetails] = useState(false);
-  const [fullHoverName, setFullHoverName] = useState<string | null>(null);
   const { profile: githubStats, isLoading: isGithubLoading } = useGitHubProfile(GITHUB_USERNAME);
   const reducedMotion = usePrefersReducedMotion();
-  const handleMouseMove = useCursorGlow();
 
   const handleLinkHover = (name: string | null) => {
     setHoveredLink(name);
   };
 
-  const resetFullHover = () => {
-    setFullHoverName(null);
-  };
-
   return (
-    <section id="connect" aria-labelledby="connect-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
-      {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-linear-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
-      
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <h2 id="connect-heading" className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
+    <section
+      id="connect"
+      aria-labelledby="connect-heading"
+      className="font-system relative px-6 py-24 sm:px-8 lg:px-12"
+    >
+      {/* The blue-to-purple wash that sat behind this section is gone. It was
+          the same three-stop gradient on About, Skills and Connect -- a
+          backdrop identical across three sections is not atmosphere, it is a
+          default nobody chose. */}
+      <div className="relative z-10 mx-auto max-w-[980px]">
+        <h2
+          id="connect-heading"
+          className="text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold tracking-[-0.02em] text-ink"
+        >
           Get In Touch
         </h2>
-        <p className="text-gray-400 mb-10 max-w-2xl mx-auto">
-          I'm currently looking for internship opportunities. Whether you have a question 
-          or just want to say hi, feel free to reach out!
+        <p className="mt-4 max-w-[58ch] text-[15px] leading-relaxed text-muted">
+          I'm currently looking for internship opportunities. Whether you have a question or just want to say hi, feel
+          free to reach out!
         </p>
 
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap mb-8">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {CONTACT_LINKS.map((link, index) => (
             <div
               key={link.name}
@@ -113,7 +115,6 @@ export default function Connect() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                onMouseMove={handleMouseMove}
                 /* The card grows with `transform: scale`, not width/height.
                    Animating width and height re-runs layout on every frame and
                    reflows the neighbouring cards with it, which is why the old
@@ -137,43 +138,37 @@ export default function Connect() {
                    The size is therefore fixed and the detail line is always in
                    the DOM, revealed by opacity and height. It used to be a
                    conditional render, so the label was REPLACED on hover: the
-                   box eased while its contents popped. */
-                className={`group relative flex w-[188px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3 backdrop-blur-xs ${
+                   box eased while its contents popped.
+
+                   The grow itself is kept deliberately. A hover-scale is
+                   normally a tell -- every card lifting for no reason -- but
+                   this one was asked for, it reveals content that is otherwise
+                   hidden, and the reveal is the point. What went is the
+                   decoration that surrounded it: a blue-to-purple gradient
+                   fill, a `shadow-blue-500/40` halo, a backdrop blur with
+                   nothing behind it, and two cursor-tracking gradient blobs. */
+                className={`group relative flex w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 py-3.5 ${
                   reducedMotion
                     ? ''
-                    : 'transition-[scale,background-color,border-color,box-shadow] duration-[420ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[scale]'
-                } ${
+                    : 'transition-[scale,background-color,border-color] duration-[420ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[scale]'
+                } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                   hoveredLink === link.name
-                    ? 'z-10 scale-110 border-blue-400/90 bg-linear-to-br from-blue-500/60 via-purple-500/50 to-blue-600/60 text-white shadow-2xl shadow-blue-500/40'
-                    : 'scale-100 border-gray-700/50 bg-linear-to-r from-gray-800/50 to-gray-700/50 text-gray-300'
+                    ? 'z-10 scale-110 border-accent/60 bg-paper-3 text-ink'
+                    : 'scale-100 border-rule/60 bg-paper-2 text-neutral'
                 }`}
                 style={{
-                  animation: reducedMotion ? 'none' : `fadeIn 0.5s ease-out ${index * 100}ms both`,
+                  animation: reducedMotion ? 'none' : `fadeIn 0.5s ease-out ${index * 80}ms both`,
                 }}
               >
-                {/* Always mounted, faded rather than conditionally rendered, so
-                    the glow arrives with the scale instead of appearing at full
-                    strength on the first hovered frame. */}
-                <span
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
-                    hoveredLink === link.name ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <span className="cursor-glow h-[160px] w-[160px] rounded-full bg-linear-to-r from-blue-400/30 via-purple-400/25 to-transparent blur-[50px]" />
-                </span>
-
                 <span
                   className={`relative z-10 ${
-                    reducedMotion
-                      ? ''
-                      : 'transition-[scale] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]'
-                  } ${hoveredLink === link.name ? 'scale-110' : 'scale-100'}`}
+                    hoveredLink === link.name ? 'text-accent' : 'text-muted'
+                  } ${reducedMotion ? '' : 'transition-colors duration-300'}`}
                 >
                   {link.icon}
                 </span>
 
-                <span className="relative z-10 text-sm font-medium">{link.name}</span>
+                <span className="relative z-10 text-[13px] font-medium">{link.name}</span>
 
                 {/* grid-template-rows 0fr -> 1fr is the one way to transition to
                     an element's natural height without hardcoding it. */}
@@ -192,11 +187,13 @@ export default function Connect() {
                       contact card whose contact detail is cut off has failed
                       at its one job.
 
-                      The card is 188px wide because that is what the longest
-                      detail needs: the email is 24 characters and at 168px it
-                      broke mid-word as "...@gma / il.com". Sized to the
-                      content rather than leaving the content to cope. */}
-                  <span className="overflow-hidden px-1 pt-0.5 text-center text-[11px] leading-snug font-semibold break-words text-blue-100">
+                      The card is no longer a fixed 188px. It is a grid cell
+                      now, so it is at least as wide as the old fixed width on
+                      any viewport above 420px and wider on most -- the reason
+                      for the 188px (the 24-character email breaking mid-word at
+                      168px) is satisfied by the column, not by a magic number
+                      that stopped matching the layout around it. */}
+                  <span className="overflow-hidden px-1 pt-1 text-center text-[11px] leading-snug font-medium break-words text-muted">
                     {link.detail}
                   </span>
                 </span>
@@ -205,12 +202,12 @@ export default function Connect() {
           ))}
         </div>
 
-        <div className="flex justify-center mb-8">
+        <div className="mt-6">
           <button
             onClick={() => setShowAllDetails((prev) => !prev)}
             aria-expanded={showAllDetails}
             aria-controls="contact-details-panel"
-            className="px-4 py-3 rounded-full bg-linear-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 hover:from-blue-500/30 hover:via-purple-500/30 hover:to-blue-500/30 border border-blue-400/40 hover:border-blue-400/70 text-xs font-semibold text-blue-100 transition-all duration-300 shadow-xs hover:shadow-blue-500/20"
+            className="rounded-lg border border-rule/60 bg-paper-2 px-4 py-2.5 text-[13px] font-medium text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             {showAllDetails ? 'Hide All Contact Details' : 'Show All Contact Details'}
           </button>
@@ -219,136 +216,139 @@ export default function Connect() {
         <div
           id="contact-details-panel"
           inert={!showAllDetails}
-          className={`mb-10 overflow-hidden transition-all duration-500 ease-in-out ${
-            showAllDetails
-              ? 'max-h-[1000px] opacity-100 translate-y-0'
-              : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
+          className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-in-out ${
+            showAllDetails ? 'mt-8 max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
-          <span className="block mb-6 text-center text-blue-200 font-bold text-xl">Supakorn Prayongyam</span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+          {/* A span, not a <p>, and deliberately so. The same name arrives
+              from the GitHub profile fetch below, so two elements can carry
+              identical text; Connect.test.tsx tells them apart with
+              selector: 'p', which makes the fetched one the paragraph and
+              leaves this hardcoded label as a span. */}
+          <span className="block text-[15px] font-semibold text-ink">Supakorn Prayongyam</span>
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {CONTACT_LINKS.map((link) => (
+              /* Three blurred gradient blobs used to live inside each of these
+                 -- two tracking the cursor, one full-bleed on hover, in blue,
+                 purple and pink. Four rows of contact details do not need an
+                 aurora behind them; they need to be readable and to say where
+                 they go. */
               <a
                 key={`full-${link.name}`}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                onMouseEnter={() => setFullHoverName(link.name)}
-                onMouseLeave={resetFullHover}
-                onMouseMove={handleMouseMove}
-                className="group relative overflow-hidden flex items-center gap-3 p-4 rounded-xl bg-linear-to-r from-gray-800/60 to-gray-700/60 border border-gray-700/60 hover:border-blue-400/60 hover:from-blue-900/20 hover:to-purple-900/20 transition-all duration-300"
+                className="group flex items-center gap-3.5 rounded-xl border border-rule/60 bg-paper-2 p-4 transition-colors duration-200 hover:border-rule hover:bg-paper-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
-                {fullHoverName === link.name && (
-                  <>
-                    <span className="cursor-glow pointer-events-none w-[140px] h-[140px] bg-linear-to-r from-blue-500/20 via-purple-500/20 to-transparent rounded-full blur-2xl opacity-80" />
-                    <span className="cursor-glow pointer-events-none w-[80px] h-[80px] bg-linear-to-r from-blue-300/25 to-transparent rounded-full blur-xl opacity-80" />
-                  </>
-                )}
-                <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="absolute -inset-6 bg-linear-to-r from-blue-500/15 via-purple-500/15 to-pink-500/15 blur-3xl" />
-                </span>
-                <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10 text-blue-200">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-paper-3 text-muted transition-colors duration-200 group-hover:text-accent">
                   {link.icon}
                 </span>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-white">{link.name}</span>
-                  <span className="text-sm text-blue-100">{link.detail}</span>
-                </div>
+                <span className="flex min-w-0 flex-col">
+                  <span className="text-[14px] font-semibold text-ink">{link.name}</span>
+                  <span className="truncate text-[13px] text-muted">{link.detail}</span>
+                </span>
               </a>
             ))}
           </div>
         </div>
 
-        {/* Detailed GitHub Profile */}
-        <div className="mb-10 bg-gray-800/30 backdrop-blur-xs border border-gray-700 rounded-xl p-6 text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* GitHub, in detail */}
+        <div className={`mt-12 ${PANEL}`}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <img
                 src={githubStats?.avatarUrl ?? GITHUB_AVATAR_URL}
                 alt={`${GITHUB_USERNAME} GitHub avatar`}
-                className="w-16 h-16 rounded-full border border-gray-600 object-cover"
+                className="h-16 w-16 rounded-full border border-rule object-cover"
                 loading="lazy"
               />
-              <div>
-                <p className="text-white text-lg font-semibold leading-tight">{githubStats?.displayName ?? 'GitHub Profile'}</p>
-                <p className="text-blue-300 text-sm">@{githubStats?.login ?? GITHUB_USERNAME}</p>
-                <p className="text-gray-400 text-sm mt-1">{githubStats?.bio ?? 'Loading profile...'}</p>
+              <div className="min-w-0">
+                <p className="text-[17px] leading-tight font-semibold text-ink">
+                  {githubStats?.displayName ?? 'GitHub Profile'}
+                </p>
+                <p className="text-[13px] text-muted">@{githubStats?.login ?? GITHUB_USERNAME}</p>
+                <p className="mt-1 text-[13px] text-muted">{githubStats?.bio ?? 'Loading profile...'}</p>
               </div>
             </div>
             <a
               href={githubStats?.profileUrl ?? GITHUB_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold text-sm text-center"
+              className="shrink-0 rounded-lg border border-accent/50 px-4 py-2 text-center text-[13px] font-semibold text-accent transition-colors duration-200 hover:border-accent hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
-              Open GitHub →
+              Open GitHub <span aria-hidden="true">&rarr;</span>
             </a>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-700">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">{isGithubLoading ? '...' : (githubStats?.repositories ?? '--')}</div>
-              <div className="text-xs text-gray-400 mt-1">Repositories</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">{isGithubLoading ? '...' : (githubStats?.totalStars ?? '--')}</div>
-              <div className="text-xs text-gray-400 mt-1">Total Stars</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">{isGithubLoading ? '...' : (githubStats?.sinceYear ?? '--')}</div>
-              <div className="text-xs text-gray-400 mt-1">GitHub Since</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-cyan-400">{isGithubLoading ? '...' : (githubStats?.followers ?? '--')}</div>
-              <div className="text-xs text-gray-400 mt-1">Followers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-pink-400">{isGithubLoading ? '...' : (githubStats?.topLanguage ?? '--')}</div>
-              <div className="text-xs text-gray-400 mt-1">Top Language</div>
-            </div>
-          </div>
+          {/* Five numbers, one colour.
+              They used to be blue, purple, green, cyan and pink -- five hues
+              for five instances of the same kind of thing, which tells the
+              reader the categories differ when only the labels do. A difference
+              in colour has to mean a difference in kind, or it means nothing.
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-6 border-t border-gray-700 text-sm">
-            <p className="text-gray-300">
-              <span className="text-gray-400">Location:</span>{' '}
-              <span className="text-white font-medium">{isGithubLoading ? '...' : (githubStats?.location ?? '--')}</span>
-            </p>
-            <p className="text-gray-300">
-              <span className="text-gray-400">Hireable:</span>{' '}
-              <span className="text-white font-medium">
+              The placeholder is an em dash rather than "--", and the loading
+              state is the same em dash rather than "...", so the row keeps its
+              shape and never shows two different kinds of absence. */}
+          <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-rule/60 pt-6 sm:grid-cols-5">
+            {[
+              { label: 'Repositories', value: githubStats?.repositories },
+              { label: 'Total Stars', value: githubStats?.totalStars },
+              { label: 'GitHub Since', value: githubStats?.sinceYear },
+              { label: 'Followers', value: githubStats?.followers },
+              { label: 'Top Language', value: githubStats?.topLanguage },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <dd className={STAT_VALUE}>{isGithubLoading ? '\u2014' : (stat.value ?? '\u2014')}</dd>
+                <dt className={STAT_LABEL}>{stat.label}</dt>
+              </div>
+            ))}
+          </dl>
+
+          <dl className="mt-6 grid grid-cols-1 gap-x-8 gap-y-3 border-t border-rule/60 pt-6 text-[14px] sm:grid-cols-2">
+            <div className="flex gap-2">
+              <dt className="text-muted">Location:</dt>
+              <dd className="font-medium text-neutral">
+                {isGithubLoading ? '\u2014' : (githubStats?.location ?? '\u2014')}
+              </dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-muted">Hireable:</dt>
+              <dd className="font-medium text-neutral">
                 {isGithubLoading
-                  ? '...'
+                  ? '\u2014'
                   : githubStats?.hireable == null
                     ? 'Not specified'
                     : githubStats.hireable
                       ? 'Yes'
                       : 'No'}
-              </span>
-            </p>
-            <p className="text-gray-300">
-              <span className="text-gray-400">Last Updated:</span>{' '}
-              <span className="text-white font-medium">
-                {isGithubLoading || !githubStats?.updatedAt ? '...' : formatShortDate(githubStats.updatedAt)}
-              </span>
-            </p>
-            <p className="text-gray-300 sm:col-span-2">
-              <span className="text-gray-400">Most Starred Repo:</span>{' '}
-              {isGithubLoading ? (
-                <span className="text-white font-medium">...</span>
-              ) : githubStats?.mostStarredRepo ? (
-                <a
-                  href={githubStats.mostStarredRepo.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-300 hover:text-blue-200 font-medium"
-                >
-                  {githubStats.mostStarredRepo.name} ({githubStats.mostStarredRepo.stars}★)
-                </a>
-              ) : (
-                <span className="text-white font-medium">N/A</span>
-              )}
-            </p>
-          </div>
+              </dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-muted">Last Updated:</dt>
+              <dd className="font-medium text-neutral">
+                {isGithubLoading || !githubStats?.updatedAt ? '\u2014' : formatShortDate(githubStats.updatedAt)}
+              </dd>
+            </div>
+            <div className="flex gap-2 sm:col-span-2">
+              <dt className="text-muted">Most Starred Repo:</dt>
+              <dd className="font-medium text-neutral">
+                {isGithubLoading ? (
+                  '\u2014'
+                ) : githubStats?.mostStarredRepo ? (
+                  <a
+                    href={githubStats.mostStarredRepo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={LINK}
+                  >
+                    {githubStats.mostStarredRepo.name} ({githubStats.mostStarredRepo.stars}&#9733;)
+                  </a>
+                ) : (
+                  'N/A'
+                )}
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
     </section>

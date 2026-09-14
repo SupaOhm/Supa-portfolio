@@ -18,10 +18,13 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
   planned: 'Planned',
 };
 
+/* The same three semantic tokens ProjectCard's badges use. These dots sit
+   beside a written label in the filter list, so colour is never the only
+   channel carrying the state. */
 const STATUS_COLORS: Record<ProjectStatus, string> = {
-  completed: 'bg-green-400',
-  'in-progress': 'bg-yellow-400',
-  planned: 'bg-blue-400',
+  completed: 'bg-state-done',
+  'in-progress': 'bg-state-live',
+  planned: 'bg-state-planned',
 };
 
 export default function Projects() {
@@ -118,7 +121,11 @@ export default function Projects() {
     : '';
 
   return (
-    <section id="projects" aria-labelledby="projects-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gray-950">
+    <section
+      id="projects"
+      aria-labelledby="projects-heading"
+      className="font-system relative bg-paper px-6 py-24 sm:px-8 lg:px-12"
+    >
 
       {/* Live regions. Permanently mounted and rendered outside every conditional
           branch: a region inserted into the DOM at the same moment its text
@@ -130,25 +137,34 @@ export default function Projects() {
         {carouselStatusText}
       </p>
 
-      <div className="max-w-7xl mx-auto relative z-10 p-4 sm:p-8 border border-gray-800/60 bg-gray-950/40 backdrop-blur-xs">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-gray-800/60 pb-8 relative">
-          {/* Decorative lines */}
-          <div className="absolute top-0 left-0 w-8 h-px bg-blue-500/50" />
-          <div className="absolute bottom-0 right-0 w-8 h-px bg-purple-500/50" />
-          
-          <div className="text-center md:text-left flex-1 w-full md:w-auto">
-            <h2 id="projects-heading" className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
-              <span aria-hidden="true" className="text-gray-700 font-light text-2xl">[</span>
+      {/* No bordered panel wrapping the cards.
+          This section used to be a bordered, blurred container holding a grid
+          of bordered cards -- a container whose only job was to draw a second
+          box around boxes. Nesting like that has no semantic reason and reads
+          as an extra frame; the section's own padding does the containing now.
+
+          The decorative blue and purple hairlines pinned to its corners went
+          with it. They marked nothing. */}
+      <div className="relative z-10 mx-auto max-w-[980px]">
+        <div className="mb-10 flex flex-col gap-6 border-b border-rule/60 pb-8 md:flex-row md:items-end md:justify-between">
+          <div>
+            {/* The title was wrapped in decorative square brackets. They were
+                aria-hidden, which is the tell that they were never content. */}
+            <h2
+              id="projects-heading"
+              className="text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold tracking-[-0.02em] text-ink"
+            >
               Featured Projects
-              <span aria-hidden="true" className="text-gray-700 font-light text-2xl">]</span>
             </h2>
+            <p className="mt-3 max-w-[52ch] text-[15px] text-muted">
+              Select filters or switch views to explore technical implementations.
+            </p>
           </div>
 
-          {/* View Toggle wrapper */}
-          <div className="mt-6 md:mt-0 flex gap-4 w-full md:w-auto items-center justify-center">
+          <div className="flex shrink-0 items-center gap-3">
           <button
             onClick={() => setIsCarouselView((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-gray-800/50 to-gray-700/50 text-gray-300 rounded-lg hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white transition-all duration-300 border border-gray-700/50 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20"
+            className="flex items-center gap-2 rounded-lg border border-rule/60 bg-paper-2 px-3.5 py-2 text-muted transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             aria-pressed={isCarouselView}
             aria-label="Carousel view"
           >
@@ -165,26 +181,22 @@ export default function Projects() {
           </div>
         </div>
 
-        <p className="text-gray-400/80 text-sm text-center mb-8 max-w-2xl mx-auto pt-6">
-          Select filters or switch views to explore technical implementations.
-        </p>
-
         {/* Filter Dropdown */}
-        <div className="flex flex-wrap justify-center items-center gap-2 mb-8">
+        <div className="mb-10 flex flex-wrap items-center gap-2">
           <div className="relative" ref={filterDropdownRef}>
             <button
               ref={filterTriggerRef}
               onClick={() => setIsFilterOpen((v) => !v)}
               aria-expanded={isFilterOpen}
               aria-controls="project-filter-panel"
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 text-gray-300 rounded-lg border border-gray-700/50 hover:border-blue-400/50 hover:text-white transition-all duration-200"
+              className="flex items-center gap-2 rounded-lg border border-rule/60 bg-paper-2 px-3.5 py-2 text-muted transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
               </svg>
               <span className="text-sm font-medium">Filter</span>
               {activeFilterCount > 0 && (
-                <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-blue-500 text-white rounded-full">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-accent/50 text-[11px] font-semibold text-accent">
                   {activeFilterCount}
                 </span>
               )}
@@ -194,44 +206,44 @@ export default function Projects() {
             </button>
 
             {isFilterOpen && (
-              <div id="project-filter-panel" className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-900/95 border border-gray-700/60 rounded-xl shadow-2xl shadow-black/40 backdrop-blur-md z-50">
+              <div id="project-filter-panel" className="absolute left-0 z-50 mt-2 w-72 rounded-xl border border-rule bg-paper-2 shadow-2xl shadow-black/60">
                 <div className="p-4 space-y-4">
                   {/* Category */}
                   <div>
-                    <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-2">Category</p>
+                    <p className="mb-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase">Category</p>
                     <div className="grid grid-cols-2 gap-0.5">
                       {PROJECT_CATEGORIES.map((cat) => (
-                        <label key={cat} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md cursor-pointer hover:bg-gray-800/60 transition-colors duration-150 group">
+                        <label key={cat} className="group flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 transition-colors duration-150 hover:bg-paper-3">
                           <input
                             type="checkbox"
                             checked={selectedCategories.has(cat)}
                             onChange={() => toggleCategory(cat)}
-                            className="w-3.5 h-3.5 accent-blue-500 shrink-0"
+                            className="h-3.5 w-3.5 shrink-0 accent-accent"
                           />
-                          <span className="text-sm text-gray-300 group-hover:text-white flex-1">{cat}</span>
-                          <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
+                          <span className="flex-1 text-[13px] text-neutral group-hover:text-ink">{cat}</span>
+                          <span className="text-[11px] tabular-nums text-muted">({PROJECTS.filter((p) => p.categories.includes(cat)).length})</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
-                  <div className="border-t border-gray-700/50" />
+                  <div className="border-t border-rule/60" />
 
                   {/* Status */}
                   <div>
-                    <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-2">Status</p>
+                    <p className="mb-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase">Status</p>
                     <div className="space-y-0.5">
                       {PROJECT_STATUSES.map((st) => (
-                        <label key={st} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md cursor-pointer hover:bg-gray-800/60 transition-colors duration-150 group">
+                        <label key={st} className="group flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 transition-colors duration-150 hover:bg-paper-3">
                           <input
                             type="checkbox"
                             checked={selectedStatuses.has(st)}
                             onChange={() => toggleStatus(st)}
-                            className="w-3.5 h-3.5 accent-blue-500 shrink-0"
+                            className="h-3.5 w-3.5 shrink-0 accent-accent"
                           />
                           <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLORS[st]}`} />
-                          <span className="text-sm text-gray-300 group-hover:text-white flex-1">{STATUS_LABELS[st]}</span>
-                          <span className="text-xs text-gray-400">({PROJECTS.filter((p) => p.status === st).length})</span>
+                          <span className="flex-1 text-[13px] text-neutral group-hover:text-ink">{STATUS_LABELS[st]}</span>
+                          <span className="text-[11px] tabular-nums text-muted">({PROJECTS.filter((p) => p.status === st).length})</span>
                         </label>
                       ))}
                     </div>
@@ -239,8 +251,8 @@ export default function Projects() {
 
                   {activeFilterCount > 0 && (
                     <>
-                      <div className="border-t border-gray-700/50" />
-                      <button onClick={clearFilters} className="w-full text-center text-sm text-gray-400 hover:text-red-400 transition-colors duration-150 py-1">
+                      <div className="border-t border-rule/60" />
+                      <button onClick={clearFilters} className="w-full py-1 text-center text-[13px] text-muted transition-colors duration-150 hover:text-ink">
                         Clear all filters
                       </button>
                     </>
@@ -259,7 +271,7 @@ export default function Projects() {
                   type="button"
                   onClick={() => toggleCategory(cat)}
                   aria-label={`Remove ${cat} filter`}
-                  className="flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150"
+                  className="flex cursor-pointer items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] text-accent transition-colors duration-150 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                 >
                   {cat}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,7 +285,7 @@ export default function Projects() {
                   type="button"
                   onClick={() => toggleStatus(st)}
                   aria-label={`Remove ${STATUS_LABELS[st]} filter`}
-                  className="flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full cursor-pointer hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors duration-150"
+                  className="flex cursor-pointer items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] text-accent transition-colors duration-150 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                 >
                   {STATUS_LABELS[st]}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,17 +313,30 @@ export default function Projects() {
                         ref={isCenter ? centerCardRef : null}
                         data-testid="carousel-card"
                         inert={!isCenter}
-                        className={`w-[280px] sm:w-[360px] transition-all duration-700 ease-out ${filteredProjects.length === 1 ? '' : 'absolute'}`}
+                        /* transition-[transform,opacity], not transition-all.
+                           The slot styles set three things and only two of them
+                           should move: transform and opacity animate, zIndex
+                           must not. z-index is a discrete property, so
+                           transition-all does not interpolate it -- it swaps it
+                           at the halfway point, which restacks the card
+                           mid-flight. Naming the two properties leaves the
+                           stacking order to apply immediately, where it
+                           belongs. */
+                        className={`w-[280px] transition-[transform,opacity] duration-700 ease-out sm:w-[360px] ${filteredProjects.length === 1 ? '' : 'absolute'}`}
                         style={{ ...positionStyles[pos], transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
                       >
-                        <div className={`${isCenter ? 'ring-4 ring-blue-500/60 shadow-[0_0_50px_rgba(59,130,246,0.5)]' : ''} rounded-xl overflow-hidden`}>
+                        {/* A 1px accent ring, not a 50px blue bloom. The
+                            centred card is already distinguished by scale and
+                            position; the glow was saying the same thing a third
+                            time, in the loudest available voice. */}
+                        <div className={`overflow-hidden rounded-xl ${isCenter ? 'ring-1 ring-accent/60' : ''}`}>
                           <ProjectCard project={project} />
                         </div>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-gray-400 text-lg py-20">No projects match the selected filters.</p>
+                  <p className="py-20 text-[15px] text-muted">No projects match the selected filters.</p>
                 )}
               </div>
             </div>
@@ -319,12 +344,12 @@ export default function Projects() {
             {/* Arrow Navigation */}
             {filteredProjects.length > 1 && (
               <>
-                <button onClick={prev} className="absolute left-0 sm:left-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-xs transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Previous project">
+                <button onClick={prev} className="absolute top-64 z-40 rounded-full border border-rule/60 bg-paper-2 px-1.5 py-8 text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:p-4 left-0 sm:left-4" aria-label="Previous project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <button onClick={next} className="absolute right-0 sm:right-4 top-64 bg-gray-800/70 hover:bg-gray-700 text-white px-1.5 py-8 sm:p-4 rounded-full backdrop-blur-xs transition-all duration-200 hover:scale-110 z-40 shadow-lg sm:shadow-xl" aria-label="Next project">
+                <button onClick={next} className="absolute top-64 z-40 rounded-full border border-rule/60 bg-paper-2 px-1.5 py-8 text-neutral transition-colors duration-200 hover:border-rule hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:p-4 right-0 sm:right-4" aria-label="Next project">
                   <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>
@@ -343,7 +368,7 @@ export default function Projects() {
                     aria-label={`Go to project ${i + 1}`}
                   >
                     <span
-                      className={`block transition-all duration-300 rounded-full ${currentIndex === i ? 'bg-blue-500 w-8 h-3' : 'bg-gray-500 group-hover:bg-gray-400 w-3 h-3'}`}
+                      className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${currentIndex === i ? 'w-7 bg-accent' : 'w-2 bg-rule group-hover:bg-muted'}`}
                     />
                   </button>
                 ))}
@@ -354,7 +379,12 @@ export default function Projects() {
           /* Grid View */
           <div>
             {filteredProjects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              /* Two columns, not three. An even three-up grid of
+                 icon-over-heading-over-two-lines cards is the single most
+                 emitted generated layout there is; at two the cards are wide
+                 enough to show their image and their description properly,
+                 and the row stops reading as a feature matrix. */
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {filteredProjects.map((project, i) => (
                   <div key={project.id} style={{ animation: reducedMotion ? 'none' : `fadeIn 0.6s ease-out ${i * 100}ms both` }}>
                     <ProjectCard project={project} />
@@ -362,7 +392,7 @@ export default function Projects() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-lg text-center py-20">No projects match the selected filters.</p>
+              <p className="py-20 text-center text-[15px] text-muted">No projects match the selected filters.</p>
             )}
           </div>
         )}

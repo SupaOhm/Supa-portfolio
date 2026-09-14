@@ -1,0 +1,16 @@
+[
+  {
+    "date": "2026-09-14",
+    "verb": "redesign",
+    "depth": "visual layer only",
+    "genre": "modern-minimal",
+    "macrostructure": "unchanged (visual-layer-only redesign)",
+    "theme": "custom",
+    "theme_axes": "dark / system-sans / cool",
+    "vibe": "austere near-black, one blue signal",
+    "enrichment": "none",
+    "scope": "About, Skills, Projects, ProjectCard, Connect",
+    "out_of_scope": "Hero, ContributionGraph, Navbar, Footer",
+    "brief": "Supa portfolio - reset the four content sections to the hero's Apple-inspired direction"
+  }
+]

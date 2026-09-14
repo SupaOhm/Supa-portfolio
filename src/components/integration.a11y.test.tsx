@@ -168,26 +168,43 @@ describe('earlier slices still hold', () => {
     });
 
     try {
+      // The reveal is read off the CATEGORY BLOCK, not off the chip.
+      //
+      // It used to be the chip: every one of the 63 chips carried its own
+      // revealStyle at 45ms increments, so the list was still arriving nearly
+      // three seconds after it scrolled into view. The redesign moved the
+      // reveal up to the four category blocks, and this test moved with it --
+      // the design detail it was pinning is the one that intentionally changed,
+      // so the test was the stale side, not the component.
+      //
+      // What it guards is unchanged and is the whole reason for the
+      // FiringObserver above: that the reduced-motion flag is actually read,
+      // rather than the assertion passing because isVisible never became true.
+      const blockOf = (chipLabel: string) => {
+        const chip = screen.getByText(chipLabel);
+        expect(chip.tagName).toBe('LI');
+        const block = chip.closest('section')?.querySelector<HTMLElement>('[style*="opacity"]');
+        expect(block).not.toBeNull();
+        return block as HTMLElement;
+      };
+
       setReducedMotion(true);
       render(<Skills />);
-      const reducedChip = screen.getByText('TypeScript');
+      const reducedBlock = blockOf('TypeScript');
 
-      // The chip became an <li>; revealStyle's output must have travelled with it.
-      expect(reducedChip.tagName).toBe('LI');
-      expect(reducedChip.style.opacity).toBe('1');
-      expect(reducedChip.style.animation).toBe('none');
+      expect(reducedBlock.style.opacity).toBe('1');
+      expect(reducedBlock.style.animation).toBe('none');
 
       cleanup();
 
       setReducedMotion(false);
       render(<Skills />);
-      const movingChip = screen.getByText('TypeScript');
+      const movingBlock = blockOf('TypeScript');
 
       // Same element, motion allowed: the reveal animation must actually run,
       // which is what proves the assertion above was reading the reduced flag
       // rather than the not-yet-visible default.
-      expect(movingChip.tagName).toBe('LI');
-      expect(movingChip.style.animation).toContain('fadeIn');
+      expect(movingBlock.style.animation).toContain('fadeIn');
     } finally {
       Object.defineProperty(window, 'matchMedia', {
         writable: true,

@@ -1,4 +1,69 @@
+/* Hallmark · verb: redesign (visual layer only) · genre: modern-minimal
+ * theme: custom · vibe: "austere near-black, one blue signal"
+ * paper: oklch(14% 0.008 250) · accent: oklch(70% 0.155 250)
+ * type: SF Pro system stack via @utility font-system
+ * axes: dark paper / system-sans display / cool accent
+ * scope: About, Skills, Projects, ProjectCard, Connect
+ * macrostructure: unchanged by request -- section shape, DOM landmarks and
+ *   section IDs are all as they were; only the visual layer was replaced
+ * nav + footer: out of scope, untouched -- both still carry the previous
+ *   blue-to-purple vocabulary, which is a known and deliberate seam
+ * enrichment: none (typography only)
+ *
+ * pre-emit critique: P5 H4 E5 S4 R5 V3
+ *   V3 is the honest one. The four sections now share a single vocabulary --
+ *   head, lede, grid of hairline-ruled blocks -- which is the POINT here, since
+ *   the brief was to stop two halves of one page speaking different languages.
+ *   But coherence bought with one repeated shape is still one repeated shape.
+ *   Varying it means varying the macrostructures, which this pass was
+ *   explicitly scoped out of.
+ */
 @import 'tailwindcss';
+
+/* The palette, as tokens.
+ *
+ * Before this block the page had no tokens at all: every colour was an inline
+ * literal in a component, which is how the hero came to speak one language
+ * (#f5f5f7 / #86868b / #2997ff) while About, Skills, Projects and Connect spoke
+ * another (blue-400 -> purple-400 gradients on gray-800). Two vocabularies, one
+ * page. Naming the colours is what makes that impossible to repeat.
+ *
+ * OKLCH rather than hex: it is perceptually uniform, so the lightness numbers
+ * below are comparable to each other and a tint keeps its hue as it lightens.
+ * Every value carries a trace of chroma on the anchor hue (250, the blue of the
+ * accent) -- a truly neutral grey next to a blue accent reads slightly wrong and
+ * most people cannot say why.
+ *
+ * Elevation on dark is LIGHTNESS, not shadow: paper -> paper-2 -> paper-3 climbs
+ * ~4% each step. A glow around a card on a dark ground is one of the named
+ * generated-UI tells, and it is also just a bad model of light.
+ *
+ * Declared in @theme, not :root, so Tailwind v4 generates real utilities from
+ * them -- bg-paper-2, text-muted, border-rule. A token you can only reach
+ * through bg-[var(--x)] gets bypassed the moment someone is in a hurry.
+ */
+@theme {
+  --color-paper: oklch(14% 0.008 250);
+  --color-paper-2: oklch(18% 0.009 250);
+  --color-paper-3: oklch(22% 0.01 250);
+  --color-rule: oklch(30% 0.008 250);
+  --color-muted: oklch(62% 0.008 250);
+  --color-neutral: oklch(76% 0.006 250);
+  --color-ink: oklch(95% 0.005 250);
+
+  /* One accent. It is a highlighter -- links, focus rings, the single active
+     state -- never a background fill or a gradient. The hero's #2997ff with its
+     chroma pulled back slightly, which is what the dark-mode recipe asks for. */
+  --color-accent: oklch(70% 0.155 250);
+  --color-focus: oklch(74% 0.17 250);
+
+  /* Semantic, not decorative. These three encode project status, and each one
+     ships beside a written label, so the colour is never the only signal. They
+     are deliberately desaturated: they are information, not ornament. */
+  --color-state-done: oklch(72% 0.1 155);
+  --color-state-live: oklch(78% 0.1 85);
+  --color-state-planned: oklch(62% 0.008 250);
+}
 
 /* Bricolage Grotesque, variable, self-hosted. Regenerate with `npm run fonts`;
    the Fontsource original lives in assets-src/fonts/.

@@ -1,6 +1,7 @@
 import { useReveal } from '../hooks/useReveal';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { revealStyle } from '../lib/revealStyle';
+import { CHIP } from '../lib/surfaces';
 
 const SKILL_CATEGORIES = {
   Languages: ['Python', 'Java', 'C', 'C++', 'C#', 'JavaScript', 'TypeScript', 'SQL', 'PHP', 'HTML', 'CSS'],
@@ -14,35 +15,46 @@ export default function Skills() {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <section ref={sectionRef} id="skills" aria-labelledby="skills-heading" className="py-20 px-4 sm:px-6 lg:px-8 relative">
-      <div className="absolute inset-0 bg-linear-to-br from-blue-900/5 via-purple-900/5 to-transparent pointer-events-none" />
-
-      <div className="max-w-5xl mx-auto relative z-10">
-        <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-blue-300/80 text-center mb-3">
-          Technical Snapshot
-        </p>
-        <h2 id="skills-heading" className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-3 text-center">
-          Skills & Technologies
+    <section
+      ref={sectionRef}
+      id="skills"
+      aria-labelledby="skills-heading"
+      className="font-system relative px-6 py-24 sm:px-8 lg:px-12"
+    >
+      <div className="relative z-10 mx-auto max-w-[980px]">
+        {/* Left-aligned, not centred. Four sections of centred column was the
+            page's strongest structural tic; breaking it once per section is
+            enough to stop the rhythm reading as a template. */}
+        <h2
+          id="skills-heading"
+          className="text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold tracking-[-0.02em] text-ink"
+        >
+          Skills &amp; Technologies
         </h2>
-        <p className="text-gray-400 text-sm sm:text-base text-center mb-10 max-w-3xl mx-auto">
-          A practical snapshot of the tools and concepts I have worked with across academic, personal, and collaborative projects.
+        <p className="mt-4 max-w-[58ch] text-[15px] leading-relaxed text-muted">
+          A practical snapshot of the tools and concepts I have worked with across academic, personal, and
+          collaborative projects.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-rule/60 bg-rule/60 md:grid-cols-2">
           {Object.entries(SKILL_CATEGORIES).map(([category, skills], categoryIndex) => (
+            /* gap-px over a rule-coloured parent draws the dividers between
+               cells as the grid's own gaps. One hairline between neighbours
+               instead of two abutting borders, and no doubled line where cells
+               meet -- which is what a bordered-card grid always produces. */
             <div
               key={category}
-              className="p-5 rounded-xl border border-gray-700/70 bg-linear-to-br from-gray-900/70 to-gray-800/40 backdrop-blur-xs hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300"
-              style={revealStyle(isVisible, categoryIndex * 120, reducedMotion)}
+              className="bg-paper p-6"
+              /* One reveal per category, not per chip. The old version staggered
+                 every chip individually at 45ms apart: 63 chips meant the list
+                 was still arriving nearly three seconds after it came into view,
+                 and "everything fades up on scroll" is the motion tell itself. */
+              style={revealStyle(isVisible, categoryIndex * 90, reducedMotion)}
             >
-              <h3 className="text-sm font-semibold text-blue-300 mb-4 tracking-wide">{category}</h3>
-              <ul className="flex flex-wrap gap-2.5">
-                {skills.map((skill, index) => (
-                  <li
-                    key={skill}
-                    className="px-3.5 py-1.5 bg-gray-800/80 text-gray-300 rounded-full text-sm border border-gray-700/80 hover:bg-blue-500/15 hover:text-blue-200 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 cursor-default"
-                    style={revealStyle(isVisible, (categoryIndex * 120) + (index * 45), reducedMotion, 450)}
-                  >
+              <h3 className="text-[13px] font-semibold tracking-[0.02em] text-ink">{category}</h3>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {skills.map((skill) => (
+                  <li key={skill} className={CHIP}>
                     {skill}
                   </li>
                 ))}
@@ -51,8 +63,10 @@ export default function Skills() {
           ))}
         </div>
 
-        <p className="mt-10 text-sm sm:text-base text-gray-400 leading-relaxed text-center max-w-4xl mx-auto">
-          The skills listed above reflect technologies and concepts I have learned and applied through coursework and hands-on projects. While I am still developing depth in several areas, I bring a strong learning mindset, practical experience, and the discipline to grow quickly in a professional environment.
+        <p className="mt-10 max-w-[68ch] text-[15px] leading-relaxed text-muted">
+          The skills listed above reflect technologies and concepts I have learned and applied through coursework and
+          hands-on projects. While I am still developing depth in several areas, I bring a strong learning mindset,
+          practical experience, and the discipline to grow quickly in a professional environment.
         </p>
       </div>
     </section>
